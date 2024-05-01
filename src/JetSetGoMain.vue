@@ -1,6 +1,8 @@
 <template>
   <nav>
-    <router-link to="/">JetSetGoView</router-link> |
+    <router-link to="/">JetSetGoView</router-link>
+    <router-link to="/">LoginPage</router-link>
+    <router-link to="/">MyPage</router-link>
     <router-link to="/about">About</router-link>
   </nav>
   <router-view/>
@@ -28,3 +30,7 @@ nav a.router-link-exact-active {
   color: #42b983;
 }
 </style>
+<script>export default {
+  components: {}
+}
+</script>
