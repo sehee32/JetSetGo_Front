@@ -1,6 +1,6 @@
 <template>
 <nav>
-<router-link to="/">SignUp</router-link>
+<router-link to="/signup">SignUp</router-link>
 </nav>
 <router-view/>
 </template>

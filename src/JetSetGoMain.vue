@@ -1,8 +1,8 @@
 <template>
   <nav>
     <router-link to="/">JetSetGoView</router-link>
-    <router-link to="/">LoginPage</router-link>
-    <router-link to="/">MyPage</router-link>
+    <router-link to="/loginpage">LoginPage</router-link>
+    <router-link to="/mypage">MyPage</router-link>
     <router-link to="/about">About</router-link>
   </nav>
   <router-view/>
