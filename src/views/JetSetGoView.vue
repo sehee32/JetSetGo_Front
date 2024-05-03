@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <JetSetGoBody msg="Welcome to Your Vue.js App"/>
+    <JetSetGoBody msg="JetSetGo에서 여행을 떠나보세요"/>
   </div>
 </template>
 

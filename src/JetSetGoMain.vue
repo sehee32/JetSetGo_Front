@@ -1,11 +1,10 @@
 <template>
-  <nav>
-    <router-link to="/">JetSetGoView</router-link>
-    <router-link to="/loginpage">LoginPage</router-link>
-    <router-link to="/mypage">MyPage</router-link>
-    <router-link to="/about">About</router-link>
-  </nav>
+  <div id="app">
+    <Navbar />
+  </div>
   <router-view/>
+
+
 </template>
 
 <style>
@@ -30,7 +29,9 @@ nav a.router-link-exact-active {
   color: #42b983;
 }
 </style>
-<script>export default {
-  components: {}
+<script>
+import Navbar from "@/components/NavbarView";
+export default {
+  components: {Navbar}
 }
 </script>
