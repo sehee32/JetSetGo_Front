@@ -154,6 +154,10 @@ ul {
   text-align: left;
 }
 
+.faq .faq-title:hover {
+  box-shadow: inset 0 0 0 1px #0064de;
+}
+
 .faq .faq-title[aria-expanded=true] {
   background-image: url(https://www.koreanair.com/ico-expander-active.svg);
   font-weight: 700;
