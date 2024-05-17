@@ -6,6 +6,7 @@
           <div class="card shadow-lg">
             <div class="card-body p-6">
               <h2 class="text-center">Sign Up</h2>
+              <p></p>
               <form @submit.prevent="signup">
                 <div>
                   <input type="text" id="name" class="form-control" v-model="name" placeholder="이름" required />
