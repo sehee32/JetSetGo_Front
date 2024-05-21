@@ -11,14 +11,8 @@
     </div>
     <div>
       <ul class="categoryList">
-        <li>
-          <button :class="{ active: category === 'total' }" type="button" @click="setCategory('total')">전체</button>
-        </li>
-        <li>
-          <button :class="{ active: category === 'ticket' }" type="button" @click="setCategory('ticket')">항공권</button>
-        </li>
-        <li>
-          <button :class="{ active: category === 'baggage' }" type="button" @click="setCategory('baggage')">수하물</button>
+        <li v-for="categorySelect in categories" :key="categorySelect.value">
+          <button :class="{ active: category === categorySelect.value }" type="button" @click="setCategory(categorySelect.value)">{{ categorySelect.name }}</button>
         </li>
       </ul>
     </div>
@@ -61,11 +55,7 @@
       </button>
       <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
     </div>
-
-
-
     <router-link to="/faq" class="faqBtn">FAQ</router-link>
-
   </div>
 </template>
 
@@ -78,6 +68,12 @@ export default {
     return {
       searchQuery: '', // 검색어를 저장하는 데이터
       category: 'total', // 카테고리 값 저장
+      categories: [
+        { name: '전체', value: 'total' },
+        { name: '항공권', value: 'ticket' },
+        { name: '수하물', value: 'baggage' },
+        { name: 'etc', value: 'etc' }
+      ],
       searchResults: [],
       currentPage: 1,
       itemsPerPage: 5,
