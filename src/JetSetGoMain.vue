@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Navbar />
+    <JetSetGoHeader />
   </div>
   <router-view/>
 
@@ -30,8 +30,8 @@ nav a.router-link-exact-active {
 }
 </style>
 <script>
-import Navbar from "@/components/NavbarView";
+import JetSetGoHeader from "@/components/common/JetSetGoHeader";
 export default {
-  components: {Navbar}
+  components: {JetSetGoHeader}
 }
 </script>
