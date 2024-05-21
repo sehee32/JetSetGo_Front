@@ -71,7 +71,7 @@
         </li>
       </ul>
     </div>
-    <router-link to="/support" class="SupportBtn">1:1 문의하기</router-link>
+    <router-link to="/support" class="supportBtn">1:1 문의하기</router-link>
   </div>
 </template>
 
@@ -112,7 +112,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 ul {
   list-style: none;
@@ -186,7 +186,7 @@ ul {
   background-color: #f3f4f8;
 }
 
-.faq .SupportBtn {
+.faq .supportBtn {
   display: block;
   width: 320px;
   min-width: 34px;
@@ -204,7 +204,7 @@ ul {
   cursor: pointer;
 }
 
-.faq .SupportBtn:hover {
+.faq .supportBtn:hover {
   background-color: #00256c;
   color: #fff;
 }
