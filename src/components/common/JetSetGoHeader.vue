@@ -26,13 +26,11 @@ export default {
 </script>
 
 <style scoped>
-
 .navbar {
   padding: 0 60px;
-  /*background-color: #2E9AFE;*/
   overflow: hidden;
   display: flex;
-  justify-content: space-between; /* 좌우 사이 공간 균등하게 분배*/
+  justify-content: space-between; /* 좌우 사이 공간 균등하게 분배 */
   width: 100%;
   border-bottom: 1px solid #ececec;
 }
@@ -47,24 +45,25 @@ export default {
   width: 95%;
 }
 
-
-.nav-links li{
+.nav-links li {
   padding: 14px 20px;
-  /*font-size: 20px;*/
 }
 
 .nav-links li a {
   text-decoration: none;
-  /*color: white;*/
   transition: color 0.3s;
 }
 
 .nav-links li a:hover, .right-links li a:hover {
-  /*color: #0080FF;*/
+  color: #0080FF;
 }
 
 .right-links {
   display: flex;
   margin-left: auto;
+}
+
+.router-link-active {
+  color: #0080FF !important; /* 활성화된 링크의 글씨색 변경*/
 }
 </style>
