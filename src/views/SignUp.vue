@@ -1,51 +1,156 @@
 <template>
-  <section class="signup-section">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-6">
-          <div class="card shadow-lg">
-            <div class="card-body p-6">
-              <h2 class="text-center">Sign Up</h2>
-              <form @submit.prevent="signup">
-                <div>
-                  <input type="text" id="name" class="form-control" v-model="name" placeholder="이름" required />
-                </div>
-                <div>
-                  <input type="text" id="username" class="form-control" v-model="username" placeholder="아이디" required />
-                </div>
-                <div>
-                  <input type="submit" class="btn-primary" name="id_check" value="중복확인" @click="checkUsername" />
-                </div>
-                <div>
-                  <input type="password" id="password" class="form-control" v-model="password" placeholder="비밀번호" required />
-                </div>
-                <div>
-                  <input type="password" id="confirmPassword" class="form-control" v-model="confirmPassword" placeholder="비밀번호 확인" required />
-                  <p v-if="password !== confirmPassword" class="text-danger">비밀번호가 일치하지 않습니다.</p>
-                </div>
-                <div>
-                  <input type="text" id="phoneNumber" class="form-control" v-model="phoneNumber" placeholder="휴대전화번호" required />
-                </div>
-                <div>
-                  <button type="button" class="btn-primary" @click="verifyPhoneNumber">인증하기</button>
-                </div>
-                <div>
-                  <input type="date" id="birthdate" class="form-control" v-model="birthdate" placeholder="생년월일" required />
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="agreeTerms" v-model="agreeTerms" required />
-                  <label class="form-check-label" for="agreeTerms">이용 약관에 동의합니다.</label>
-                </div>
-                <div class="d-grid">
-                  <button type="submit" class="btn" :disabled="password !== confirmPassword">가입</button>
-                </div>
-              </form>
-            </div>
-          </div>
+  <div>
+    <v-img
+        class="mx-auto my-6"
+        max-width="300"
+        :src="require('@/assets/JetSetGoLogo.png')"
+    ></v-img>
+    <v-card class="custom-card mx-auto px-6 py-8">
+      <v-form v-model="formValid" @submit.prevent="signup">
+        <div>
+          <v-text-field
+              v-model="name"
+              :rules="[rules.required]"
+              class="mb-2"
+              id="name"
+              label="이름"
+              variant="outlined"
+              prepend-inner-icon="mdi-account-outline"
+              clearable
+          ></v-text-field>
+
+          <v-text-field
+              v-model="username"
+              :rules="[rules.required]"
+              class="mb-2"
+              id="username"
+              label="ID"
+              variant="outlined"
+              prepend-inner-icon="mdi-account-outline"
+              clearable
+          ></v-text-field>
+
+          <v-btn
+              color="#00256c"
+              size="small"
+              type="button"
+              variant="elevated"
+              name="id_check"
+              block
+              @click="checkUsername"
+          >
+            중복확인
+          </v-btn>
+
+          <br>
+
+          <v-text-field
+              v-model="password"
+              :rules="[rules.required, rules.password]"
+              :type="show ? 'text' : 'password'"
+              class="mb-2"
+              id="password"
+              label="비밀번호"
+              variant="outlined"
+              prepend-inner-icon="mdi-lock-outline"
+              clearable
+          >
+            <!-- 비밀번호 표시/숨김 아이콘 -->
+            <template v-slot:append-inner>
+              <v-icon @click="show = !show">
+                {{ show ? 'mdi-eye' : 'mdi-eye-off' }}
+              </v-icon>
+            </template>
+          </v-text-field>
         </div>
-      </div>
-    </div>
-  </section>
+
+        <div>
+          <v-text-field
+              v-model="confirmPassword"
+              :rules="[rules.required, rules.matchPassword]"
+              :type="show ? 'text' : 'password'"
+              class="mb-2"
+              id="confirmPassword"
+              label="비밀번호 확인"
+              variant="outlined"
+              prepend-inner-icon="mdi-lock-check-outline"
+              clearable
+          >
+            <template v-slot:append-inner>
+              <v-icon @click="show = !show">
+                {{ show ? 'mdi-eye' : 'mdi-eye-off' }}
+              </v-icon>
+            </template>
+          </v-text-field>
+        </div>
+
+        <div>
+          <v-text-field
+              v-model="phoneNumber"
+              :rules="[rules.required]"
+              class="mb-2"
+              id="phoneNumber"
+              label="휴대전화번호"
+              variant="outlined"
+              prepend-inner-icon="mdi-phone-outline"
+              clearable
+          ></v-text-field>
+        </div>
+
+        <div>
+          <v-btn
+              color="#00256c"
+              size="small"
+              type="button"
+              variant="elevated"
+              name="phone_check"
+              block
+              @click="verifyPhoneNumber"
+          >
+            인증하기
+          </v-btn>
+        </div>
+
+        <br>
+
+        <div>
+          <v-text-field
+              v-model="birthdate"
+              :rules="[rules.required]"
+              class="mb-2"
+              id="birthdate"
+              label="생년월일"
+              type="date"
+              prepend-inner-icon="mdi-calendar-outline"
+              variant="outlined"
+          ></v-text-field>
+        </div>
+
+        <br><br>
+
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="agreeTerms" v-model="agreeTerms" required />
+          <label class="form-check-label" for="agreeTerms">이용 약관에 동의합니다.</label>
+        </div>
+
+        <br>
+
+        <div>
+          <v-btn
+              :disabled="!formValid || !birthdate || !agreeTerms"
+              color="#00256c"
+              size="large"
+              type="submit"
+              variant="elevated"
+              block
+              @click="signup"
+          >
+            가입하기
+          </v-btn>
+        </div>
+      </v-form>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -60,7 +165,14 @@ export default {
       confirmPassword: '',
       birthdate: '',
       phoneNumber: '',
-      agreeTerms: false
+      agreeTerms: false,
+      formValid: false,
+      show: false, // 비밀번호 보기/숨기기 아이콘 상태
+      rules: {
+        required: v => !!v || '이 항목을 입력하지 않았습니다.',
+        password: v => v.length >= 8 || '비밀번호는 최소 8자 이상이어야 합니다.',
+        matchPassword: v => v === this.password || '비밀번호가 일치하지 않습니다.'
+      }
     };
   },
   methods: {
@@ -69,6 +181,7 @@ export default {
         console.error('비밀번호가 일치하지 않습니다.');
         return;
       }
+
       // 회원가입 정보 서버로 전송
       axios.post('http://localhost:8080/api/signup', {
         name: this.name,
@@ -110,44 +223,18 @@ export default {
 </script>
 
 <style scoped>
-.signup-section {
-  background-color: #f2f3f8;
-  padding: 100px 0;
+
+.form-check {
+  margin-top: 20px;
 }
-.card {
+
+.custom-card {
   border: none;
   border-radius: 15px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  margin-top: 40px;
-  margin-bottom: 100px;
-}
-input.form-control {
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 20px;
-}
-input.form-control:focus {
-  box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+  background-color: white;
+  max-width: 600px;
+  width: 100%;
 }
 
-.btn-primary {
-  background-color: #003a70;
-  border-color: #003a70;
-  color: white;
-  margin-top: -50px;
-  transition: background-color 0.3s, border-color 0.3s;
-  border-radius: 7px;
-}
-.btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-}
-
-.form-check {
-  margin-top: 200px;
-}
-
-.d-grid {
-  padding: 10px;
-}
 </style>
