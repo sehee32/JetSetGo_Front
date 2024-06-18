@@ -3,8 +3,8 @@
     <h1>1:1 문의하기</h1>
     <div class="search">
       <div>
-        <input type="text" class="searchInput" v-model="searchQuery" @keyup.enter="searchText" placeholder="검색어를 입력하세요"/>
-        <button type="button" class="searchRm" v-if="searchQuery" @click="searchRm"></button> <!--x 버튼-->
+        <input type="text" class="searchInput" v-model="searchQueryText" @keyup.enter="searchText" placeholder="검색어를 입력하세요"/>
+        <button type="button" class="searchRm" v-if="searchQueryText" @click="searchRm"></button> <!--x 버튼-->
       </div>
       <button type="button" class="searchBt" @click="searchText"></button> <!--검색 버튼-->
       <router-link to="/inquiry" class="inquiryBtn">문의하기</router-link>
@@ -16,44 +16,21 @@
         </li>
       </ul>
     </div>
-    <div class="page-size-selector">
-      <select id="pageSize" v-model="itemsPerPage">
-        <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}줄 보기</option>
-      </select>
-    </div>
     <div>
-      <div v-if="searchResults.length > 0">
-        <ul>
-          <li>
-            <span>번호</span>
-            <span>문의번호</span>
-            <span>제목</span>
-            <span>작성자</span>
-            <span>작성일</span>
-            <span>답변</span>
-            <span>공개여부</span>
-          </li>
-          <li v-for="result in paginatedData" :key="result.supportNum">
-            <span>{{ result.num }}</span>
-            <span>{{ result.supportNum }}</span>
-            <span>{{ result.title }}</span>
-            <span>{{ result.author }}</span>
-            <span>{{ result.createdDate }}</span>
-            <span>{{ result.answer }}</span>
-            <span>{{ result.isPublic }}</span>
-          </li>
-        </ul>
-      </div>
-      <div v-else>
-        검색 결과가 없습니다.
-      </div>
-    </div>
-    <div>
-      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
-      <button v-for="page in totalPages" :key="page" @click="goToPage(page)" :class="{ active: currentPage === page }">
-        {{ page }}
-      </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+      <v-data-table-server
+          :items-per-page="itemsPerPage"
+          :items-per-page-text="'항목 갯수'"
+          :items-per-page-options="[5, 10, 30]"
+          :headers="headers"
+          :items="serverItems"
+          :items-length="searchResults.length"
+          :loading="loading"
+          :search="searchQuery"
+          item-value="num"
+          @update:options="search"
+          @click:row="showDetail">
+      </v-data-table-server>
+      <!-- 설명 : 페이지당항목수 테이블 헤더 현재페이지항목 전체항목수 데이터로딩상태 검색어 고유식별자 메서드-->
     </div>
     <router-link to="/faq" class="faqBtn">FAQ</router-link>
   </div>
@@ -67,6 +44,7 @@ export default {
   data: function () {
     return {
       searchQuery: '', // 검색어를 저장하는 데이터
+      searchQueryText:'', // 검색어
       category: 'total', // 카테고리 값 저장
       categories: [
         { name: '전체', value: 'total' },
@@ -74,62 +52,101 @@ export default {
         { name: '수하물', value: 'baggage' },
         { name: 'etc', value: 'etc' }
       ],
-      searchResults: [],
-      currentPage: 1,
-      itemsPerPage: 5,
-      pageSizes: [5, 10, 30]
-    }
-  },
-  computed: {
-    paginatedData() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.searchResults.slice(start, end);
-    },
-    totalPages() { // 전체 페이지
-      return Math.ceil(this.searchResults.length / this.itemsPerPage);
+      searchResults: [], // 검색한 값들
+      serverItems: [], // 현재 페이지 값들
+      currentPage: 1, // 현재 페이지
+      itemsPerPage: 5, // 줄 갯수
+      headers: [
+        { title: '번호', align: 'start', key: 'num', sortable: false }, //제목 정렬방향 키 정렬가능여부
+        { title: '문의번호', key: 'supportNum', align: 'end', sortable: false },
+        { title: '제목', key: 'title', align: 'end' },
+        { title: '작성자', key: 'author', align: 'end' , sortable: false},
+        { title: '작성일', key: 'createdDate', align: 'end' },
+        { title: '답변', key: 'answer', align: 'end' , sortable: false},
+        { title: '공개여부', key: 'isPublic', align: 'end' , sortable: false},
+      ],
+      loading: false,
     }
   },
   methods: {
-    async search() {// 검색어 백엔드로 전달하는 과정
+    async search({ page, itemsPerPage, sortBy}) {
+      this.loading = true;
       try {
-        const response = await axios.post('/api/supportSearch',{search : this.searchQuery, category : this.category});
+        const response = await axios.post('/api/supportSearch', {
+          search: this.searchQuery,
+          category: this.category
+        });
         console.log(response.data); // 서버로부터의 응답 확인
         this.searchResults = response.data;// 응답 데이터를 results에 저장
+        setTimeout(() => {
+          const start = (page - 1) * itemsPerPage
+          const end = start + itemsPerPage
+          const items = this.searchResults.slice()
+          this.currentPage = page;
+          this.itemsPerPage = itemsPerPage;
+
+          if (sortBy.length) {
+            const sortKey = sortBy[0].key;
+            const sortOrder = sortBy[0].order;
+            items.sort((a, b) => {
+              const aValue = a[sortKey];
+              const bValue = b[sortKey];
+
+              if (sortOrder === 'desc') {
+                if (aValue > bValue) return -1;
+                if (aValue < bValue) return 1;
+                return 0;
+              } else {
+                if (aValue > bValue) return 1;
+                if (aValue < bValue) return -1;
+                return 0;
+              }
+            });
+          }
+
+          this.serverItems = items.slice(start, end);
+        }, 500)
       } catch (error) {
         console.error('Error:', error);
         // 오류 처리
+      } finally {
+        this.loading = false;
       }
     },
     searchRm() {
       this.searchQuery = '';
+      this.searchQueryText = '';
     },
     searchText() {
+      this.searchQuery = this.searchQueryText;
       this.category = 'total';
-      this.search();
+      this.search({
+        page: this.currentPage,
+        itemsPerPage: this.itemsPerPage,
+        sortBy: []
+      });
     },
     setCategory(categoryValue) {
       this.category = categoryValue; // 카테고리 값을 설정
       this.searchQuery = '';
       console.log(this.category);
-      this.search();
+      this.search({
+        page: this.currentPage,
+        itemsPerPage: this.itemsPerPage,
+        sortBy: []
+      });
     },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-      }
-    },
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-      }
-    },
-    goToPage(page) {
-      this.currentPage = page;
+    showDetail(item) {
+      // 특정 행 클릭 시 호출되는 메소드 우선은 문의하기 페이지에 연결 변경 예정
+      this.$router.push({ name: 'Inquiry', params: { supportNum: item.supportNum } });
     }
   },
   mounted() {
-    this.search(); // 컴포넌트가 마운트될 때 검색 메서드 실행
+    this.search({
+      page: this.currentPage,
+      itemsPerPage: this.itemsPerPage,
+      sortBy: [{ key: 'createdDate', order: 'desc' }]
+    });
   }
 }
 </script>
@@ -155,7 +172,7 @@ ul {
 
 .support .search {
   max-width: 850px;
-  margin: 0 auto;
+  margin: 0 auto 30px;
   position: relative;
   text-align: left;
   display: flex;
@@ -306,7 +323,6 @@ box-sizing: border-box;
 }
 
 
-
-
 </style>
 
+x
