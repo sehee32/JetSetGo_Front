@@ -195,7 +195,7 @@ box-sizing: border-box;
   right: 350px;
   width: 36px;
   height: 36px;
-  background: url(https://www.koreanair.com/ico-n-clear.svg) no-repeat 50% 50%;
+  background: url(@/assets/ico-n-clear.svg) no-repeat 50% 50%;
   background-size: 24px 24px;
   cursor: pointer;
   border: 0;
@@ -208,7 +208,7 @@ box-sizing: border-box;
   width: 36px;
   height: 36px;
   border: 0;
-  background: transparent url(https://www.koreanair.com/search__button.svg) no-repeat center center;
+  background: transparent url(@/assets/search__button.svg) no-repeat center center;
   background-size: 24px 24px;
   cursor: pointer;
 }

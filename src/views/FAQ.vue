@@ -146,7 +146,7 @@ ul {
   width: 100%;
   padding: 35px 60px;
   border: 0;
-  background: url(https://www.koreanair.com/ico-expander.svg) no-repeat calc(100% - 20px) 50%;
+  background: url(@/assets/ico-expander.svg) no-repeat calc(100% - 20px) 50%;
   background-size: 24px 24px;
   font-size: 20px;
   line-height: 1.5;
@@ -159,7 +159,7 @@ ul {
 }
 
 .faq .faq-title[aria-expanded=true] {
-  background-image: url(https://www.koreanair.com/ico-expander-active.svg);
+  background-image: url(@/assets/ico-expander-active.svg);
   font-weight: 700;
 }
 
