@@ -6,6 +6,85 @@
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
     </div>
+    <div>
+      <v-container>
+        <v-row no-gutters>
+          <v-col cols="1">
+            <v-sheet class="pa-3 fontSize20">
+              유형<span class="colRed">*</span>
+            </v-sheet>
+          </v-col>
+          <v-col>
+            <v-sheet>
+              <v-select
+                  variant="outlined"
+                  placeholder="선택해주세요."
+                  :items="categories"
+                  item-title="name"
+                  item-value="value"
+                  :rules="[rules.requiredSelect]"
+              ></v-select>
+            </v-sheet>
+          </v-col>
+        </v-row>
+
+        <v-row no-gutters>
+          <v-col cols="1">
+            <v-sheet class="pa-3 fontSize20">
+             제목<span class="colRed">*</span>
+            </v-sheet>
+          </v-col>
+          <v-col>
+            <v-sheet>
+              <v-text-field
+                  variant="outlined"
+                  placeholder="입력해주세요."
+                  v-model="title"
+                  :rules="[rules.required, rules.counterTitle]"
+                  maxlength="50"
+                  counter
+              ></v-text-field>
+            </v-sheet>
+          </v-col>
+        </v-row>
+
+        <v-row no-gutters>
+          <v-col cols="1">
+            <v-sheet class="pa-3 fontSize20">
+              내용<span class="colRed">*</span>
+            </v-sheet>
+          </v-col>
+          <v-col>
+            <v-sheet>
+              <v-textarea
+                  variant="outlined"
+                  placeholder="신속하고 정확한 안내를 위해 주문번호를 입력해주세요."
+                  hint="신속하고 정확한 안내를 위해 주문번호를 입력해주세요."
+                  rows="15"
+                  class="no-resize"
+                  :rules="[rules.required, rules.counterDetail]"
+                  maxlength="2000"
+                  counter
+              ></v-textarea>
+            </v-sheet>
+          </v-col>
+        </v-row>
+
+        <v-row no-gutters>
+          <v-col cols="1">
+            <v-sheet class="pa-3 fontSize20">
+              공개여부
+            </v-sheet>
+          </v-col>
+          <v-col>
+            <v-sheet class="pa-2">
+
+            </v-sheet>
+          </v-col>
+        </v-row>
+      </v-container>
+
+    </div>
   </div>
 </template>
 
@@ -21,7 +100,13 @@ export default {
         { name: 'etc', value: 'etc' }
       ],
       title: '',
-      detail: ''
+      detail: '',
+      rules: {
+        required: value => !!value || '이 항목을 입력하지 않았습니다.',
+        requiredSelect: value => !!value || '이 항목을 선택하지 않았습니다.',
+        counterTitle: value => value.length <= 50 || '최대 50자입니다.',
+        counterDetail: value => value.length <= 2000 || '최대 2000자입니다.',
+      },
     }
   },
   methods: {
@@ -60,4 +145,18 @@ ul {
   top: 0;
   left: 10px;
 }
+
+.inquiry .no-resize >>> textarea {
+  resize: none;
+}
+
+.inquiry .fontSize20{
+  font-size: 20px;
+}
+
+.inquiry .colRed{
+  color: red;
+}
+
+
 </style>
