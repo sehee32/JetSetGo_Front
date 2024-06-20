@@ -1,52 +1,12 @@
 <template>
   <div class="inquiry">
-    <h1>문의하기</h1>
-    <router-link to="/support">뒤로가기</router-link>
-    <div class="category-name-selector">
-      <ul>
-        <li>
-          <h3>유형<span>*</span></h3>
-          <select id="category" v-model="selectedCategory">
-            <option value="" disabled>선택해주세요</option>
-            <option v-for="category in categories" :key="category.value" :value="category.value">
-              {{ category.name }}
-            </option>
-          </select>
-        </li>
-        <li>
-          <h3>제목<span>*</span></h3>
-          <input id="title" type="text" v-model="title" placeholder="입력해주세요" />
-        </li>
-        <li>
-          <h3>내용<span>*</span></h3>
-          <input id="detail" type="text" v-model="detail" placeholder="신속하고 정확한 안내를 위해 주문번호를 입력해주세요." />
-        </li>
-      </ul>
-
+    <div class="inquiryTitle">
+      <h1>문의하기</h1>
+      <v-btn icon @click="goBack" class="backBt">
+        <v-icon>mdi-arrow-left</v-icon>
+      </v-btn>
     </div>
   </div>
-
-    <v-row dense>
-      <v-col cols="12" md="6">
-        <v-date-input
-            label="Select a date"
-            prepend-icon=""
-            prepend-inner-icon="$calendar"
-            variant="solo"
-        ></v-date-input>
-
-      </v-col>
-
-      <v-col cols="12" md="6">
-        <v-date-input
-            label="Select a date"
-            prepend-icon=""
-            variant="solo"
-        ></v-date-input>
-
-      </v-col>
-    </v-row>
-
 </template>
 
 <script>
@@ -62,6 +22,11 @@ export default {
       ],
       title: '',
       detail: ''
+    }
+  },
+  methods: {
+    goBack() {
+      this.$router.go(-1); // 이전 페이지로 이동
     }
   }
 }
@@ -79,10 +44,20 @@ ul {
   padding: 65px 0 110px;
 }
 
-.inquiry h1 {
+.inquiry .inquiryTitle{
+  position: relative;
+}
+
+.inquiry .inquiryTitle h1 {
   font-weight: 400;
   font-size: 35px;
   color: #000;
   margin: 0 0 50px 0;
+}
+
+.inquiry .inquiryTitle .backBt{
+  position: absolute;
+  top: 0;
+  left: 10px;
 }
 </style>
