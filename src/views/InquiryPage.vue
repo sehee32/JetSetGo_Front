@@ -17,6 +17,7 @@
           <v-col>
             <v-sheet>
               <v-select
+                  v-model="selectedCategory"
                   variant="outlined"
                   placeholder="선택해주세요."
                   :items="categories"
@@ -37,9 +38,9 @@
           <v-col>
             <v-sheet>
               <v-text-field
+                  v-model="title"
                   variant="outlined"
                   placeholder="입력해주세요."
-                  v-model="title"
                   :rules="[rules.required, rules.counterTitle]"
                   maxlength="50"
                   counter
@@ -57,6 +58,7 @@
           <v-col>
             <v-sheet>
               <v-textarea
+                  v-model="detail"
                   variant="outlined"
                   placeholder="신속하고 정확한 안내를 위해 주문번호를 입력해주세요."
                   hint="신속하고 정확한 안내를 위해 주문번호를 입력해주세요."
@@ -93,7 +95,7 @@ export default {
   name: 'InquiryPage',
   data: function (){
     return{
-      selectedCategory: '',
+      selectedCategory: null,
       categories: [
         { name: '항공권', value: 'ticket' },
         { name: '수하물', value: 'baggage' },
@@ -111,7 +113,17 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.go(-1); // 이전 페이지로 이동
+      if (this.selectedCategory || this.title || this.detail){
+        const confirmed = window.confirm('작성 중인 내용이 있습니다. 정말 이동하시겠습니까?'); // 폼이 수정되었을 경우 사용자에게 경고 메시지 표시
+        if (confirmed) {
+          this.$router.go(-1); // 사용자가 확인을 눌렀을 경우 이전 페이지로 이동
+        } else {
+          // 사용자가 취소를 눌렀을 경우 아무 작업도 하지 않음
+        }
+      }else {
+        this.$router.go(-1); //폼이 수정되지 않았을 경우 이전 페이지로 이동
+      }
+
     }
   }
 }
