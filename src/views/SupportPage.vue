@@ -30,6 +30,9 @@
           no-data-text="검색 결과가 없습니다."
           @update:options="search"
           @click:row="showDetail">
+        <template v-slot:[`item.answer`]="{ item }">
+          <span>{{ item.answer ? '완료' : '확인중' }}</span>
+        </template>
         <template v-slot:[`item.public`]="{ item }">
           <v-icon>{{ item.public ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
         </template>
@@ -141,6 +144,7 @@ export default {
       });
     },
     showDetail(item) {
+
       // 특정 행 클릭 시 호출되는 메소드 우선은 문의하기 페이지에 연결 변경 예정
       this.$router.push({ name: 'Inquiry', params: { supportNum: item.supportNum } });
     }
