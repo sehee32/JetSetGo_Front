@@ -28,13 +28,32 @@
           :search="searchQuery"
           item-value="num"
           no-data-text="검색 결과가 없습니다."
-          @update:options="search"
-          @click:row="showDetail">
+          @update:options=search
+          @click:row=showDetail>
+        <template v-slot:[`item.answer`]="{ item }">
+          <span>{{ item.answer ? '완료' : '확인중' }}</span>
+        </template>
+        <template v-slot:[`item.public`]="{ item }">
+          <v-icon>{{ item.public ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+        </template>
       </v-data-table-server>
       <!-- 설명 : 페이지당항목수 테이블 헤더 현재페이지항목 전체항목수 데이터로딩상태 검색어 고유식별자 메서드-->
     </div>
     <router-link to="/faq" class="faqBtn">FAQ</router-link>
   </div>
+  <v-dialog v-model="passwordDialog" max-width="500px">
+    <v-card>
+      <!-- 비밀번호 입력 폼 -->
+      <v-card-title>비밀번호 입력</v-card-title>
+      <v-card-text>
+        <v-text-field v-model="password" label="비밀번호" type="password"></v-text-field>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="submitPassword">확인</v-btn>
+        <v-btn @click="closePasswordDialog">취소</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -64,9 +83,12 @@ export default {
         { title: '작성자', key: 'author', align: 'end' , sortable: false},
         { title: '작성일', key: 'createdDate', align: 'end' },
         { title: '답변', key: 'answer', align: 'end' , sortable: false},
-        { title: '공개여부', key: 'isPublic', align: 'end' , sortable: false},
+        { title: '공개여부', key: 'public', align: 'end' , sortable: false},
       ],
       loading: false,
+      passwordDialog: false, // 비밀번호 입력 다이얼로그 표시 여부
+      password: '', // 사용자가 입력한 비밀번호
+      selectedSupportNum: null // 선택된 문의번호
     }
   },
   methods: {
@@ -137,18 +159,48 @@ export default {
         sortBy: []
       });
     },
-    showDetail(item) {
-      // 특정 행 클릭 시 호출되는 메소드 우선은 문의하기 페이지에 연결 변경 예정
-      this.$router.push({ name: 'Inquiry', params: { supportNum: item.supportNum } });
+    showDetail(event, { item }) {
+      // console.log(item) //item 내용 확인용
+      if (item.public) {
+        this.$router.push({name: 'SupportDetail', params: {supportNum: item.supportNum}});
+      }else{
+        this.openPasswordDialog(item.supportNum)
+      }
+    },
+    openPasswordDialog(supportNum) {
+      this.selectedSupportNum = supportNum;
+      this.passwordDialog = true;
+    },
+    // 비밀번호 입력 확인
+    async submitPassword() {
+      // 비밀번호 확인 로직
+      try {
+        const response = await axios.post('/api/checkPassword', {
+          supportNum: this.selectedSupportNum,
+          password: this.password
+        });
+        if (response.data.success) {
+          // 비밀번호 일치 시 처리할 로직
+          // 예: 문의 내용 보기로 이동
+          this.$router.push({ name: 'SupportDetail', params: { supportNum: this.selectedSupportNum } });
+        } else {
+          alert('비밀번호가 일치하지 않습니다.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('비밀번호 확인 중 오류가 발생했습니다.');
+      } finally {
+        this.closePasswordDialog();
+      }
+    },
+
+    // 비밀번호 입력 다이얼로그 닫기
+    closePasswordDialog() {
+      this.passwordDialog = false;
+      this.password = '';
+      this.selectedSupportNum = null;
     }
   },
-  mounted() {
-    this.search({
-      page: this.currentPage,
-      itemsPerPage: this.itemsPerPage,
-      sortBy: [{ key: 'createdDate', order: 'desc' }]
-    });
-  }
 }
 </script>
 
