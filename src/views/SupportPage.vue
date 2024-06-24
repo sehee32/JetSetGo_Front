@@ -142,13 +142,6 @@ export default {
       this.$router.push({ name: 'Inquiry', params: { supportNum: item.supportNum } });
     }
   },
-  mounted() {
-    this.search({
-      page: this.currentPage,
-      itemsPerPage: this.itemsPerPage,
-      sortBy: [{ key: 'createdDate', order: 'desc' }]
-    });
-  }
 }
 </script>
 
