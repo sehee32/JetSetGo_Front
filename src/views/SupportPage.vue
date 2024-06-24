@@ -64,7 +64,7 @@ export default {
         { title: '작성자', key: 'author', align: 'end' , sortable: false},
         { title: '작성일', key: 'createdDate', align: 'end' },
         { title: '답변', key: 'answer', align: 'end' , sortable: false},
-        { title: '공개여부', key: 'isPublic', align: 'end' , sortable: false},
+        { title: '공개여부', key: 'public', align: 'end' , sortable: false},
       ],
       loading: false,
     }
