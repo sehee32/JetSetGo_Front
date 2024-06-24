@@ -30,6 +30,9 @@
           no-data-text="검색 결과가 없습니다."
           @update:options="search"
           @click:row="showDetail">
+        <template v-slot:[`item.public`]="{ item }">
+          <v-icon>{{ item.public ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+        </template>
       </v-data-table-server>
       <!-- 설명 : 페이지당항목수 테이블 헤더 현재페이지항목 전체항목수 데이터로딩상태 검색어 고유식별자 메서드-->
     </div>
