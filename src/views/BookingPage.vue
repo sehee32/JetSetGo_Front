@@ -84,6 +84,8 @@
 </template>
 
 <script>
+// import router from "@/router";
+
 export default {
   data() {
     return {
@@ -103,6 +105,7 @@ export default {
   methods: {
     // 예매 정보 처리 메서드
     bookTicket() {
+
       console.log('예매 정보:', {
         departure: this.departure,
         destination: this.destination,
@@ -111,6 +114,7 @@ export default {
         adults: this.adults,
         children: this.children
       });
+      this.$router.push('ticketsearch');
     }
   }
 };
