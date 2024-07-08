@@ -85,7 +85,7 @@
   <!-- 하단 부분 -->
   <div class="bookingLower">
     <v-container class="padding0">
-      <v-slide-group v-model="currentIndex" class="marginTop50" show-arrows>
+      <v-slide-group v-model="currentIndex" class="marginTop60" show-arrows>
         <v-slide-item v-for="(slideItems, index) in slideItems" :key="index">
             <v-card
                 :class="['ma-4', 'custom-card']"
@@ -107,7 +107,7 @@
         </v-slide-item>
       </v-slide-group>
       <!-- 리스트 컴포넌트 -->
-      <v-toolbar color="white" dark class="marginTop50">
+      <v-toolbar color="white" dark class="marginTop60">
         <v-toolbar-title class="custom-toolbar-title">알려드립니다.</v-toolbar-title>
         <v-btn :ripple="false" text router to="/support" class="btn-underline">목록보기</v-btn>
       </v-toolbar>
@@ -122,16 +122,16 @@
             </v-list-item>
           </v-list>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="5">
           <!-- 사진 컴포넌트 -->
-          <v-img src="@/assets/mainimage1.jpg" aspect-ratio="1.5"></v-img>
+          <v-img :src="require('@/assets/listImage.png')" aspect-ratio="1.5" class="costom-list-image" @click="goToPage('/support')" :rounded="4"></v-img>
         </v-col>
       </v-row>
     </v-container>
   </div>
-  <div class="colorblue">
+  <div class="colorBlue marginTop60">
     <div class="bookingLower">
-      <v-toolbar color="#D0E7F6" dark class="marginTop50">
+      <v-toolbar color="#D0E7F6" dark >
         <v-toolbar-title class="custom-toolbar-title">여행의 완성을 위한 경험</v-toolbar-title>
       </v-toolbar>
       <div class="d-flex">
@@ -246,8 +246,8 @@ export default {
   padding: 0;
 }
 
-.bookingLower .marginTop50 {
-  margin-top: 50px;
+.marginTop60 {
+  margin-top: 60px;
 }
 
 /* 하단 슬라이더 */
@@ -316,12 +316,28 @@ export default {
   font-weight: bold;
 }
 
-/* 하단 아이콘 */
-.colorblue{
-  background-color: #D0E7F6;
+.bookingLower .costom-list-image{
+  margin-left: 45px;
+  width: 90%;
+  height: 88%;
+  max-width: 600px;
+  border-radius: 20px;
 }
 
+.bookingLower .costom-list-image:hover{
+  border: 1px solid #7599EE;
+  cursor: pointer;
+}
 
+/* 하단 아이콘 */
+.colorBlue{
+  background-color: #D0E7F6;
+  padding-top: 60px;
+}
+
+.bookingLower .costom-toolbar{
+  height: 120px;
+}
 
 
 </style>
