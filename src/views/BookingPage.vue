@@ -113,11 +113,11 @@
       </v-toolbar>
       <v-row>
         <v-col cols="7">
-          <v-list dense>
-            <v-list-item v-for="listItems in listItems" :key="listItems.id">
-              <v-list-item-content>
+          <v-list lines="two">
+            <v-list-item v-for="listItems in listItems" :key="listItems.id" class="custom-list-item" :class="{ 'custom-list-last-item': index === listItems.length - 1 }">
+              <v-list-item-content  class="d-flex justify-space-between" @click="goToPage(listItems.route)">
                 <v-list-item-title class="v-list-title">{{ listItems.title }}</v-list-item-title>
-                <v-list-item-subtitle class="v-list-subtitle">{{ listItems.subtitle }}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ listItems.subtitle }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -128,6 +128,29 @@
         </v-col>
       </v-row>
     </v-container>
+  </div>
+  <div class="colorblue">
+    <div class="bookingLower">
+      <v-toolbar color="#D0E7F6" dark class="marginTop50">
+        <v-toolbar-title class="custom-toolbar-title">여행의 완성을 위한 경험</v-toolbar-title>
+      </v-toolbar>
+      <div class="d-flex">
+        <v-card
+            class="mx-auto"
+            max-width="344"
+            subtitle="Same looks, no anchor"
+            title="Hover and click me"
+            link
+        >
+          <v-tooltip
+              activator="parent"
+              location="bottom"
+              @click="goToPage('/support')"
+          >Tooltip</v-tooltip>
+        </v-card>
+      </div>
+
+    </div>
   </div>
 
 </template>
@@ -160,10 +183,10 @@ export default {
         { image: require('@/assets/mainimage6.jpg'), title: '신규 취항 및 운항 재개 노선 스케줄을\n 확인하세요', route: '/support' },
       ], // 슬라이더 아이템
       listItems: [
-        { id: 1, title: '국내선 유류할증료 (2024년 8월)', subtitle: '2024.07.03' },
-        { id: 2, title: '카드 Edition2 출시 안내 (2024년 7월 3일부)', subtitle: '2024.07.03' },
-        { id: 3, title: '국제선 브랜드 운임 개편 계획 안내', subtitle: '2024.06.28' },
-        { id: 4, title: '스카이패스 마일리지 적립 제휴 종료', subtitle: '2024.06.25' },
+        { id: 1, title: '국내선 유류할증료 (2024년 8월)', subtitle: '2024.07.03', route: '/support'},
+        { id: 2, title: '카드 Edition2 출시 안내 (2024년 7월 3일부)', subtitle: '2024.07.03', route: '/support' },
+        { id: 3, title: '국제선 브랜드 운임 개편 계획 안내', subtitle: '2024.06.28', route: '/support' },
+        { id: 4, title: '스카이패스 마일리지 적립 제휴 종료', subtitle: '2024.06.25', route: '/support' },
       ] //리스트 아이템
     };
   },
@@ -262,23 +285,43 @@ export default {
   text-decoration: underline; /* 마우스 오버 시 밑줄 추가 */
 }
 
-/* 하단 리스트 */
+/* 하단 리스트, 아이콘 동일 */
 .bookingLower .custom-toolbar-title {
   text-align: left;
   font-weight: 700;
-  font-size: 30px;
+  font-size: 25px;
   line-height: 1;
 }
+
+/* 하단 리스트 */
 .bookingLower .btn-underline:hover {
   text-decoration: underline; /* 마우스 오버 시 밑줄 효과 */
 }
 
-.bookingLower .v-list-title {
-  align-self: flex-start;
+.bookingLower .custom-list-item {
+  border-top: 1px solid #ccc;
 }
 
-.bookingLower .v-list-subtitle {
-  align-self: flex-end;
+.bookingLower .custom-list-item:last-child  {
+  border-bottom: 1px solid #ccc;
 }
+
+.bookingLower .custom-list-item:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.bookingLower .v-list-title{
+  font-size: 15px;
+  font-weight: bold;
+}
+
+/* 하단 아이콘 */
+.colorblue{
+  background-color: #D0E7F6;
+}
+
+
+
 
 </style>
