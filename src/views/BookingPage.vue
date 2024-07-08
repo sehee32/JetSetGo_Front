@@ -81,6 +81,55 @@
       </v-form>
     </v-card>
   </v-container>
+
+  <!-- 하단 부분 -->
+  <div class="bookingLower">
+    <v-container class="padding0">
+      <v-slide-group v-model="currentIndex" class="marginTop50" show-arrows>
+        <v-slide-item v-for="(slideItems, index) in slideItems" :key="index">
+            <v-card
+                :class="['ma-4', 'custom-card']"
+                height="280"
+                width="360"
+                @click="goToPage(slideItems.route)"
+            >
+              <div class="image-container">
+                <v-img
+                    :src="slideItems.image"
+                    class="custom-img"
+                    @mouseover="handleMouseOver"
+                    @mouseleave="handleMouseLeave"
+                    aspect-ratio="1.77">
+                </v-img>
+              </div>
+              <v-card-title class="custom-card-title">{{ slideItems.title }}</v-card-title>
+            </v-card>
+        </v-slide-item>
+      </v-slide-group>
+      <!-- 리스트 컴포넌트 -->
+      <v-toolbar color="white" dark class="marginTop50">
+        <v-toolbar-title class="custom-toolbar-title">알려드립니다.</v-toolbar-title>
+        <v-btn :ripple="false" text router to="/support" class="btn-underline">목록보기</v-btn>
+      </v-toolbar>
+      <v-row>
+        <v-col cols="7">
+          <v-list dense>
+            <v-list-item v-for="listItems in listItems" :key="listItems.id">
+              <v-list-item-content>
+                <v-list-item-title class="v-list-title">{{ listItems.title }}</v-list-item-title>
+                <v-list-item-subtitle class="v-list-subtitle">{{ listItems.subtitle }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-col>
+        <v-col cols="3">
+          <!-- 사진 컴포넌트 -->
+          <v-img src="@/assets/mainimage1.jpg" aspect-ratio="1.5"></v-img>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+
 </template>
 
 <script>
@@ -99,7 +148,23 @@ export default {
       passengerOptions: Array.from({ length: 10 }, (v, i) => i + 1), // 승객 수 (1~10)
       rules: {
         required: value => !!value || '이 항목을 입력하지 않았습니다.' // 필수 입력 규칙
-      }
+      },
+      currentIndex: 0, // 현재 슬라이드의 인덱스
+      // 하단 부분
+      slideItems: [
+        { image: require('@/assets/mainimage1.jpg'), title: '새로워진 홈페이지 콘텐츠를 소개합니다.', route: '/support' },
+        { image: require('@/assets/mainimage2.jpg'), title: '더욱 강력하게 돌아온 카드! 혜택 알아보기', route: '/support' },
+        { image: require('@/assets/mainimage3.jpg'), title: '기프트카드로 여행을 선물하세요', route: '/support' },
+        { image: require('@/assets/mainimage4.jpg'), title: '동영상으로 알아보는 서비스 가이드', route: '/support' },
+        { image: require('@/assets/mainimage5.jpg'), title: '안전한 여행을 위한 필수품, 여행보험\n 간편하게 가입하세요', route: '/support' },
+        { image: require('@/assets/mainimage6.jpg'), title: '신규 취항 및 운항 재개 노선 스케줄을\n 확인하세요', route: '/support' },
+      ], // 슬라이더 아이템
+      listItems: [
+        { id: 1, title: '국내선 유류할증료 (2024년 8월)', subtitle: '2024.07.03' },
+        { id: 2, title: '카드 Edition2 출시 안내 (2024년 7월 3일부)', subtitle: '2024.07.03' },
+        { id: 3, title: '국제선 브랜드 운임 개편 계획 안내', subtitle: '2024.06.28' },
+        { id: 4, title: '스카이패스 마일리지 적립 제휴 종료', subtitle: '2024.06.25' },
+      ] //리스트 아이템
     };
   },
   methods: {
@@ -115,7 +180,11 @@ export default {
         children: this.children
       });
       this.$router.push('ticketsearch');
-    }
+    },
+    // 하단 부분
+    goToPage(route) {
+      this.$router.push(route); // 라우터 변경
+    },
   }
 };
 </script>
@@ -142,6 +211,74 @@ export default {
 
 .text-center {
   color: #00256c;
+}
+
+/* 하단 효과 */
+.bookingLower {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.bookingLower .padding0{
+  padding: 0;
+}
+
+.bookingLower .marginTop50 {
+  margin-top: 50px;
+}
+
+/* 하단 슬라이더 */
+.bookingLower .v-card:hover {
+  cursor: pointer;
+}
+
+.bookingLower .image-container {
+  width: 100%; /* 이미지 컨테이너 고정 너비 */
+  height: 203px; /* 이미지 컨테이너 고정 높이 */
+  overflow: hidden; /* 이미지가 넘치는 경우를 대비하여 오버플로우 처리 */
+}
+
+.bookingLower .custom-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 연한 그림자 색상 */
+}
+
+.bookingLower .custom-card:hover .custom-img {
+  transform: scale(1.2);
+}
+
+.bookingLower .custom-img {
+  transition: transform 0.3s ease; /* 변환 효과를 부드럽게 만듦 */
+}
+
+.bookingLower .custom-card-title{
+  color: #000;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left;
+  white-space: pre-line;
+}
+
+.bookingLower .custom-card-title:hover{
+  text-decoration: underline; /* 마우스 오버 시 밑줄 추가 */
+}
+
+/* 하단 리스트 */
+.bookingLower .custom-toolbar-title {
+  text-align: left;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1;
+}
+.bookingLower .btn-underline:hover {
+  text-decoration: underline; /* 마우스 오버 시 밑줄 효과 */
+}
+
+.bookingLower .v-list-title {
+  align-self: flex-start;
+}
+
+.bookingLower .v-list-subtitle {
+  align-self: flex-end;
 }
 
 </style>
