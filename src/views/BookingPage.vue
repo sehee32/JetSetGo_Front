@@ -83,8 +83,10 @@
   </v-container>
 
   <!-- 하단 부분 -->
+  <v-app>
   <div class="bookingLower">
     <v-container class="padding0">
+      <!-- 슬라이더 컴포넌트 -->
       <v-slide-group v-model="currentIndex" class="marginTop60" show-arrows>
         <v-slide-item v-for="(slideItems, index) in slideItems" :key="index">
             <v-card
@@ -108,7 +110,7 @@
       </v-slide-group>
       <!-- 리스트 컴포넌트 -->
       <v-toolbar color="white" dark class="marginTop60">
-        <v-toolbar-title class="custom-toolbar-title">알려드립니다.</v-toolbar-title>
+        <v-toolbar-title class="custom-toolbar-title">알려드립니다</v-toolbar-title>
         <v-btn :ripple="false" text router to="/support" class="btn-underline">목록보기</v-btn>
       </v-toolbar>
       <v-row>
@@ -123,36 +125,66 @@
           </v-list>
         </v-col>
         <v-col cols="5">
-          <!-- 사진 컴포넌트 -->
           <v-img :src="require('@/assets/listImage.png')" aspect-ratio="1.5" class="costom-list-image" @click="goToPage('/support')" :rounded="4"></v-img>
         </v-col>
       </v-row>
     </v-container>
   </div>
+    <!-- 카드nav 컴포넌트 -->
   <div class="colorBlue marginTop60">
     <div class="bookingLower">
       <v-toolbar color="#D0E7F6" dark >
         <v-toolbar-title class="custom-toolbar-title">여행의 완성을 위한 경험</v-toolbar-title>
       </v-toolbar>
-      <div class="d-flex">
-        <v-card
-            class="mx-auto"
-            max-width="344"
-            subtitle="Same looks, no anchor"
-            title="Hover and click me"
-            link
-        >
-          <v-tooltip
-              activator="parent"
-              location="bottom"
-              @click="goToPage('/support')"
-          >Tooltip</v-tooltip>
-        </v-card>
-      </div>
-
+      <v-container>
+        <v-row>
+          <v-col
+              v-for="(card, index) in cards"
+              :key="index"
+              cols="12"
+              sm="6"
+              md="4"
+              lg="3"
+              xl="1"
+              class="card-column"
+              @mouseover="showNav(index)"
+              @mouseleave="hideNav"
+          >
+            <div class="card-container">
+              <v-card variant="flat" class="custom-flat-card">
+                <v-card-title class="card-title">{{ card.title }}</v-card-title>
+                <v-img
+                    :src="card.image"
+                    aspect-ratio="16/9"
+                    max-width="100%"
+                    max-height="50px"
+                    style="object-fit: cover;"
+                ></v-img>
+              </v-card>
+              <!-- 카드 아래에 네비게이션 항목을 표시 -->
+              <v-list
+                  v-if="hoveredCardIndex === index"
+                  dense
+                  nav
+                  flat
+                  class="custom-nav-list"
+              >
+                <v-list-item
+                    v-for="(navItem, navIndex) in card.navItems"
+                    :key="navIndex"
+                    @click="navigate(navItem.route)"
+                    class="custom-nav-list-item"
+                >
+                  <v-list-item-title class="custom-nav-item-title">{{ navItem.text }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
     </div>
   </div>
-
+  </v-app>
 </template>
 
 <script>
@@ -187,7 +219,57 @@ export default {
         { id: 2, title: '카드 Edition2 출시 안내 (2024년 7월 3일부)', subtitle: '2024.07.03', route: '/support' },
         { id: 3, title: '국제선 브랜드 운임 개편 계획 안내', subtitle: '2024.06.28', route: '/support' },
         { id: 4, title: '스카이패스 마일리지 적립 제휴 종료', subtitle: '2024.06.25', route: '/support' },
-      ] //리스트 아이템
+      ], //리스트 아이템
+      cards: [
+        {
+          title: '항공카드', image: require('@/assets/main_icon1.png'),
+          navItems: [
+              { text: '항공카드', route: '/support' }
+          ]
+        },
+        {
+          title: '기프트카드', image: require('@/assets/main_icon2.png'),
+          navItems: [
+              { text: '기프트카드', route: '/support' }
+          ]
+        },
+        {
+          title: '호텔',  image: require('@/assets/main_icon3.png'),
+          navItems: [
+              { text: '아고다', route: '/support' },
+              { text: 'Hotels.com', route: '/support' }
+          ]
+        },
+        {
+          title: '렌터카',  image: require('@/assets/main_icon4.png'),
+          navItems: [
+              { text: 'Hertz', route: '/support' },
+              { text: 'SK렌터카', route: '/support' },
+              { text: '롯데렌터카', route: '/support' },
+              { text: 'Rentalcars.com', route: '/support' }
+          ]
+        },
+        {
+          title: '기내 면세점',  image: require('@/assets/main_icon5.png'),
+          navItems: [
+              { text: 'SKYSHOP', route: '/support' }
+          ]
+        },
+        {
+          title: '여행자 보험',  image: require('@/assets/main_icon6.png'),
+          navItems: [
+              { text: 'Chubb 여행보험', route: '/support' }
+          ]
+        },
+        {
+          title: '여행 상품',  image: require('@/assets/main_icon7.png'),
+          navItems: [
+              { text: '한진관광', route: '/support' },
+              { text: 'KALPAK', route: '/support' }
+          ]
+        }
+      ],
+      hoveredCardIndex: null,
     };
   },
   methods: {
@@ -208,6 +290,15 @@ export default {
     goToPage(route) {
       this.$router.push(route); // 라우터 변경
     },
+    showNav(index) {
+      this.hoveredCardIndex = index;
+    },
+    hideNav() {
+      this.hoveredCardIndex = null;
+    },
+    navigate(route) {
+        this.$router.push(route);
+    }
   }
 };
 </script>
@@ -332,12 +423,60 @@ export default {
 /* 하단 아이콘 */
 .colorBlue{
   background-color: #D0E7F6;
-  padding-top: 60px;
+  padding: 60px 0 30px 0;
 }
 
-.bookingLower .costom-toolbar{
-  height: 120px;
+.bookingLower .card-container {
+  position: relative; /* 부모 요소를 상대적으로 배치하여 자식 요소의 절대 위치를 설정할 수 있게 함 */
 }
 
+.bookingLower .card-column {
+  flex: 1 0 calc(100% / 7); /* 각 카드의 너비를 7분의 1로 설정 */
+  max-width: calc(100% / 7); /* 최대 너비를 7분의 1로 설정 */
+  transition: padding-bottom 0.3s ease; /* 패딩 변화에 애니메이션 추가 */
+}
+
+.bookingLower .card-column:hover {
+  text-decoration: underline; /* 마우스 오버 시 밑줄 추가 */
+  padding-bottom: 40px;
+}
+
+.bookingLower .card-title{
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.bookingLower .custom-flat-card {
+  padding-top: 20px; /* 카드 상단 패딩 추가 */
+  padding-bottom: 20px; /* 카드 하단 패딩 추가 */
+  background-color: #E8F3FB;
+  border-radius: 10px; /* 라운드 처리를 더 크게 설정 */
+}
+
+.bookingLower .custom-flat-card:hover {
+  background-color: #f9f9f9; /* 마우스 오버 시 배경색 변경 */
+}
+
+.bookingLower .custom-nav-list{
+  position: absolute;
+  width: auto;
+  margin-top: 10px;
+  border-radius: 10px;
+  white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 설정 */
+}
+
+.bookingLower .custom-nav-list-item {
+  display: inline-block; /* 인라인 블록으로 설정하여 텍스트 너비에 맞춤 */
+  min-height: 15px;
+  padding-bottom: 0;
+  white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 설정 */
+}
+
+
+.bookingLower .custom-nav-item-title {
+  font-size: 13px; /* 글자 크기 설정 */
+  padding: 3px; /* 항목의 패딩 설정 */
+  text-decoration: none !important; /* 텍스트 밑줄 제거 */
+}
 
 </style>
