@@ -62,14 +62,14 @@
       <!-- 다음여정 버튼 -->
       <v-row v-if="journeyStage === 'outgoing' && selectedFlightId !== null">
         <v-col cols="12" class="text-center">
-          <v-btn @click="proceedToNextJourney" class="custom-btn mt-4">다음여정</v-btn>
+          <v-btn @click="NextJourney" class="custom-btn mt-4">다음여정</v-btn>
         </v-col>
       </v-row>
 
       <!-- 결제하기 버튼 -->
       <v-row v-if="journeyStage === 'return' && selectedFlightId !== null && returnFlightId !== null">
         <v-col cols="12" class="text-center">
-          <v-btn @click="proceedToPayment" class="custom-btn mt-4">결제하기</v-btn>
+          <v-btn @click="Payment" class="custom-btn mt-4">결제하기</v-btn>
         </v-col>
       </v-row>
     </v-card>
@@ -188,7 +188,7 @@ export default {
       return false;
     },
     // 다음 여정으로 진행 메소드
-    proceedToNextJourney() {
+    NextJourney() {
       if (this.journeyStage === 'outgoing' && this.selectedFlightId !== null) {
         // 다음 여정으로 전환하고 오는편 리스트로 변경
         this.currentFlights = this.returnFlights;
@@ -198,10 +198,9 @@ export default {
         this.selectedSeatType = null;
       }
     },
-    // 결제 페이지로 이동 메소드
-    proceedToPayment() {
-      // 실제 결제 페이지 URL로 이동 (예시)
-      window.location.href = '/payment';
+    // 결제 페이지로 이동
+    Payment() {
+
     }
   }
 };
