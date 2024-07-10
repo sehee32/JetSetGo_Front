@@ -6,7 +6,7 @@
         :src="require('@/assets/JetSetGoLogo.png')"
     ></v-img>
     <v-card class="custom-card mx-auto px-6 py-8">
-      <v-form v-model="formValid" @submit.prevent="signup">
+      <v-form v-model="formValid" @submit.prevent="Signup">
         <div>
           <v-text-field
               v-model="name"
@@ -95,6 +95,7 @@
               prepend-inner-icon="mdi-phone-outline"
               clearable
           ></v-text-field>
+
         </div>
 
         <div>
@@ -105,13 +106,14 @@
               variant="elevated"
               name="phone_check"
               block
-              @click="verifyPhoneNumber"
+              @click="Verify"
           >
             인증하기
           </v-btn>
         </div>
 
         <br>
+
 
         <div>
           <v-text-field
@@ -176,7 +178,7 @@ export default {
     };
   },
   methods: {
-    signup() {
+    Signup() {
       if (this.password !== this.confirmPassword) {
         console.error('비밀번호가 일치하지 않습니다.');
         return;
@@ -199,9 +201,9 @@ export default {
           });
     },
 
-    verifyPhoneNumber() {
-      // 휴대전화번호 인증하기 기능
-      console.log('휴대전화번호 인증하기:', this.phoneNumber);
+    Verify() {
+      // 인증하기 기능
+
     },
 
     checkUsername() {
@@ -217,7 +219,8 @@ export default {
           .catch(error => {
             console.error('아이디 중복 확인에 실패했습니다.', error);
           });
-    }
+    },
+
   }
 };
 </script>
