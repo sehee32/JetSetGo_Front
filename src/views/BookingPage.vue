@@ -5,24 +5,26 @@
       <v-form v-model="formValid" @submit.prevent="bookTicket">
         <v-row>
           <v-col cols="12" md="6">
-            <v-text-field
+            <v-select
                 v-model="departure"
+                :items="city"
                 :rules="[rules.required]"
                 label="출발지"
                 variant="outlined"
                 prepend-inner-icon="mdi-airplane-takeoff"
                 clearable
-            ></v-text-field>
+            ></v-select>
           </v-col>
           <v-col cols="12" md="6">
-            <v-text-field
+            <v-select
                 v-model="destination"
+                :items="city"
                 :rules="[rules.required]"
                 label="도착지"
                 variant="outlined"
                 prepend-inner-icon="mdi-airplane-landing"
                 clearable
-            ></v-text-field>
+            ></v-select>
           </v-col>
         </v-row>
 
@@ -84,8 +86,6 @@
 </template>
 
 <script>
-// import router from "@/router";
-
 export default {
   data() {
     return {
@@ -96,6 +96,7 @@ export default {
       adults: null, // 성인 수
       children: null, // 아동 수
       formValid: false,
+      city: ['인천','서울','도쿄','오사카','홍콩'],
       passengerOptions: Array.from({ length: 10 }, (v, i) => i + 1), // 승객 수 (1~10)
       rules: {
         required: value => !!value || '이 항목을 입력하지 않았습니다.' // 필수 입력 규칙
@@ -121,7 +122,6 @@ export default {
 </script>
 
 <style scoped>
-
 .custom-card {
   max-width: 1000px;
   margin: auto;
