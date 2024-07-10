@@ -1,14 +1,16 @@
 <template>
   <div class="support">
     <h1>1:1 문의하기</h1>
+    <!-- 검색하기 -->
     <div class="search">
       <div>
         <input type="text" class="searchInput" v-model="searchQueryText" @keyup.enter="searchText" placeholder="검색어를 입력하세요"/>
         <button type="button" class="searchRm" v-if="searchQueryText" @click="searchRm"></button> <!--x 버튼-->
       </div>
       <button type="button" class="searchBt" @click="searchText"></button> <!--검색 버튼-->
-      <router-link to="/inquiry" class="inquiryBtn">문의하기</router-link>
+      <router-link to="/inquiry" class="inquiryBtn">문의하기</router-link> <!--문의하기 버튼-->
     </div>
+    <!-- 카테고리 -->
     <div>
       <ul class="categoryList">
         <li v-for="categorySelect in categories" :key="categorySelect.value">
@@ -16,6 +18,7 @@
         </li>
       </ul>
     </div>
+    <!-- 목록 -->
     <div>
       <v-data-table-server
           :items-per-page="itemsPerPage"
@@ -33,17 +36,18 @@
         <template v-slot:[`item.answer`]="{ item }">
           <span>{{ item.answer ? '완료' : '확인중' }}</span>
         </template>
-        <template v-slot:[`item.public`]="{ item }">
-          <v-icon>{{ item.public ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+        <template v-slot:[`item.isPublic`]="{ item }">
+          <v-icon>{{ item.isPublic ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
         </template>
       </v-data-table-server>
       <!-- 설명 : 페이지당항목수 테이블 헤더 현재페이지항목 전체항목수 데이터로딩상태 검색어 고유식별자 메서드-->
     </div>
+    <!-- FAQ버튼 -->
     <router-link to="/faq" class="faqBtn">FAQ</router-link>
   </div>
+  <!-- 비밀번호 입력 폼 -->
   <v-dialog v-model="passwordDialog" max-width="500px">
     <v-card>
-      <!-- 비밀번호 입력 폼 -->
       <v-card-title>비밀번호 입력</v-card-title>
       <v-card-text>
         <v-text-field v-model="password" label="비밀번호" type="password"></v-text-field>
@@ -83,7 +87,7 @@ export default {
         { title: '작성자', key: 'author', align: 'end' , sortable: false},
         { title: '작성일', key: 'createdDate', align: 'end' },
         { title: '답변', key: 'answer', align: 'end' , sortable: false},
-        { title: '공개여부', key: 'public', align: 'end' , sortable: false},
+        { title: '공개여부', key: 'isPublic', align: 'end' , sortable: false},
       ],
       loading: false,
       passwordDialog: false, // 비밀번호 입력 다이얼로그 표시 여부
@@ -161,7 +165,7 @@ export default {
     },
     showDetail(event, { item }) {
       // console.log(item) //item 내용 확인용
-      if (item.public) {
+      if (item.isPublic) {
         this.$router.push({name: 'SupportDetail', params: {supportNum: item.supportNum}});
       }else{
         this.openPasswordDialog(item.supportNum)
