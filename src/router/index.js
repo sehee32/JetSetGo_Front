@@ -57,12 +57,12 @@ const routes = [
     name: 'Inquiry',
     component: () => import(/* webpackChunkName: "inquiry" */ '../views/InquiryPage.vue')
   },
-  // {
-  //   path: '/myPageWithdrawal',
-  //   name: 'MyPageWithdrawal',
-  //   component: () => import(/* webpackChunkName: "myPageWithdrawal" */ '../views/MyPageWithdrawal.vue')
-  // }
-  // ,
+  {
+    path: '/myPageWithdrawal',
+    name: 'MyPageWithdrawal',
+    component: () => import(/* webpackChunkName: "myPageWithdrawal" */ '../views/MyPageWithdrawal.vue')
+  }
+  ,
   {
     path: '/ticketsearch',
     name: 'TicketSearch',

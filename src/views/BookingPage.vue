@@ -113,7 +113,7 @@
       <!-- 리스트 컴포넌트 -->
       <v-toolbar color="white" dark class="marginTop60">
         <v-toolbar-title class="custom-toolbar-title">알려드립니다</v-toolbar-title>
-        <v-btn :ripple="false" text router to="/support" class="btn-underline">목록보기</v-btn>
+        <v-btn :ripple="false" variant="text" router to="/support" class="btn-underline">목록보기</v-btn>
       </v-toolbar>
       <v-row>
         <v-col cols="7">

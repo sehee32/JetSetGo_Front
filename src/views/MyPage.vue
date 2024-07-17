@@ -1,6 +1,6 @@
 <template>
 <div class="myPage">
-  <h1 class="marginBottom40">회원정보</h1>
+  <h1>회원정보</h1>
   <v-app>
     <v-main>
       <v-container class="costom-container">
@@ -70,28 +70,27 @@
           </v-row>
         </div>
         <!-- 비밀번호 변경 -->
-        <div class="costom-box password-change">
+        <div class="costom-box">
           <h3>비밀번호</h3>
           <p>회원님의 소중한 개인정보 보호를 위해 비밀번호를 주기적으로 변경해 주세요.</p>
-          <v-btn>변경</v-btn>
+          <v-btn :ripple="false" variant="outlined" router to="/myPageWithdrawal" class="costom-box-btn">변경</v-btn>
         </div>
         <!-- 기본정보 변경 -->
-        <div class="costom-box profile-change">
-          <h3 class="marginBottom40">기본정보</h3>
+        <div class="costom-box">
+          <h3>기본정보</h3>
           <p>성명, 연락처 정보를 변경할 수 있습니다.</p>
-          <v-btn>변경</v-btn>
+          <v-btn :ripple="false" variant="outlined" router to="/myPageWithdrawal" class="costom-box-btn">변경</v-btn>
         </div>
         <!-- 예약내역 -->
-        <div class="costom-box reservation-list">
+        <div class="costom-box">
           <h3>예약내역</h3>
           <p>예약내역을 확인 할 수 있습니다.</p>
-          <v-btn>예약내역</v-btn>
+          <v-btn :ripple="false" variant="outlined" router to="/myPageWithdrawal" class="costom-box-btn">확인</v-btn>
         </div>
         <!-- 회원탈퇴 -->
-        <v-btn :ripple="false" flat router to="/mypageWithdrawal" class="withdrawal">회원탈퇴</v-btn>
-        <v-btn>
-          회원탈퇴
-        </v-btn>
+        <div class="withdrawal">
+          <v-btn :ripple="false" variant="text" router to="/myPageWithdrawal" class="withdrawalBtn">회원탈퇴</v-btn>
+        </div>
       </v-container>
     </v-main>
   </v-app>
@@ -116,11 +115,7 @@ export default {
 .myPage {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 65px 0 110px;
-}
-
-.myPage .marginBottom40{
-  margin-bottom: 40px;
+  padding-top: 70px;
 }
 
 .myPage .costom-container{
@@ -130,12 +125,10 @@ export default {
 
 .myPage h1{
   text-align: left;
+  margin-bottom: 20px;
 }
 
-.myPage h3{
-
-}
-
+/* 회원정보 */
 .myPage .profile{
   text-align: left;
   padding: 32px;
@@ -159,9 +152,11 @@ export default {
   font-weight: 500;
 }
 
+/* 비밀번호 변경, 기본정보 변경, 예약내역 */
 .myPage .costom-box{
+  position: relative;
   text-align: left;
-  padding: 30px;
+  padding: 40px 30px;
   margin-bottom: 20px;
   border-radius: 10px;
   border: 1px solid #ccc;
@@ -171,24 +166,28 @@ export default {
   margin-bottom: 15px;
 }
 
-
-.myPage .reservation-list{
-
+.myPage .costom-box .costom-box-btn{
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  margin-bottom: 15px;
 }
 
-.myPage .password-change{
-
+.myPage .costom-box .costom-box-btn:hover{
+  border: 2px solid #0064de; ;
 }
 
-.myPage .profile-change{
-
-}
-
+/* 회원탈퇴 */
 .myPage .withdrawal{
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.myPage .withdrawal .withdrawalBtn{
   text-decoration: underline; /* 밑줄 효과 */
 }
 
-.myPage .withdrawal:hover{
+.myPage .withdrawal .withdrawalBtn:hover{
   border: 1px solid #0064de; ;
 }
 </style>
