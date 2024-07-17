@@ -23,9 +23,9 @@ const routes = [
   },
 
   {
-    path: '/mypage',
+    path: '/myPage',
     name: 'MyPage',
-    component: () => import(/* webpackChunkName: "about" */ '../views/MyPage.vue')
+    component: () => import(/* webpackChunkName: "myPage" */ '../views/MyPage.vue')
   },
 
   {
@@ -57,7 +57,12 @@ const routes = [
     name: 'Inquiry',
     component: () => import(/* webpackChunkName: "inquiry" */ '../views/InquiryPage.vue')
   },
-
+  // {
+  //   path: '/myPageWithdrawal',
+  //   name: 'MyPageWithdrawal',
+  //   component: () => import(/* webpackChunkName: "myPageWithdrawal" */ '../views/MyPageWithdrawal.vue')
+  // }
+  // ,
   {
     path: '/ticketsearch',
     name: 'TicketSearch',

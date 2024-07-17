@@ -12,7 +12,7 @@
     <ul class="nav-links">
       <div class="right-links">   <!--오른쪽 정렬하려고 묶음-->
         <li><router-link to="/faq">고객센터</router-link></li>
-        <li><router-link to="/mypage">마이페이지</router-link></li>
+        <li><router-link to="/mPpage">마이페이지</router-link></li>
         <li><router-link to="/loginpage">로그인</router-link></li>
       </div>
     </ul>
