@@ -106,7 +106,7 @@
               variant="elevated"
               name="phone_check"
               block
-              @click="Verify"
+              @click="verify"
           >
             인증하기
           </v-btn>
@@ -157,6 +157,7 @@
 
 <script>
 import axios from 'axios';
+import { requestIdentityVerification } from "@/identityVerification";
 
 export default {
   data() {
@@ -201,9 +202,13 @@ export default {
           });
     },
 
-    Verify() {
-      // 인증하기 기능
-
+    async verify() {
+      try {
+        // 본인 인증 요청
+        await requestIdentityVerification();
+      } catch (error) {
+        console.error("본인 인증 요청 실패:", error);
+      }
     },
 
     checkUsername() {
