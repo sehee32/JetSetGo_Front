@@ -73,19 +73,19 @@
         <div class="costom-box">
           <h3>비밀번호</h3>
           <p>회원님의 소중한 개인정보 보호를 위해 비밀번호를 주기적으로 변경해 주세요.</p>
-          <v-btn :ripple="false" variant="outlined" router to="/myPageWithdrawal" class="costom-box-btn">변경</v-btn>
+          <v-btn :ripple="false" variant="outlined" router to="/myPageChangePassword" class="costom-box-btn">변경</v-btn>
         </div>
         <!-- 기본정보 변경 -->
         <div class="costom-box">
           <h3>기본정보</h3>
           <p>성명, 연락처 정보를 변경할 수 있습니다.</p>
-          <v-btn :ripple="false" variant="outlined" router to="/myPageWithdrawal" class="costom-box-btn">변경</v-btn>
+          <v-btn :ripple="false" variant="outlined" router to="/myPageProfileEdit" class="costom-box-btn">변경</v-btn>
         </div>
         <!-- 예약내역 -->
         <div class="costom-box">
           <h3>예약내역</h3>
           <p>예약내역을 확인 할 수 있습니다.</p>
-          <v-btn :ripple="false" variant="outlined" router to="/myPageWithdrawal" class="costom-box-btn">확인</v-btn>
+          <v-btn :ripple="false" variant="outlined" router to="/myPageReservationList" class="costom-box-btn">확인</v-btn>
         </div>
         <!-- 회원탈퇴 -->
         <div class="withdrawal">
