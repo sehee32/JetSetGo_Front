@@ -193,9 +193,9 @@ export default {
         // 다음 여정으로 전환하고 오는편 리스트로 변경
         this.currentFlights = this.returnFlights;
         this.journeyStage = 'return';
-        // 선택 정보 초기화
-        this.selectedFlightId = null;
-        this.selectedSeatType = null;
+        // // 선택 정보 초기화
+        // this.selectedFlightId = null;
+        // this.selectedSeatType = null;
       }
     },
     // 결제 페이지로 이동
