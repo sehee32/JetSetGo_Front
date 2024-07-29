@@ -126,7 +126,7 @@
               </v-row>
             </div>
             <!-- 정보 변경 -->
-            <v-form ref="profileForm">
+            <v-form ref="profileForm" validate-on="submit" @submit.prevent="profileSubmit">
               <div class="costom-box">
                 <div class = "Contact" >
                   <div class ="title">
@@ -143,6 +143,7 @@
                         maxlength="20"
                         :rules="[rules.required]"
                         ref="contactField"
+                        @keydown.enter.stop.prevent
                     ></v-text-field>
                   </div>
                 </div>
@@ -159,7 +160,7 @@
                     :loading="loading"
                     class="submitBtn"
                     text="변경완료"
-                    @click="profileSubmit"
+                    type="submit"
                     block
                 ></v-btn>
               </div>
@@ -212,7 +213,7 @@ export default {
     },
     goBack() {
       this.$router.go(-1); // 이전 페이지로 이동
-    },
+    }
   }
 }
 </script>
