@@ -175,7 +175,7 @@ export default {
 }
 
 .myPage .costom-box .costom-box-btn:hover{
-  border: 2px solid #0064de; ;
+  border: 2px solid #0064de;
 }
 
 /* 회원탈퇴 */
