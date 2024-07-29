@@ -183,7 +183,7 @@ export default {
         required : value => !!value || '필수 입력 항목입니다.'
       },
       loading: false,
-      isPasswordValid: true, // 비밀번호 확인 상태
+      isPasswordValid: false, // 비밀번호 확인 상태
       contact: '01011111111',
     };
   },
