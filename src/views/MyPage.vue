@@ -171,6 +171,7 @@ export default {
   top: 30px;
   right: 40px;
   margin-bottom: 15px;
+  border-radius: 10px;
 }
 
 .myPage .costom-box .costom-box-btn:hover{
