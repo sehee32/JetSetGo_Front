@@ -327,7 +327,6 @@ export default {
 
 /* 정보 변경 */
 .profileEdit .profileList .costom-box{
-  position: relative;
   text-align: left;
   padding: 40px 30px;
   margin-bottom: 20px;

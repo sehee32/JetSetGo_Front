@@ -219,7 +219,6 @@ export default {
 /* 회원 탈퇴 화면 */
 
 .withdrawal .withdrawalTerms .costom-box{
-  position: relative;
   text-align: left;
   padding: 40px 30px;
   margin-bottom: 20px;
