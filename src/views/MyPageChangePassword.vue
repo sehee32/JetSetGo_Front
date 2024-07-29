@@ -79,9 +79,7 @@ export default {
         password: value => this.checkPassword(value),
         matchPassword: value => value === this.newPassword || '비밀번호가 일치하지 않습니다.'
       },
-      loading: false,
-      timeout: null,
-      userName: '',
+      loading: false
     };
   },
   methods: {
@@ -154,8 +152,8 @@ export default {
 .changePassword .backBtn,
 .changePassword .submitBtn{
   display: inline-block;
-  width: 320px;
-  height: 65px;
+  width: 280px;
+  height: 60px;
   min-width: 34px;
   margin: 60px 2px 0;
   padding: 15px 20px;
