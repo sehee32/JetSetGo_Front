@@ -7,7 +7,7 @@ import * as PortOne from "@portone/browser-sdk/v2";
 export async function requestIdentityVerification() {
     try {
         const response = await PortOne.requestIdentityVerification({
-            storeId: "id", // 고객사 storeId로 변경
+            storeId: "store-da4ab0d8-d5a6-4110-9e67-2ebf9fc1f5ff", // 고객사 storeId로 변경
             identityVerificationId: `identity-verification-${crypto.randomUUID()}`,
             channelKey: "channel-key-daa2e2fe-a9d4-43ff-b843-3b5e5b694f01", // 채널 키
         });

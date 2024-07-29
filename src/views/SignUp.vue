@@ -55,7 +55,6 @@
               prepend-inner-icon="mdi-lock-outline"
               clearable
           >
-            <!-- 비밀번호 표시/숨김 아이콘 -->
             <template v-slot:append-inner>
               <v-icon @click="show = !show">
                 {{ show ? 'mdi-eye' : 'mdi-eye-off' }}
@@ -95,7 +94,6 @@
               prepend-inner-icon="mdi-phone-outline"
               clearable
           ></v-text-field>
-
         </div>
 
         <div>
@@ -113,7 +111,6 @@
         </div>
 
         <br>
-
 
         <div>
           <v-text-field
@@ -145,7 +142,6 @@
               type="submit"
               variant="elevated"
               block
-              @click="signup"
           >
             가입하기
           </v-btn>
@@ -157,7 +153,7 @@
 
 <script>
 import axios from 'axios';
-import { requestIdentityVerification } from "@/identityVerification";
+//import requestCertification from "../../public/portOneVerification.html";
 
 export default {
   data() {
@@ -203,9 +199,51 @@ export default {
     },
 
     async verify() {
+      const IMP = window.IMP;
+      IMP.init("imp12777257");
       try {
+
+        // await axios({
+        //   url: `https://api.portone.io/identity-verifications/${encodeURIComponent(`identity-verification-${crypto.randomUUID()}`)}/send`,
+        //   method: "post",
+        //   headers: { "Content-Type": "application/json" },
+        //
+        //   body: {
+        //     /* 기타 파라미터 생략 */
+        //     // bypass: danalBypass,
+        //     "storeId": "store-da4ab0d8-d5a6-4110-9e67-2ebf9fc1f5ff",
+        //     "channelKey": "channel-key-daa2e2fe-a9d4-43ff-b843-3b5e5b694f01",
+        //     "customer": {
+        //       "name": "문유정",
+        //       "phoneNumber": "01099292253",
+        //       "ipAddress": "220.86.116.153"
+        //     },
+        //     // "customData": "customData",
+        //     // "bypass": {},
+        //     "operator": "SKT",
+        //     "method": "APP",
+        //   },
+        // });
         // 본인 인증 요청
-        await requestIdentityVerification();
+
+        IMP.certification(
+            {
+              // param
+              pg: "inicis_unified.MIIiasTest", //본인인증 설정이 2개이상 되어 있는 경우 필수
+              merchant_uid: "ORD20180131-0000011", // 주문 번호
+            },
+            function (rsp) {
+              // callback
+              if (rsp.success) {
+                // 인증 성공 시 로직
+                console.log("본인 인증 요청 성공", rsp.message);
+              } else {
+                // 인증 실패 시 로직
+                console.log("본인 인증 요청 실패");
+              }
+            },
+        );
+
       } catch (error) {
         console.error("본인 인증 요청 실패:", error);
       }
@@ -225,13 +263,11 @@ export default {
             console.error('아이디 중복 확인에 실패했습니다.', error);
           });
     },
-
   }
 };
 </script>
 
 <style scoped>
-
 .form-check {
   margin-top: 20px;
 }
@@ -244,5 +280,4 @@ export default {
   max-width: 600px;
   width: 100%;
 }
-
 </style>
