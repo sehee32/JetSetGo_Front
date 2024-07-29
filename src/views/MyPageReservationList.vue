@@ -7,10 +7,9 @@
           <!-- 예약 -->
           <div v-for="(item, index) in reservations" :key="index" class="costom-box">
             <div class="list">
-              <v-checkbox
-                  v-model="item.checked"
-                  :label="item.label"
-              ></v-checkbox>
+              <p><strong>Name:</strong> {{ item.name }}</p>
+              <p><strong>Date:</strong> {{ item.date }}</p>
+              <p><strong>Location:</strong> {{ item.location }}</p>
             </div>
             <div class="line"></div>
             <div class="btn">
@@ -36,8 +35,8 @@ export default {
   data() {
     return {
       reservations: [
-        { label: 'Checkbox 1', checked: false, valid: true, errorMessage: 'This is required' },
-        { label: 'Checkbox 2', checked: false, valid: true, errorMessage: 'This is required' },
+        { name: 'John Doe', date: '2024-07-30', location: 'New York' },
+        { name: 'Jane Smith', date: '2024-08-01', location: 'Los Angeles' }
         // Add more items as needed
       ],
     };
