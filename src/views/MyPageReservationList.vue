@@ -4,14 +4,23 @@
     <v-app>
       <v-main>
         <v-container class="costom-container">
+          <!-- 예약 -->
           <div v-for="(item, index) in reservations" :key="index" class="costom-box">
-            <v-checkbox
-                v-model="item.checked"
-                :label="item.label"
-            ></v-checkbox>
-            <v-alert v-if="!item.valid" type="error" dismissible>
-              {{ item.errorMessage }}
-            </v-alert>
+            <div class="list">
+              <v-checkbox
+                  v-model="item.checked"
+                  :label="item.label"
+              ></v-checkbox>
+            </div>
+            <div class="line"></div>
+            <div class="btn">
+              <v-btn
+                  @click="goDetail"
+                  class="detailBtn"
+                  text="상세보기"
+                  block
+              ></v-btn>
+            </div>
           </div>
 
         </v-container>
@@ -33,6 +42,11 @@ export default {
       ],
     };
   },
+  methods: {
+    goDetail() {
+      this.$router.go(-1); // 우선 이전 페이지로 이동
+    }
+  }
 }
 </script>
 
@@ -51,17 +65,60 @@ export default {
 
 .reservationList h1{
   text-align: left;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   color: #00256c;
 }
 
-.profileEdit .profileList .costom-box{
-  position: relative;
+/* 예약 */
+.reservationList .costom-box{
   text-align: left;
   padding: 40px 30px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   border-radius: 10px;
-  border: 1px solid #ccc;
+  border-top: 3px solid #00256c;
+  box-shadow: 1px 5px 5px rgba(0, 0, 0, 0.2); /* 수평 오프셋, 수직 오프셋, 흐림 정도, 색상 */
+}
+
+.reservationList .costom-box .list,
+.reservationList .costom-box .line,
+.reservationList .costom-box .btn{
+  display: inline-block;
+}
+
+.reservationList .costom-box .line{
+  width: 1px;
+  height: 50px;
+  background-color: #eee;
+}
+
+.reservationList .costom-box .list{
+  width: 72%;
+}
+
+.reservationList .costom-box .btn{
+  width: 27%;
+}
+
+.reservationList .costom-box .btn .detailBtn {
+  width: 280px;
+  height: 50px;
+  margin-left: auto;
+  min-width: 34px;
+  padding: 18px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 2;
+  border: 1px solid #00256c;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: #00256c;
+  color: #fff;
+}
+
+.reservationList .costom-box .btn .detailBtn:hover{
+  background-color: #fff;
+  color: #00256c;
 }
 
 </style>
