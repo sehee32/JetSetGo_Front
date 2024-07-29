@@ -45,6 +45,9 @@ export default {
     goDetail() {
       this.$router.go(-1); // 우선 이전 페이지로 이동
     }
+  },
+  mounted() {
+    window.scrollTo(0, 0); // 페이지 스크롤 위치 맨 위로
   }
 }
 </script>
