@@ -55,7 +55,6 @@
               prepend-inner-icon="mdi-lock-outline"
               clearable
           >
-            <!-- 비밀번호 표시/숨김 아이콘 -->
             <template v-slot:append-inner>
               <v-icon @click="show = !show">
                 {{ show ? 'mdi-eye' : 'mdi-eye-off' }}
@@ -95,7 +94,6 @@
               prepend-inner-icon="mdi-phone-outline"
               clearable
           ></v-text-field>
-
         </div>
 
         <div>
@@ -113,7 +111,6 @@
         </div>
 
         <br>
-
 
         <div>
           <v-text-field
@@ -145,7 +142,6 @@
               type="submit"
               variant="elevated"
               block
-              @click="signup"
           >
             가입하기
           </v-btn>
@@ -157,7 +153,7 @@
 
 <script>
 import axios from 'axios';
-import { requestIdentityVerification } from "@/identityVerification";
+import requestCertification from "../../public/portOneVerification.html";
 
 export default {
   data() {
@@ -205,7 +201,9 @@ export default {
     async verify() {
       try {
         // 본인 인증 요청
-        await requestIdentityVerification();
+        await requestCertification();
+
+        window.open("/portOneVerification", "_blank", 'width=600,height=600');
       } catch (error) {
         console.error("본인 인증 요청 실패:", error);
       }
@@ -225,13 +223,11 @@ export default {
             console.error('아이디 중복 확인에 실패했습니다.', error);
           });
     },
-
   }
 };
 </script>
 
 <style scoped>
-
 .form-check {
   margin-top: 20px;
 }
@@ -244,5 +240,4 @@ export default {
   max-width: 600px;
   width: 100%;
 }
-
 </style>
