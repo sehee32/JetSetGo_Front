@@ -28,6 +28,7 @@
                     variant="underlined"
                     maxlength="20"
                     :rules="[rules.required]"
+                    @keydown.enter="submitPassword"
                 ></v-text-field>
               </div>
               <!-- 버튼 -->

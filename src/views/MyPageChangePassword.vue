@@ -17,6 +17,7 @@
                   variant="underlined"
                   maxlength="20"
                   :rules="[rules.required]"
+                  @keydown.enter="submit"
               ></v-text-field>
               <!-- 신규 비밀번호 -->
               <p>신규 비밀번호 <span class="red">*</span> </p>
@@ -29,6 +30,7 @@
                   :rules="[rules.required, rules.password]"
                   ref="newPasswordField"
                   @input="validateNewPassword"
+                  @keydown.enter="submit"
               ></v-text-field>
               <!-- 신규 비밀번호 확인 -->
               <p>신규 비밀번호 확인 <span class="red">*</span> </p>
@@ -39,6 +41,7 @@
                   variant="underlined"
                   maxlength="20"
                   :rules="[rules.required, rules.matchPassword]"
+                  @keydown.enter="submit"
               ></v-text-field>
             </div>
             <!-- 버튼 -->
