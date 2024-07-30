@@ -7,21 +7,27 @@
           <!-- 예약 -->
           <div v-for="(item, index) in reservations" :key="index" class="costom-box">
             <div class="list">
-              <p><strong>Name:</strong> {{ item.name }}</p>
-              <p><strong>Date:</strong> {{ item.date }}</p>
-              <p><strong>Location:</strong> {{ item.location }}</p>
+              <div class="status">
+                <p><strong>{{ item.status }}</strong> {{ item.reservationId }}</p>
+              </div>
+              <div class="airport">
+                <span><strong>{{ item.departureCode }}</strong>{{ item.departureCity }} </span>
+                <span> <strong>{{ item.arrivalCode }}</strong>{{ item.arrivalCity }}</span>
+              </div>
+              <div class="time">
+                <strong>{{ item.departureTime }} ~ {{ item.arrivalTime }}</strong>
+              </div>
             </div>
             <div class="line"></div>
             <div class="btn">
               <v-btn
-                  @click="goDetail(item.id)"
+                  @click="goDetail(item.reservationId)"
                   class="detailBtn"
                   text="상세보기"
                   block
               ></v-btn>
             </div>
           </div>
-
         </v-container>
       </v-main>
     </v-app>
@@ -35,8 +41,8 @@ export default {
   data() {
     return {
       reservations: [
-        { name: 'John Doe', date: '2024-07-30', location: 'New York' , id: 1 },
-        { name: 'Jane Smith', date: '2024-08-01', location: 'Los Angeles', id: 2  }
+        { reservationId: 1002, status: '미사용', departureCode:'ICN', arrivalCode:'KIX', departureCity: '서울', arrivalCity: '오사카', departureTime: '2025-05-07 15:15', arrivalTime: '2025-05-07 17:15'  },
+        { reservationId: 1001, status: '사용완료', departureCode:'ICN', arrivalCode:'KIX', departureCity: '서울', arrivalCity: '오사카', departureTime: '2025-05-03 13:30', arrivalTime: '2025-05-03 15:30'  },
         // Add more items as needed
       ],
     };
@@ -81,7 +87,7 @@ export default {
 /* 예약 */
 .reservationList .costom-box{
   text-align: left;
-  padding: 40px 30px;
+  padding: 25px 40px;
   margin-bottom: 40px;
   border-radius: 10px;
   border-top: 3px solid #00256c;
@@ -101,11 +107,39 @@ export default {
 }
 
 .reservationList .costom-box .list{
-  width: 72%;
+  width: 71%;
+}
+
+.reservationList .costom-box .list .status{
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.reservationList .costom-box .list .airport{
+  display: inline-block;
+  width: 30%;
+  background: url('@/assets/flight.png') no-repeat 88px center;
+  background-size: 20px 20px; /* 너비와 높이 모두 지정 */
+}
+
+.reservationList .costom-box .list .airport span{
+  display: inline-block;
+  margin-right: 60px;
+  text-align: center;
+}
+
+.reservationList .costom-box .list .airport span strong{
+  display: block;
+  font-size: 40px;
+}
+
+.reservationList .costom-box .list .time{
+  display: inline-block;
+  margin-top: 20px;
 }
 
 .reservationList .costom-box .btn{
-  width: 27%;
+  width: 28%;
 }
 
 .reservationList .costom-box .btn .detailBtn {
