@@ -5,7 +5,7 @@
       <v-main>
         <v-container class="costom-container">
           <!-- 예약 -->
-          <div v-for="(item, index) in reservations" :key="index" class="costom-box">
+          <div v-for="(item, index) in reservations" :key="index" class="costom-box" :style="getBorderTopStyle(item.status)">
             <div class="list">
               <div class="status">
                 <p><strong>{{ item.status }}</strong> {{ item.reservationId }}</p>
@@ -53,6 +53,19 @@ export default {
       localStorage.setItem('reservationId', id);
       // MyPageReservationDetail로 이동
       this.$router.push({ name: 'MyPageReservationDetail' });
+    },
+    getBorderTopStyle(status) {
+      let borderColor;
+      switch (status) {
+        case '사용완료':
+          borderColor = '#cccccc';
+          break;
+        default:
+          borderColor = '#000256'; // 기본 색상
+      }
+      return {
+        borderTop: `3px solid ${borderColor}`
+      };
     }
   },
   mounted() {
@@ -90,7 +103,6 @@ export default {
   padding: 25px 40px;
   margin-bottom: 40px;
   border-radius: 10px;
-  border-top: 3px solid #00256c;
   box-shadow: 1px 5px 5px rgba(0, 0, 0, 0.2); /* 수평 오프셋, 수직 오프셋, 흐림 정도, 색상 */
 }
 
