@@ -1,6 +1,7 @@
 <template>
   <div class="reservationList">
-    <h1>예약 목록</h1>
+    <h1>예약 상세 페이지</h1>
+    <p>예약 ID: {{ reservationId }}</p>
     <v-app>
       <v-main>
         <v-container class="costom-container">
@@ -14,7 +15,7 @@
             <div class="line"></div>
             <div class="btn">
               <v-btn
-                  @click="goDetail(item.id)"
+                  @click="goDetail"
                   class="detailBtn"
                   text="상세보기"
                   block
@@ -30,31 +31,33 @@
 
 <script>
 export default {
-  name: "MyPageReservationList",
+  name: "MyPageReservationDetail",
   components: {},
+  props: ['id'], // Define id as a prop
   data() {
     return {
       reservations: [
-        { name: 'John Doe', date: '2024-07-30', location: 'New York' , id: 1 },
-        { name: 'Jane Smith', date: '2024-08-01', location: 'Los Angeles', id: 2  }
-        // Add more items as needed
+        { name: 'John Doe', date: '2024-07-30', location: 'New York' },
+        { name: 'Jane Smith', date: '2024-08-01', location: 'Los Angeles' }
       ],
+      reservationId: null
     };
   },
   methods: {
-    goDetail(id) {
-      // ID 값을 localStorage에 저장
-      localStorage.setItem('reservationId', id);
-      // MyPageReservationDetail로 이동
-      this.$router.push({ name: 'MyPageReservationDetail' });
+    goDetail() {
+      this.$router.go(-1); // 우선 이전 페이지로 이동
     }
   },
   mounted() {
-    const element = this.$el.querySelector('.v-application__wrap');
-    if (element) {
-      element.style.minHeight = 'initial';
-    } //v-app 아래의 div class="v-application__wrap" 요소에 min-height: initial; 스타일을 적용
-    window.scrollTo(0, 0); // 페이지 스크롤 위치 맨 위로
+    // localStorage에서 ID 값을 읽어와서 데이터에 저장
+    this.reservationId = localStorage.getItem('reservationId');
+
+    // 필요에 따라 ID를 기반으로 추가 작업을 수행할 수 있습니다.
+    console.log('예약자 ID:', this.reservationId);
+  },
+  beforeUnmount() {
+    // 컴포넌트가 사라질 때 localStorage에서 ID 값을 삭제할 수 있습니다.
+    localStorage.removeItem('reservationId');
   }
 }
 </script>

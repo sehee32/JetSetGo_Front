@@ -76,6 +76,12 @@ const routes = [
   }
   ,
   {
+    path: '/myPageReservationDetail',
+    name: 'MyPageReservationDetail',
+    component: () => import(/* webpackChunkName: "myPageReservationDetail" */ '../views/MyPageReservationDetail.vue')
+  }
+  ,
+  {
     path: '/myPageWithdrawal',
     name: 'MyPageWithdrawal',
     component: () => import(/* webpackChunkName: "myPageWithdrawal" */ '../views/MyPageWithdrawal.vue')
