@@ -106,7 +106,13 @@ export default {
             sampleData: ''
          };
     },
-    methods: {}
+    methods: {},
+  mounted() {
+    const element = this.$el.querySelector('.v-application__wrap');
+    if (element) {
+      element.style.minHeight = 'initial';
+    }//v-app 아래의 div class="v-application__wrap" 요소에 min-height: initial; 스타일을 적용
+  }
 }
 </script>
 
