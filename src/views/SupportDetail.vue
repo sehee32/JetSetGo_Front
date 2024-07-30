@@ -7,8 +7,8 @@
       </v-btn>
     </div>
     <div>
-      <p>Support Number: <span>{{ supportNum }}</span></p>
-      왜 안나오지...
+      <h1>문의 상세 페이지</h1>
+      <p>문의 ID: {{ supportId }}</p>
     </div>
   </div>
 </template>
@@ -19,19 +19,25 @@ export default {
   name: 'InquiryPage',
   data() {
     return {
-      supportNum: null // 초기에는 null로 설정하여 초기화
+      supportId: null // 초기에는 null로 설정하여 초기화
     };
-  },
-  created() {
-    // Vue 라이프사이클 훅인 created에서 this.$route.params를 통해 params 값에 접근
-    this.supportNum = this.$route.params.supportNum;
-    console.log('확인',this.$route.params.supportNum)
   },
   methods: {
     goBack()
     {
       this.$router.go(-1); //이전 페이지로 이동
     }
+  },
+  mounted() {
+    // localStorage에서 ID 값을 읽어와서 데이터에 저장
+    this.supportId = localStorage.getItem('supportId');
+
+    // 필요에 따라 ID를 기반으로 추가 작업을 수행할 수 있습니다.
+    console.log('예약자 ID:', this.supportId);
+  },
+  beforeUnmount() {
+    // 컴포넌트가 사라질 때 localStorage에서 ID 값을 삭제할 수 있습니다.
+    localStorage.removeItem('supportId');
   }
 }
 

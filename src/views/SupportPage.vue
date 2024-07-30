@@ -164,12 +164,17 @@ export default {
       });
     },
     showDetail(event, { item }) {
-      // console.log(item) //item 내용 확인용
       if (item.isPublic) {
-        this.$router.push({name: 'SupportDetail', params: {supportNum: item.supportNum}});
+        this.goDetail(item.supportNum)
       }else{
         this.openPasswordDialog(item.supportNum)
       }
+    },
+    goDetail(id) {
+      // ID 값을 localStorage에 저장
+      localStorage.setItem('supportId', id);
+      // MyPageReservationDetail로 이동
+      this.$router.push({ name: 'SupportDetail' });
     },
     openPasswordDialog(supportNum) {
       this.selectedSupportNum = supportNum;
@@ -186,7 +191,7 @@ export default {
         if (response.data.success) {
           // 비밀번호 일치 시 처리할 로직
           // 예: 문의 내용 보기로 이동
-          this.$router.push({ name: 'SupportDetail', params: { supportNum: this.selectedSupportNum } });
+          this.showDetail(this.selectedSupportNum)
         } else {
           alert('비밀번호가 일치하지 않습니다.');
         }
