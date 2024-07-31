@@ -64,7 +64,7 @@ export default {
           borderColor = '#000256'; // 기본 색상
       }
       return {
-        borderTop: `3px solid ${borderColor}`
+        borderTop: `4px solid ${borderColor}`
       };
     }
   },
