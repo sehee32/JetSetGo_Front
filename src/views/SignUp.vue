@@ -62,6 +62,27 @@
           </v-text-field>
         </div>
 
+        <div>
+          <v-text-field
+              v-model="confirmPassword"
+              :rules="[rules.required, rules.matchPassword]"
+              :type="show ? 'text' : 'password'"
+              class="mb-2"
+              id="confirmPassword"
+              label="비밀번호 확인"
+              variant="outlined"
+              prepend-inner-icon="mdi-lock-check-outline"
+              clearable
+          >
+            <template v-slot:append-inner>
+              <v-icon @click="show = !show">
+                {{ show ? 'mdi-eye' : 'mdi-eye-off' }}
+              </v-icon>
+            </template>
+          </v-text-field>
+        </div>
+
+
         <!-- 인증하기 버튼을 텍스트 필드 내부에 배치 -->
         <div class="phone-container">
           <v-text-field
