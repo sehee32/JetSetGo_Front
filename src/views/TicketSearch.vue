@@ -1,15 +1,16 @@
 <template>
   <v-container>
-    <v-card class="custom-card pa-6 mt-6">
-      <h2 class="text-center mb-6">항공편 검색 결과</h2>
+<!--    <v-card class="custom-card pa-6 mt-6">-->
+    <br>
+      <h1 class="text-center mb-6">항공편 검색 결과</h1>
 
       <!-- 출발지, 도착지, 날짜, 인원 정보 표시 -->
       <v-row>
         <v-col cols="12">
           <div class="route-info">
-            <p>{{ departure }} -> {{ destination }}</p>
-            <p>{{ departureDate }} - {{ returnDate }}</p>
-            <p>성인 {{ adults }}명, 아동 {{ children }}명</p>
+            <h2><p>{{ departure }} - {{ destination }}</p></h2>
+            <h3><p>{{ departureDate }} - {{ returnDate }}</p>
+            <p>성인 {{ adults }}명, 아동 {{ children }}명</p></h3>
           </div>
         </v-col>
       </v-row>
@@ -38,10 +39,10 @@
               </v-col>
 
               <!-- 가격 옵션 표시 -->
-              <v-col cols="12" md="6">
+              <v-col cols="12" md="8">
                 <v-row>
                   <v-col
-                      cols="4"
+                      cols="3"
                       class="price-option"
                       v-for="option in flight.priceOptions"
                       :key="option.type"
@@ -72,20 +73,40 @@
           <v-btn @click="Payment" class="custom-btn mt-4">결제하기</v-btn>
         </v-col>
       </v-row>
-    </v-card>
+<!--    </v-card>-->
   </v-container>
 </template>
 
 <script>
 export default {
+  props: {
+    departure: {
+      type: String,
+      required: true
+    },
+    destination: {
+      type: String,
+      required: true
+    },
+    departureDate: {
+      type: String,
+      required: true
+    },
+    returnDate: {
+      type: String,
+      required: true
+    },
+    adults: {
+      type: String,
+      required: true
+    },
+    children: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
-      departure: '서울',
-      destination: '뉴욕',
-      departureDate: '2023-07-24',
-      returnDate: '2023-07-31',
-      adults: '2',
-      children: '1',
       currentFlights: [], // 현재 화면에 표시되는 항공편 리스트
       outgoingFlights: [
         // 가는편 항공편 데이터
@@ -209,7 +230,7 @@ export default {
 <style scoped>
 
 .custom-card {
-  max-width: 1000px;
+  max-width: 2000px;
   margin: auto;
   background-color: #ffffff;
   color: #00256c;
@@ -223,7 +244,7 @@ export default {
 }
 
 .flight-card {
-  background-color: #f9f9f9;
+  background-color: #f3f4f8;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -245,7 +266,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
   margin: 5px;
-  background-color: #e0e0e0;
+  background-color: #f3f4f8;
 }
 
 .price-option:hover {

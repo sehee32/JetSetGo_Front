@@ -86,11 +86,11 @@
 
   <!-- 하단 부분 -->
   <v-app>
-  <div class="bookingLower">
-    <v-container class="padding0">
-      <!-- 슬라이더 컴포넌트 -->
-      <v-slide-group v-model="currentIndex" class="marginTop60" show-arrows>
-        <v-slide-item v-for="(slideItems, index) in slideItems" :key="index">
+    <div class="bookingLower">
+      <v-container class="padding0">
+        <!-- 슬라이더 컴포넌트 -->
+        <v-slide-group v-model="currentIndex" class="marginTop60" show-arrows>
+          <v-slide-item v-for="(slideItems, index) in slideItems" :key="index">
             <v-card
                 :class="['ma-4', 'custom-card']"
                 height="280"
@@ -108,84 +108,84 @@
               </div>
               <v-card-title class="custom-card-title">{{ slideItems.title }}</v-card-title>
             </v-card>
-        </v-slide-item>
-      </v-slide-group>
-      <!-- 리스트 컴포넌트 -->
-      <v-toolbar color="white" dark class="marginTop60">
-        <v-toolbar-title class="custom-toolbar-title">알려드립니다</v-toolbar-title>
-        <v-btn :ripple="false" variant="text" router to="/support" class="btn-underline">목록보기</v-btn>
-      </v-toolbar>
-      <v-row>
-        <v-col cols="7">
-          <v-list lines="two">
-            <v-list-item v-for="listItems in listItems" :key="listItems.id" class="custom-list-item" :class="{ 'custom-list-last-item': index === listItems.length - 1 }">
-              <v-list-item-content  class="d-flex justify-space-between" @click="goToPage(listItems.route)">
-                <v-list-item-title class="v-list-title">{{ listItems.title }}</v-list-item-title>
-                <v-list-item-subtitle>{{ listItems.subtitle }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-col>
-        <v-col cols="5">
-          <v-img :src="require('@/assets/listImage.png')" aspect-ratio="1.5" class="costom-list-image" @click="goToPage('/support')" :rounded="4"></v-img>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
-    <!-- 카드nav 컴포넌트 -->
-  <div class="colorBlue marginTop60">
-    <div class="bookingLower">
-      <v-toolbar color="#D0E7F6" dark >
-        <v-toolbar-title class="custom-toolbar-title">여행의 완성을 위한 경험</v-toolbar-title>
-      </v-toolbar>
-      <v-container>
+          </v-slide-item>
+        </v-slide-group>
+        <!-- 리스트 컴포넌트 -->
+        <v-toolbar color="white" dark class="marginTop60">
+          <v-toolbar-title class="custom-toolbar-title">알려드립니다</v-toolbar-title>
+          <v-btn :ripple="false" variant="text" router to="/support" class="btn-underline">목록보기</v-btn>
+        </v-toolbar>
         <v-row>
-          <v-col
-              v-for="(card, index) in cards"
-              :key="index"
-              cols="12"
-              sm="6"
-              md="4"
-              lg="3"
-              xl="1"
-              class="card-column"
-              @mouseover="showNav(index)"
-              @mouseleave="hideNav"
-          >
-            <div class="card-container">
-              <v-card variant="flat" class="custom-flat-card">
-                <v-card-title class="card-title">{{ card.title }}</v-card-title>
-                <v-img
-                    :src="card.image"
-                    aspect-ratio="16/9"
-                    max-width="100%"
-                    max-height="50px"
-                    style="object-fit: cover;"
-                ></v-img>
-              </v-card>
-              <!-- 카드 아래에 네비게이션 항목을 표시 -->
-              <v-list
-                  v-if="hoveredCardIndex === index"
-                  dense
-                  nav
-                  flat
-                  class="custom-nav-list"
-              >
-                <v-list-item
-                    v-for="(navItem, navIndex) in card.navItems"
-                    :key="navIndex"
-                    @click="navigate(navItem.route)"
-                    class="custom-nav-list-item"
-                >
-                  <v-list-item-title class="custom-nav-item-title">{{ navItem.text }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </div>
+          <v-col cols="7">
+            <v-list lines="two">
+              <v-list-item v-for="listItems in listItems" :key="listItems.id" class="custom-list-item" :class="{ 'custom-list-last-item': index === listItems.length - 1 }">
+                <v-list-item-content  class="d-flex justify-space-between" @click="goToPage(listItems.route)">
+                  <v-list-item-title class="v-list-title">{{ listItems.title }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ listItems.subtitle }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-col>
+          <v-col cols="5">
+            <v-img :src="require('@/assets/listImage.png')" aspect-ratio="1.5" class="costom-list-image" @click="goToPage('/support')" :rounded="4"></v-img>
           </v-col>
         </v-row>
       </v-container>
     </div>
-  </div>
+    <!-- 카드nav 컴포넌트 -->
+    <div class="colorBlue marginTop60">
+      <div class="bookingLower">
+        <v-toolbar color="#D0E7F6" dark >
+          <v-toolbar-title class="custom-toolbar-title">여행의 완성을 위한 경험</v-toolbar-title>
+        </v-toolbar>
+        <v-container>
+          <v-row>
+            <v-col
+                v-for="(card, index) in cards"
+                :key="index"
+                cols="12"
+                sm="6"
+                md="4"
+                lg="3"
+                xl="1"
+                class="card-column"
+                @mouseover="showNav(index)"
+                @mouseleave="hideNav"
+            >
+              <div class="card-container">
+                <v-card variant="flat" class="custom-flat-card">
+                  <v-card-title class="card-title">{{ card.title }}</v-card-title>
+                  <v-img
+                      :src="card.image"
+                      aspect-ratio="16/9"
+                      max-width="100%"
+                      max-height="50px"
+                      style="object-fit: cover;"
+                  ></v-img>
+                </v-card>
+                <!-- 카드 아래에 네비게이션 항목을 표시 -->
+                <v-list
+                    v-if="hoveredCardIndex === index"
+                    dense
+                    nav
+                    flat
+                    class="custom-nav-list"
+                >
+                  <v-list-item
+                      v-for="(navItem, navIndex) in card.navItems"
+                      :key="navIndex"
+                      @click="navigate(navItem.route)"
+                      class="custom-nav-list-item"
+                  >
+                    <v-list-item-title class="custom-nav-item-title">{{ navItem.text }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </div>
+            </v-col>
+          </v-row>
+        </v-container>
+      </div>
+    </div>
   </v-app>
 </template>
 
@@ -225,48 +225,48 @@ export default {
         {
           title: '항공카드', image: require('@/assets/main_icon1.png'),
           navItems: [
-              { text: '항공카드', route: '/support' }
+            { text: '항공카드', route: '/support' }
           ]
         },
         {
           title: '기프트카드', image: require('@/assets/main_icon2.png'),
           navItems: [
-              { text: '기프트카드', route: '/support' }
+            { text: '기프트카드', route: '/support' }
           ]
         },
         {
           title: '호텔',  image: require('@/assets/main_icon3.png'),
           navItems: [
-              { text: '아고다', route: '/support' },
-              { text: 'Hotels.com', route: '/support' }
+            { text: '아고다', route: '/support' },
+            { text: 'Hotels.com', route: '/support' }
           ]
         },
         {
           title: '렌터카',  image: require('@/assets/main_icon4.png'),
           navItems: [
-              { text: 'Hertz', route: '/support' },
-              { text: 'SK렌터카', route: '/support' },
-              { text: '롯데렌터카', route: '/support' },
-              { text: 'Rentalcars.com', route: '/support' }
+            { text: 'Hertz', route: '/support' },
+            { text: 'SK렌터카', route: '/support' },
+            { text: '롯데렌터카', route: '/support' },
+            { text: 'Rentalcars.com', route: '/support' }
           ]
         },
         {
           title: '기내 면세점',  image: require('@/assets/main_icon5.png'),
           navItems: [
-              { text: 'SKYSHOP', route: '/support' }
+            { text: 'SKYSHOP', route: '/support' }
           ]
         },
         {
           title: '여행자 보험',  image: require('@/assets/main_icon6.png'),
           navItems: [
-              { text: 'Chubb 여행보험', route: '/support' }
+            { text: 'Chubb 여행보험', route: '/support' }
           ]
         },
         {
           title: '여행 상품',  image: require('@/assets/main_icon7.png'),
           navItems: [
-              { text: '한진관광', route: '/support' },
-              { text: 'KALPAK', route: '/support' }
+            { text: '한진관광', route: '/support' },
+            { text: 'KALPAK', route: '/support' }
           ]
         }
       ],
@@ -274,18 +274,26 @@ export default {
     };
   },
   methods: {
+    formatDate(date) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
+      return new Date(date).toLocaleDateString('ko-KR', options);
+    },
     // 예매 정보 처리 메서드
     bookTicket() {
+      const formattedDepartureDate = this.formatDate(this.departureDate);
+      const formattedReturnDate = this.formatDate(this.returnDate);
 
-      console.log('예매 정보:', {
-        departure: this.departure,
-        destination: this.destination,
-        departureDate: this.departureDate,
-        returnDate: this.returnDate,
-        adults: this.adults,
-        children: this.children
+      this.$router.push({
+        name: 'TicketSearch',
+        query: {
+          departure: this.departure,
+          destination: this.destination,
+          departureDate: formattedDepartureDate,
+          returnDate: formattedReturnDate,
+          adults: this.adults,
+          children: this.children
+        }
       });
-      this.$router.push('ticketsearch');
     },
     // 하단 부분
     goToPage(route) {
@@ -298,7 +306,7 @@ export default {
       this.hoveredCardIndex = null;
     },
     navigate(route) {
-        this.$router.push(route);
+      this.$router.push(route);
     }
   }
 };
