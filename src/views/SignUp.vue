@@ -82,7 +82,6 @@
           </v-text-field>
         </div>
 
-
         <!-- 인증하기 버튼을 텍스트 필드 내부에 배치 -->
         <div class="phone-container">
           <v-text-field
@@ -120,7 +119,6 @@
           ></v-text-field>
         </div>
 
-
         <br><br>
 
         <div class="form-check">
@@ -132,7 +130,7 @@
 
         <div>
           <v-btn
-              :disabled="!formValid || !birthdate || !agreeTerms"
+              :disabled="!formValid || !birthdate || !agreeTerms || !verificationSuccess || !usernameChecked"
               color="#00256c"
               size="large"
               type="submit"
@@ -157,22 +155,34 @@ export default {
       username: '',
       password: '',
       confirmPassword: '',
-      birthdate: '', // Date object should be used for v-date-input
+      birthdate: '',
       phoneNumber: '',
       agreeTerms: false,
       formValid: false,
       show: false, // 비밀번호 보기/숨기기 아이콘 상태
+      verificationSuccess: false, // 인증 성공 여부를 저장하는 변수
+      usernameChecked: false, // 아이디 중복 확인 성공 여부를 저장하는 변수
       rules: {
         required: v => !!v || '이 항목을 입력하지 않았습니다.',
         password: v => v.length >= 8 || '비밀번호는 최소 8자 이상이어야 합니다.',
         matchPassword: v => v === this.password || '비밀번호가 일치하지 않습니다.',
-        }
       }
+    }
   },
   methods: {
     Signup() {
       if (this.password !== this.confirmPassword) {
         console.error('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+
+      if (!this.verificationSuccess) {
+        alert('본인 인증을 완료해주세요.');
+        return;
+      }
+
+      if (!this.usernameChecked) {
+        alert('아이디 중복 확인을 완료해주세요.');
         return;
       }
 
@@ -209,35 +219,21 @@ export default {
               // callback
               if (rsp.success) {
                 // 인증 성공 시
-                const verifiedData = {
-                  name: rsp.name,
-                  username: rsp.username,
-                  password: rsp.password,
-                  birthdate: rsp.birthdate,
-                  phoneNumber: rsp.phoneNumber,
-                  agreeTerms: true
-                };
-
-                // 서버로 전송
-                axios.post('http://localhost:8080/api/signup', verifiedData)
-                    .then(response => {
-                      console.log('회원가입 성공:', response.data);
-                      alert('회원가입이 성공적으로 완료되었습니다.');
-                    })
-                    .catch(error => {
-                      console.error('회원가입 실패:', error);
-                      alert('회원가입에 실패했습니다.');
-                    });
+                console.log("인증 성공");
+                alert('본인 인증 요청에 성공했습니다.');
+                this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
               } else {
                 // 인증 실패 시 로직
                 console.log("본인 인증 요청 실패");
                 alert('본인 인증 요청에 실패했습니다.');
+                this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
               }
-            }
+            }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
         );
       } catch (error) {
         console.error("본인 인증 요청 실패:", error);
         alert('본인 인증 요청에 실패했습니다.');
+        this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
       }
     },
 
@@ -248,14 +244,17 @@ export default {
             if (response.data.exists) {
               console.log('이미 사용중인 아이디 입니다.');
               alert('이미 사용중인 아이디 입니다.');
+              this.usernameChecked = false; // 중복된 아이디가 있는 경우 false로 설정
             } else {
               console.log('사용할 수 있는 아이디 입니다.');
               alert('사용할 수 있는 아이디 입니다.');
+              this.usernameChecked = true; // 사용 가능한 아이디인 경우 true로 설정
             }
           })
           .catch(error => {
             console.error('아이디 중복 확인에 실패했습니다.', error);
             alert('아이디 중복 확인에 실패했습니다.');
+            this.usernameChecked = false; // 오류 발생 시 false로 설정
           });
     },
   }
