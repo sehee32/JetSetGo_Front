@@ -1,28 +1,69 @@
 <template>
-  <div class="reservationList">
-    <h1>예약 상세 페이지</h1>
-    <p>예약 ID: {{ reservationId }}</p>
+  <div class="reservationID">
+    <!-- 예약 정보 -->
+    <div style="max-width: 1280px; margin: 0 auto;">
+      <h1>예약번호 : {{ reservationId }}</h1>
+      <h3>{{ flights[0].departureCity }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ flights[0].arrivalCity }}</h3>
+    </div>
+  </div>
+  <div class="reservationDetail">
     <v-app>
       <v-main>
         <v-container class="costom-container">
-          <!-- 예약 -->
-          <div v-for="(item, index) in reservations" :key="index" class="costom-box">
-            <div class="list">
-              <p><strong>Name:</strong> {{ item.name }}</p>
-              <p><strong>Date:</strong> {{ item.date }}</p>
-              <p><strong>Location:</strong> {{ item.location }}</p>
+          <!-- 예약 항공편 정보 -->
+          <div v-for="(item, index) in flights" :key="index" class="costom-box">
+            <div class="title">
+              <span>여정 {{index+1}}</span>
+              <span>{{ item.departureCode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.arrivalCode }}</span>
             </div>
-            <div class="line"></div>
-            <div class="btn">
-              <v-btn
-                  @click="goDetail"
-                  class="detailBtn"
-                  text="상세보기"
-                  block
-              ></v-btn>
+            <div class="detail">
+              <h4>{{ item.departureDate }}</h4>
+              <v-row>
+                <v-col class="departure">
+                  <p><strong>{{ item.departureTime }}</strong></p>
+                  <p>{{ item.departureCity }}</p>
+                  <p class="code">{{ item.departureCode }}</p>
+                </v-col>
+                <v-col cols="2" class="img">
+                  <p>총 {{ item.duration }} 소요</p>
+                  <p></p>
+                  <p></p>
+                </v-col>
+                <v-col class="arrival">
+                  <p><strong>{{ item.arrivalTime }}</strong></p>
+                  <p>{{ item.arrivalCity }}</p>
+                  <p class="code">{{ item.arrivalCode }}</p>
+                </v-col>
+              </v-row>
             </div>
           </div>
-
+          <!-- 연락처 및 탑승객 정보 -->
+          <div class="info">
+            <h5>연락처 및 탑승객 정보</h5>
+            <v-row>
+              <v-col>
+                <p><strong>{{user.name}}</strong></p>
+              </v-col>
+              <v-col>
+                <p><strong>연락처</strong> {{user.phoneNumber}}</p>
+              </v-col>
+              <v-col>
+              </v-col>
+            </v-row>
+          </div>
+          <div class="info">
+            <h5>여행 변경 및 취소</h5>
+            <v-row>
+              <v-col>
+                <v-btn></v-btn>
+                <p>예약변경</p>
+              </v-col>
+              <v-col>
+                <v-btn></v-btn>
+                <p>예약취소/환불</p>
+              </v-col>
+            </v-row>
+          </div>
         </v-container>
       </v-main>
     </v-app>
@@ -36,11 +77,14 @@ export default {
   props: ['id'], // Define id as a prop
   data() {
     return {
-      reservations: [
-        { name: 'John Doe', date: '2024-07-30', location: 'New York' },
-        { name: 'Jane Smith', date: '2024-08-01', location: 'Los Angeles' }
+      flights: [
+        { flightID:100, departureCode:'ICN', arrivalCode:'KIX', departureCity: '서울', arrivalCity: '오사카', departureDate: '2025-05-07', arrivalDate: '2025-05-07', departureTime: '15:15', arrivalTime: '17:15', duration: '2시간 0분' },
+        { flightID:321, departureCode:'KIX', arrivalCode:'ICN', departureCity: '오사카', arrivalCity: '서울', departureDate: '2025-05-09', arrivalDate: '2025-05-09', departureTime: '14:30', arrivalTime: '16:31', duration: '2시간 1분' },
+        // Add more items as needed
       ],
-      reservationId: null
+      reservationId: null,
+      status: '미사용',
+      user: {name:'사용자', phoneNumber:'01022222222'},
     };
   },
   methods: {
@@ -64,73 +108,111 @@ export default {
 
 
 <style scoped>
-.reservationList{
-  max-width: 1280px;
-  margin: 0 auto;
-  padding-top: 70px;
+
+.reservationID{
+  background: linear-gradient(to right, #00256c, #0064de);
+  padding: 20px 0 30px 0;
 }
 
-.reservationList .costom-container{
+.reservationID h1,
+.reservationID h3{
+  color: white;
+  text-align: left;
+}
+
+.reservationID h1{
+  font-size: 15px;
+}
+
+.reservationID h3{
+  font-size: 20px;
+  font-weight: 500;
+  background: url('@/assets/to_w.svg') no-repeat 50px center;
+}
+
+.reservationDetail{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 40px;
+}
+
+/* 예약 */
+.reservationDetail .costom-container{
   max-width: 1280px;
   padding: 0;
 }
 
-.reservationList h1{
+/* 예약 항공편 정보 */
+.reservationDetail .costom-box{
   text-align: left;
-  margin-bottom: 40px;
-  color: #00256c;
-}
-
-/* 예약 */
-.reservationList .costom-box{
-  text-align: left;
-  padding: 40px 30px;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
   border-radius: 10px;
-  border-top: 3px solid #00256c;
-  box-shadow: 1px 5px 5px rgba(0, 0, 0, 0.2); /* 수평 오프셋, 수직 오프셋, 흐림 정도, 색상 */
+  box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2); /* 수평 오프셋, 수직 오프셋, 흐림 정도, 색상 */
 }
-
-.reservationList .costom-box .list,
-.reservationList .costom-box .line,
-.reservationList .costom-box .btn{
+.reservationDetail .costom-box .title{
+  border-bottom: 1px solid #eee;
+  background: url('@/assets/to.svg') no-repeat 155px center;
+}
+.reservationDetail .costom-box .title span{
   display: inline-block;
-}
-
-.reservationList .costom-box .line{
-  width: 1px;
-  height: 50px;
-  background-color: #eee;
-}
-
-.reservationList .costom-box .list{
-  width: 72%;
-}
-
-.reservationList .costom-box .btn{
-  width: 27%;
-}
-
-.reservationList .costom-box .btn .detailBtn {
-  width: 280px;
-  height: 50px;
-  margin-left: auto;
-  min-width: 34px;
-  padding: 18px 20px;
-  font-size: 18px;
+  padding: 13px 25px;
   font-weight: 700;
-  line-height: 2;
-  border: 1px solid #00256c;
-  border-radius: 10px;
-  text-decoration: none;
-  cursor: pointer;
-  background-color: #00256c;
-  color: #fff;
+  font-size: 17px;
+
 }
 
-.reservationList .costom-box .btn .detailBtn:hover{
-  background-color: #fff;
-  color: #00256c;
+.reservationDetail .costom-box .title span:first-of-type {
+  background-color: #5985e1;
+  border-radius: 10px 0 3px 0;
+  color: white;
+  padding: 17px 29px;
+  font-size: 13px;
 }
+
+.reservationDetail .costom-box .detail{
+  padding: 30px 40px 50px 40px;
+}
+
+.reservationDetail .costom-box .detail p{
+  text-align: center;
+  line-height: 30px;
+  font-size: 15px;
+  color: #777;
+}
+
+.reservationDetail .costom-box .detail p strong{
+  font-size: 30px;
+  color: #000000;
+}
+
+.reservationDetail .costom-box .detail .code{
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.reservationDetail .costom-box .detail .img{
+  font-size: 20px;
+  background: url('@/assets/flight.png') no-repeat center;
+  background-size: 25px 25px;
+}
+
+.reservationDetail .costom-box .detail .departure p{
+  text-align: right;
+}
+
+.reservationDetail .costom-box .detail .arrival p{
+  text-align: left;
+}
+
+/* 연락처 및 탑승객 정보 */
+.reservationDetail .info h5{
+  padding-top: 50px;
+  text-align: left;
+  font-size: 20px;
+  line-height: 50px;
+  border-bottom: 2px solid #00256c;
+}
+
 
 </style>

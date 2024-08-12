@@ -241,6 +241,20 @@ export default {
       console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
       alert('삭제가 완료되었습니다.');
       this.$router.push({path: '/support'});
+    },
+    async selectSupport(){
+      const response = await axios.post('/api/enterSupport', {
+        supportId: this.supportId
+      });
+      // API 요청이 성공한 경우
+      console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+      this.title = response.data.title;// 응답 데이터를 results에 저장
+      //supportId로 문의 내용 받아오기
+      this.selectedCategory = 'ticket';
+      // this.title = '문의할게요';
+      this.detail = 'test 할게요';
+      this.isPublic = 'true';
+
     }
   },
   computed: {
@@ -253,13 +267,9 @@ export default {
     this.supportId = localStorage.getItem('supportId');
     this.sessionId = localStorage.getItem('session_id'); // 저장된 키에 맞게 수정
 
-    this.adminId = false//sessionId로 관리자인지 아닌지 여부 확인
-    //supportId로 문의 내용 받아오기
-    this.selectedCategory = 'ticket';
-    this.title = '문의할게요';
-    this.detail = 'test 할게요';
-    this.isPublic = 'true';
 
+    this.adminId = false//sessionId로 관리자인지 아닌지 여부 확인
+    this.selectSupport();
   },
   beforeUnmount() {
     // 컴포넌트가 사라질 때 localStorage에서 ID 값을 삭제할 수 있습니다.
