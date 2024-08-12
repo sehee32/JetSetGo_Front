@@ -19,28 +19,27 @@
               clearable
           ></v-text-field>
 
-          <v-text-field
-              v-model="username"
-              :rules="[rules.required]"
-              class="mb-2"
-              id="username"
-              label="ID"
-              variant="outlined"
-              prepend-inner-icon="mdi-account-outline"
-              clearable
-          ></v-text-field>
-
-          <v-btn
-              color="#00256c"
-              size="small"
-              type="button"
-              variant="elevated"
-              name="id_check"
-              block
-              @click="checkUsername"
-          >
-            중복확인
-          </v-btn>
+          <!-- 사용자명 입력과 버튼을 감싸는 div -->
+          <div class="username-container">
+            <v-text-field
+                v-model="username"
+                :rules="[rules.required]"
+                id="username"
+                label="ID"
+                variant="outlined"
+                prepend-inner-icon="mdi-account-outline"
+                clearable
+                class="username-text-field"
+            ></v-text-field>
+            <v-btn
+                class="username-btn"
+                color="#00256c"
+                size="small"
+                @click="checkUsername"
+            >
+              중복확인
+            </v-btn>
+          </div>
 
           <br>
 
@@ -83,27 +82,22 @@
           </v-text-field>
         </div>
 
-        <div>
+        <!-- 인증하기 버튼을 텍스트 필드 내부에 배치 -->
+        <div class="phone-container">
           <v-text-field
               v-model="phoneNumber"
               :rules="[rules.required]"
-              class="mb-2"
               id="phoneNumber"
               label="휴대전화번호"
               variant="outlined"
               prepend-inner-icon="mdi-phone-outline"
               clearable
+              class="phone-text-field"
           ></v-text-field>
-        </div>
-
-        <div>
           <v-btn
+              class="phone-btn"
               color="#00256c"
               size="small"
-              type="button"
-              variant="elevated"
-              name="phone_check"
-              block
               @click="verify"
           >
             인증하기
@@ -136,7 +130,7 @@
 
         <div>
           <v-btn
-              :disabled="!formValid || !birthdate || !agreeTerms"
+              :disabled="!formValid || !birthdate || !agreeTerms || !verificationSuccess || !usernameChecked"
               color="#00256c"
               size="large"
               type="submit"
@@ -153,7 +147,6 @@
 
 <script>
 import axios from 'axios';
-//import requestCertification from "../../public/portOneVerification.html";
 
 export default {
   data() {
@@ -167,17 +160,29 @@ export default {
       agreeTerms: false,
       formValid: false,
       show: false, // 비밀번호 보기/숨기기 아이콘 상태
+      verificationSuccess: false, // 인증 성공 여부를 저장하는 변수
+      usernameChecked: false, // 아이디 중복 확인 성공 여부를 저장하는 변수
       rules: {
         required: v => !!v || '이 항목을 입력하지 않았습니다.',
         password: v => v.length >= 8 || '비밀번호는 최소 8자 이상이어야 합니다.',
-        matchPassword: v => v === this.password || '비밀번호가 일치하지 않습니다.'
+        matchPassword: v => v === this.password || '비밀번호가 일치하지 않습니다.',
       }
-    };
+    }
   },
   methods: {
     Signup() {
       if (this.password !== this.confirmPassword) {
         console.error('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+
+      if (!this.verificationSuccess) {
+        alert('본인 인증을 완료해주세요.');
+        return;
+      }
+
+      if (!this.usernameChecked) {
+        alert('아이디 중복 확인을 완료해주세요.');
         return;
       }
 
@@ -192,9 +197,11 @@ export default {
       })
           .then(response => {
             console.log('회원가입 성공:', response.data);
+            alert('회원가입이 성공적으로 완료되었습니다.');
           })
           .catch(error => {
             console.error('회원가입 실패:', error);
+            alert('회원가입에 실패했습니다.');
           });
     },
 
@@ -202,50 +209,31 @@ export default {
       const IMP = window.IMP;
       IMP.init("imp12777257");
       try {
-
-        // await axios({
-        //   url: `https://api.portone.io/identity-verifications/${encodeURIComponent(`identity-verification-${crypto.randomUUID()}`)}/send`,
-        //   method: "post",
-        //   headers: { "Content-Type": "application/json" },
-        //
-        //   body: {
-        //     /* 기타 파라미터 생략 */
-        //     // bypass: danalBypass,
-        //     "storeId": "store-da4ab0d8-d5a6-4110-9e67-2ebf9fc1f5ff",
-        //     "channelKey": "channel-key-daa2e2fe-a9d4-43ff-b843-3b5e5b694f01",
-        //     "customer": {
-        //       "name": "문유정",
-        //       "phoneNumber": "01099292253",
-        //       "ipAddress": "220.86.116.153"
-        //     },
-        //     // "customData": "customData",
-        //     // "bypass": {},
-        //     "operator": "SKT",
-        //     "method": "APP",
-        //   },
-        // });
-        // 본인 인증 요청
-
         IMP.certification(
             {
               // param
-              pg: "inicis_unified.MIIiasTest", //본인인증 설정이 2개이상 되어 있는 경우 필수
+              pg: "inicis_unified.MIIiasTest", // 본인인증 설정이 2개 이상 되어 있는 경우 필수
               merchant_uid: "ORD20180131-0000011", // 주문 번호
             },
             function (rsp) {
               // callback
               if (rsp.success) {
-                // 인증 성공 시 로직
-                console.log("본인 인증 요청 성공", rsp.message);
+                // 인증 성공 시
+                console.log("인증 성공");
+                alert('본인 인증 요청에 성공했습니다.');
+                this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
               } else {
                 // 인증 실패 시 로직
                 console.log("본인 인증 요청 실패");
+                alert('본인 인증 요청에 실패했습니다.');
+                this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
               }
-            },
+            }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
         );
-
       } catch (error) {
         console.error("본인 인증 요청 실패:", error);
+        alert('본인 인증 요청에 실패했습니다.');
+        this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
       }
     },
 
@@ -255,12 +243,18 @@ export default {
           .then(response => {
             if (response.data.exists) {
               console.log('이미 사용중인 아이디 입니다.');
+              alert('이미 사용중인 아이디 입니다.');
+              this.usernameChecked = false; // 중복된 아이디가 있는 경우 false로 설정
             } else {
               console.log('사용할 수 있는 아이디 입니다.');
+              alert('사용할 수 있는 아이디 입니다.');
+              this.usernameChecked = true; // 사용 가능한 아이디인 경우 true로 설정
             }
           })
           .catch(error => {
             console.error('아이디 중복 확인에 실패했습니다.', error);
+            alert('아이디 중복 확인에 실패했습니다.');
+            this.usernameChecked = false; // 오류 발생 시 false로 설정
           });
     },
   }
@@ -268,6 +262,27 @@ export default {
 </script>
 
 <style scoped>
+.username-container,
+.phone-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.username-text-field,
+.phone-text-field {
+  flex: 1;
+}
+
+.username-btn,
+.phone-btn {
+  position: absolute;
+  right: 15px;
+  top: 35%;
+  transform: translateY(-50%);
+  margin-left: 0;
+}
+
 .form-check {
   margin-top: 20px;
 }

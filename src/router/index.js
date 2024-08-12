@@ -90,8 +90,21 @@ const routes = [
   {
     path: '/ticketsearch',
     name: 'TicketSearch',
-    component: () => import(/* webpackChunkName: "about" */ '../views/TicketSearch.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/TicketSearch.vue'),
+    props: route => ({
+      departure: route.query.departure,
+      destination: route.query.destination,
+      departureDate: route.query.departureDate,
+      returnDate: route.query.returnDate,
+      adults: route.query.adults,
+      children: route.query.children
+    })
   },
+  {
+    path: '/bookingpage',
+    name: 'BookingPage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/BookingPage.vue')
+  }
 
 
 ]
