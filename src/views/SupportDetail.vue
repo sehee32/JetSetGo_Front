@@ -247,13 +247,12 @@ export default {
         supportId: this.supportId
       });
       // API 요청이 성공한 경우
-      console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
-      this.title = response.data.title;// 응답 데이터를 results에 저장
+      console.log('결과 확인: ' + response.data.public_Status); // 서버에서 받은 데이터 출력
       //supportId로 문의 내용 받아오기
-      this.selectedCategory = 'ticket';
-      // this.title = '문의할게요';
-      this.detail = 'test 할게요';
-      this.isPublic = 'true';
+      this.title = response.data.title;// 응답 데이터를 results에 저장
+      this.selectedCategory = response.data.category;
+      this.detail = response.data.detail;
+      this.isPublic = response.data.public_Status;
 
     }
   },
