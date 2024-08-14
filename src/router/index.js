@@ -53,9 +53,9 @@ const routes = [
   },
 
   {
-    path: '/inquiry',
-    name: 'Inquiry',
-    component: () => import(/* webpackChunkName: "inquiry" */ '../views/InquiryPage.vue')
+    path: '/supportInquiry',
+    name: 'SupportInquiry',
+    component: () => import(/* webpackChunkName: "inquiry" */ '../views/./SupportInquiry')
   },
   {
     path: '/myPageChangePassword',

@@ -8,7 +8,7 @@
         <button type="button" class="searchRm" v-if="searchQueryText" @click="searchRm"></button> <!--x 버튼-->
       </div>
       <button type="button" class="searchBt" @click="searchText"></button> <!--검색 버튼-->
-      <router-link to="/inquiry" class="inquiryBtn">문의하기</router-link> <!--문의하기 버튼-->
+      <router-link to="/supportInquiry" class="inquiryBtn">문의하기</router-link> <!--문의하기 버튼-->
     </div>
     <!-- 카테고리 -->
     <div>
@@ -33,6 +33,9 @@
           no-data-text="검색 결과가 없습니다."
           @update:options=search
           @click:row=showDetail>
+        <template v-slot:[`item.index`]="{ index }">
+          {{ index + 1 }}
+        </template>
         <template v-slot:[`item.answer`]="{ item }">
           <span>{{ item.answer ? '완료' : '확인중' }}</span>
         </template>
@@ -81,8 +84,8 @@ export default {
       currentPage: 1, // 현재 페이지
       itemsPerPage: 5, // 줄 갯수
       headers: [
-        { title: '번호', align: 'start', key: 'num', sortable: false }, //제목 정렬방향 키 정렬가능여부
-        { title: '문의번호', key: 'support_Id', align: 'end', sortable: false },
+        { title: '번호', align: 'start', value: 'index' , sortable: false},
+        { title: '문의번호', key: 'support_Id', align: 'end', sortable: false }, //제목 키 정렬방향 정렬가능여부
         { title: '제목', key: 'title', align: 'end' },
         { title: '작성자', key: 'writer_Name', align: 'end' , sortable: false},
         { title: '작성일', key: 'created_Date', align: 'end' },

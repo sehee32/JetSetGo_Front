@@ -111,7 +111,7 @@
 import axios from "axios";
 
 export default {
-  name: 'InquiryPage',
+  name: 'SupportInquiry',
   data: function (){
     return{
       selectedCategory: null,
