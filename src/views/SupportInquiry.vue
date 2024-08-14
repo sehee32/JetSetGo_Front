@@ -130,6 +130,7 @@ export default {
       },
       isPublic: true,  // v-switch의 초기 상태를 false로 설정
       loading: false,
+      writerId: ''
     }
   },
   methods: {
@@ -162,10 +163,11 @@ export default {
         }
         console.log('유효성 검사 결과 : ' + isValid.valid); // 유효성 검사 결과 확인
         const response = await axios.post('/api/supportAdd', {
-          category: this.selectedCategory,
+          writer_Id : this.writerId,
           title: this.title,
           detail: this.detail,
-          isPublic: this.isPublic
+          public_Status: this.isPublic,
+          category: this.selectedCategory
         });
         // API 요청이 성공한 경우
         console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
@@ -186,6 +188,11 @@ export default {
     switchLabel() {
       return this.isPublic ? '공개' : '비공개';  // 상태에 따라 라벨 변경
     },
+  },
+  mounted() {
+    // localStorage에서 ID 값을 읽어와서 데이터에 저장
+    // this.writerId = localStorage.getItem('session_id'); // 저장된 키에 맞게 수정
+    this.writerId = 1;
   },
 }
 </script>
