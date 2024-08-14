@@ -36,8 +36,8 @@
         <template v-slot:[`item.answer`]="{ item }">
           <span>{{ item.answer ? '완료' : '확인중' }}</span>
         </template>
-        <template v-slot:[`item.isPublic`]="{ item }">
-          <v-icon>{{ item.isPublic ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+        <template v-slot:[`item.public_Status`]="{ item }">
+          <v-icon>{{ item.public_Status ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
         </template>
       </v-data-table-server>
       <!-- 설명 : 페이지당항목수 테이블 헤더 현재페이지항목 전체항목수 데이터로딩상태 검색어 고유식별자 메서드-->
@@ -82,12 +82,12 @@ export default {
       itemsPerPage: 5, // 줄 갯수
       headers: [
         { title: '번호', align: 'start', key: 'num', sortable: false }, //제목 정렬방향 키 정렬가능여부
-        { title: '문의번호', key: 'supportNum', align: 'end', sortable: false },
+        { title: '문의번호', key: 'support_Id', align: 'end', sortable: false },
         { title: '제목', key: 'title', align: 'end' },
-        { title: '작성자', key: 'author', align: 'end' , sortable: false},
-        { title: '작성일', key: 'createdDate', align: 'end' },
+        { title: '작성자', key: 'writer_Name', align: 'end' , sortable: false},
+        { title: '작성일', key: 'created_Date', align: 'end' },
         { title: '답변', key: 'answer', align: 'end' , sortable: false},
-        { title: '공개여부', key: 'isPublic', align: 'end' , sortable: false},
+        { title: '공개여부', key: 'public_Status', align: 'end' , sortable: false},
       ],
       loading: false,
       passwordDialog: false, // 비밀번호 입력 다이얼로그 표시 여부
@@ -164,10 +164,10 @@ export default {
       });
     },
     showDetail(event, { item }) {
-      if (item.isPublic) {
-        this.goDetail(item.supportNum)
+      if (item.public_Status) {
+        this.goDetail(item.support_Id)
       }else{
-        this.openPasswordDialog(item.supportNum)
+        this.openPasswordDialog(item.support_Id)
       }
     },
     goDetail(id) {
@@ -176,8 +176,8 @@ export default {
       // MyPageReservationDetail로 이동
       this.$router.push({ name: 'SupportDetail' });
     },
-    openPasswordDialog(supportNum) {
-      this.selectedSupportNum = supportNum;
+    openPasswordDialog(support_Id) {
+      this.selectedSupportNum = support_Id;
       this.passwordDialog = true;
     },
     // 비밀번호 입력 확인
