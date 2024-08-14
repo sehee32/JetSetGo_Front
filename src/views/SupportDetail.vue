@@ -249,11 +249,11 @@ export default {
       // API 요청이 성공한 경우
       console.log('결과 확인: ' + response.data.public_Status); // 서버에서 받은 데이터 출력
       //supportId로 문의 내용 받아오기
-      this.title = response.data.title;// 응답 데이터를 results에 저장
-      this.selectedCategory = response.data.category;
+      this.selectedCategory = response.data.category;// 응답 데이터를 저장
+      this.title = response.data.title;
       this.detail = response.data.detail;
       this.isPublic = response.data.public_Status;
-
+      this.answer = response.data.answer;
     }
   },
   computed: {
