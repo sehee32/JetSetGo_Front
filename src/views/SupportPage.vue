@@ -191,7 +191,6 @@ export default {
           supportId: this.selectedSupportNum,
           password: this.password
         });
-        alert(response.data);
         if(response.data){
           this.goDetail(this.selectedSupportNum)
         }else{
@@ -199,7 +198,6 @@ export default {
         }
       } catch (error) {
         console.error('오류 발생:', error);
-        alert(`오류 발생: ${error.message}`);
         alert('비밀번호 확인 중 오류가 발생했습니다.');
 
       } finally {
