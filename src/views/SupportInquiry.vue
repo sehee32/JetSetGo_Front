@@ -172,13 +172,17 @@ export default {
         // API 요청이 성공한 경우
         console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
 
-        alert('문의가 성공적으로 제출되었습니다.');
-        this.$router.push({path: '/support'});
-
+        if(response.data){
+          alert('문의가 성공적으로 제출되었습니다.');
+          this.$router.push({path: '/support'});
+        }else{
+          alert('문의 불가 : 오류');
+        }
 
       } catch (error) {
         console.error('오류 발생:', error);
         alert(`오류 발생: ${error.message}`);
+
       } finally {
         this.loading = false;
       }

@@ -187,20 +187,21 @@ export default {
     async submitPassword() {
       // 비밀번호 확인 로직
       try {
-        const response = await axios.post('/api/checkPassword', {
-          supportNum: this.selectedSupportNum,
+        const response = await axios.post('/api/supportCheckPassword', {
+          supportId: this.selectedSupportNum,
           password: this.password
         });
-        if (response.data.success) {
-          // 비밀번호 일치 시 처리할 로직
-          // 예: 문의 내용 보기로 이동
-          this.showDetail(this.selectedSupportNum)
-        } else {
+        alert(response.data);
+        if(response.data){
+          this.goDetail(this.selectedSupportNum)
+        }else{
           alert('비밀번호가 일치하지 않습니다.');
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('오류 발생:', error);
+        alert(`오류 발생: ${error.message}`);
         alert('비밀번호 확인 중 오류가 발생했습니다.');
+
       } finally {
         this.closePasswordDialog();
       }
