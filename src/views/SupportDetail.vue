@@ -141,13 +141,28 @@
         <v-btn v-if="!adminId"
                :loading="loading"
                class="submitBtn"
-               @click="deleteSupport"
+               @click="openDeleteDialog"
                text="삭제하기"
                block
         ></v-btn>
       </div>
     </v-form>
   </div>
+  <!-- 삭제 확인 폼 -->
+  <v-dialog v-model="deleteDialog" max-width="500px">
+    <v-card>
+      <v-card-title>삭제 확인</v-card-title>
+      <v-card-text>
+        삭제 시 영구 삭제 됩니다.
+        <br>
+        삭제 하시겠습니까?
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="deleteSupport">확인</v-btn>
+        <v-btn @click="closeDeleteDialog">취소</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -179,7 +194,8 @@ export default {
       },
       isPublic: true,  // v-switch의 초기 상태를 false로 설정
       loading: false,
-      supportWiter: false // 현재 문의 작성자 인지 확인
+      supportWiter: false, // 현재 문의 작성자 인지 확인
+      deleteDialog: false // 삭제 확인 다이얼로그 표시 여부
     }
   },
   methods: {
@@ -238,8 +254,17 @@ export default {
         this.loading = false;
       }
     },
+    // 삭제 확인 다이얼로그 열기
+    openDeleteDialog() {
+      this.deleteDialog = true;
+    },
+    // 삭제 확인 다이얼로그 닫기
+    closeDeleteDialog() {
+      this.deleteDialog = false;
+    },
     async deleteSupport(){
-      const response = await axios.post('/api/supportAdd', {
+      this.closeDeleteDialog();
+      const response = await axios.post('/api/supportRemove', {
         supportId: this.supportId
       });
       // API 요청이 성공한 경우
