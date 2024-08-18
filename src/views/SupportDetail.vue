@@ -121,11 +121,11 @@
           </v-row>
         </v-container>
       </div>
-      <div v-if="!answer || adminId">
+      <div v-if="(!answer && supportWiter) || adminId">
         <v-btn v-if="editable"
             :loading="loading"
             class="submitBtn"
-            :text="adminId ? '답변완료하기' : '문의하기'"
+            :text="adminId ? '답변완료하기' : '문의수정하기'"
             type="submit"
             block
         ></v-btn>
@@ -137,7 +137,7 @@
                block
         ></v-btn>
       </div>
-      <div v-if="answer">
+      <div v-if="answer && supportWiter">
         <v-btn v-if="!adminId"
                :loading="loading"
                class="submitBtn"
@@ -178,7 +178,8 @@ export default {
         counterDetail: value => value.length <= 2000 || '최대 2000자입니다.',
       },
       isPublic: true,  // v-switch의 초기 상태를 false로 설정
-      loading: false
+      loading: false,
+      supportWiter: false // 현재 문의 작성자 인지 확인
     }
   },
   methods: {
@@ -212,18 +213,22 @@ export default {
           return;
         }
         console.log('유효성 검사 결과 : ' + isValid.valid); // 유효성 검사 결과 확인
-        const response = await axios.post('/api/supportAdd', {
-          supportId: this.supportId,
+        const response = await axios.post('/api/supportEdit', {
+          support_Id: this.supportId,
           category: this.selectedCategory,
           title: this.title,
           detail: this.detail,
-          isPublic: this.isPublic,
+          public_Status: this.isPublic,
           answer: this.answer
         });
         // API 요청이 성공한 경우
         console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
 
-        alert('수정이 완료되었습니다.');
+        if(this.adminId){
+          alert('답변이 완료되었습니다.');
+        }else {
+          alert('수정이 완료되었습니다.');
+        }
         this.editable = false;
 
       } catch (error) {
@@ -253,7 +258,13 @@ export default {
       this.title = response.data.title;
       this.detail = response.data.detail;
       this.isPublic = response.data.public_Status;
-      this.answer = response.data.answer;
+      this.answer = response.data.answer || ''; // null일 경우 빈 문자열로 대체
+
+      if(this.sessionId == response.data.writer_Id){
+        this.supportWiter = true;//sessionId로 작성자인지 아닌지 여부 확인
+      }else{
+        this.supportWiter = false;//sessionId로 작성자인지 아닌지 여부 확인
+      }
     }
   },
   computed: {
@@ -264,10 +275,11 @@ export default {
   mounted() {
     // localStorage에서 ID 값을 읽어와서 데이터에 저장
     this.supportId = localStorage.getItem('supportId');
-    this.sessionId = localStorage.getItem('session_id'); // 저장된 키에 맞게 수정
+    // this.sessionId = localStorage.getItem('session_id'); // 저장된 키에 맞게 수정
+    this.sessionId = 1; //임시 아이디 부여
 
+    this.adminId = false;//sessionId로 관리자인지 아닌지 여부 확인
 
-    this.adminId = false//sessionId로 관리자인지 아닌지 여부 확인
     this.selectSupport();
   },
   beforeUnmount() {
