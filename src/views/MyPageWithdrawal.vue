@@ -3,7 +3,7 @@
     <!-- 비밀번호 확인 화면 -->
     <div v-if="!isPasswordValid" class="confirmPassword">
       <h1>비밀번호 확인</h1>
-      <p>회원 정보 변경을 위해 비밀번호를 확인해 주세요.</p>
+      <p>회원 탈퇴를 위해 비밀번호를 확인해 주세요.</p>
       <p>[ <span class="red">*</span> 는 필수 입력 사항입니다.]</p>
       <v-app>
         <v-main>
