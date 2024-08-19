@@ -69,23 +69,50 @@
             </v-col>
           </v-row>
         </div>
-        <!-- 비밀번호 변경 -->
-        <div class="costom-box">
-          <h3>비밀번호</h3>
-          <p>회원님의 소중한 개인정보 보호를 위해 비밀번호를 주기적으로 변경해 주세요.</p>
-          <v-btn :ripple="false" variant="outlined" router to="/myPageChangePassword" class="costom-box-btn">변경</v-btn>
-        </div>
-        <!-- 기본정보 변경 -->
-        <div class="costom-box">
-          <h3>기본정보</h3>
-          <p>성명, 연락처 정보를 변경할 수 있습니다.</p>
-          <v-btn :ripple="false" variant="outlined" router to="/myPageProfileEdit" class="costom-box-btn">변경</v-btn>
-        </div>
         <!-- 예약내역 -->
         <div class="costom-box">
           <h3>예약내역</h3>
           <p>예약내역을 확인 할 수 있습니다.</p>
           <v-btn :ripple="false" variant="outlined" router to="/myPageReservationList" class="costom-box-btn">확인</v-btn>
+        </div>
+        <!-- 비밀번호 변경 박스 -->
+        <div class="costom-box">
+          <h3>비밀번호</h3>
+          <p>회원님의 소중한 개인정보 보호를 위해 비밀번호를 주기적으로 변경해 주세요.</p>
+          <v-btn :ripple="false" variant="outlined" @click="togglePanel('password')" class="costom-box-btn">변경</v-btn>
+
+          <v-expansion-panels v-model="activePanel">
+            <!-- 비밀번호 변경 패널 -->
+            <v-expansion-panel value="password">
+              <v-expansion-panel-title>
+                비밀번호 변경
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <p>회원님의 소중한 개인정보 보호를 위해 비밀번호를 주기적으로 변경해 주세요.</p>
+                <v-btn :ripple="false" variant="outlined" router to="/myPageChangePassword">변경</v-btn>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
+
+        <!-- 기본정보 변경 박스 -->
+        <div class="costom-box">
+          <h3>기본정보</h3>
+          <p>성명, 연락처 정보를 변경할 수 있습니다.</p>
+          <v-btn :ripple="false" variant="outlined" @click="togglePanel('profile')" class="costom-box-btn">변경</v-btn>
+
+          <v-expansion-panels v-model="activePanel">
+            <!-- 기본정보 변경 패널 -->
+            <v-expansion-panel value="profile">
+              <v-expansion-panel-title>
+                기본정보 변경
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <p>성명, 연락처 정보를 변경할 수 있습니다.</p>
+                <v-btn :ripple="false" variant="outlined" router to="/myPageProfileEdit">변경</v-btn>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </div>
         <!-- 회원탈퇴 -->
         <div class="withdrawal">
@@ -103,15 +130,26 @@ export default {
     components: {},
     data() {
         return {
-            sampleData: ''
+          activePanel: [], // 현재 열려 있는 패널의 값을 저장
          };
     },
-    methods: {},
+    methods: {
+      togglePanel(panelValue) {
+        // 클릭한 패널이 이미 열려 있는지 확인
+        if (this.activePanel.includes(panelValue)) {
+          // 열려 있으면 닫기
+          this.activePanel = this.activePanel.filter(value => value !== panelValue);
+        } else {
+          // 닫혀 있으면 열기
+          this.activePanel = [panelValue];
+        }
+      }
+    },
   mounted() {
     const element = this.$el.querySelector('.v-application__wrap');
     if (element) {
       element.style.minHeight = 'initial';
-    }//v-app 아래의 div class="v-application__wrap" 요소에 min-height: initial; 스타일을 적용
+    }//v-app 아래의 div class="v-application__wrap" 요소에 min-height: initial; 스타일을 적용},
   }
 }
 </script>
@@ -183,6 +221,22 @@ export default {
 .myPage .costom-box .costom-box-btn:hover{
   border: 2px solid #0064de;
 }
+
+/* 아코디언 패널 커스텀 스타일 */
+.v-expansion-panel {
+  box-shadow: none; /* 그림자 제거 */
+  border: none; /* 테두리 제거 */
+}
+
+.v-expansion-panel-title {
+  display: none; /* 제목 숨기기 (문구와 화살표 제거) */
+}
+
+/* 아코디언 패널 텍스트 스타일 */
+.v-expansion-panel-text {
+  padding: 0; /* 기본 패딩 제거 */
+}
+
 
 /* 회원탈퇴 */
 .myPage .withdrawal{
