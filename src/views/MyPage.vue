@@ -69,50 +69,173 @@
             </v-col>
           </v-row>
         </div>
-        <!-- 예약내역 -->
+        <!-- 기본정보 변경 박스 -->
         <div class="costom-box">
-          <h3>예약내역</h3>
-          <p>예약내역을 확인 할 수 있습니다.</p>
-          <v-btn :ripple="false" variant="outlined" router to="/myPageReservationList" class="costom-box-btn">확인</v-btn>
+          <h3>기본정보</h3>
+          <p>성명, 연락처 정보를 변경할 수 있습니다.</p>
+          <v-btn :ripple="false" variant="outlined" @click="togglePanel('profile')" class="costom-box-btn">변경</v-btn>
+          <v-expansion-panels v-model="activePanel">
+            <!-- 기본정보 변경 패널 -->
+            <v-expansion-panel value="profile">
+              <v-expansion-panel-text>
+                <div class="profileEdit">
+                  <!-- 비밀번호 확인 화면 -->
+                  <div v-if="!isPasswordValid" class="confirmPassword">
+                    <h1>비밀번호 확인</h1>
+                    <p>회원 정보 변경을 위해 비밀번호를 확인해 주세요.</p>
+                    <p>[ <span class="red">*</span> 는 필수 입력 사항입니다.]</p>
+                      <v-form validate-on="submit" @submit.prevent="submitPassword">
+                        <div class = "inputPassword" >
+                          <!-- 아이디 -->
+                          <p>아이디</p>
+                          <v-text-field
+                              class="costom-text-field"
+                              v-model="id"
+                              type="id"
+                              variant="underlined"
+                              readonly
+                          ></v-text-field>
+                          <!-- 비밀번호 확인 -->
+                          <p>비밀번호 확인 <span class="red">*</span> </p>
+                          <v-text-field
+                              class="costom-text-field"
+                              v-model="currentPasswordInfo"
+                              type="password"
+                              variant="underlined"
+                              maxlength="20"
+                              :rules="[rules.required]"
+                              @keydown.enter="submitPassword"
+                          ></v-text-field>
+                        </div>
+                        <!-- 버튼 -->
+                        <div class="button-container">
+                          <v-btn
+                              :loading="loading"
+                              class="submitBtn"
+                              text="확인"
+                              type="submit"
+                              block
+                          ></v-btn>
+                        </div>
+                      </v-form>
+                  </div>
+                  <!------------------------------------------------------------------------------>
+                  <!-- 기본정보 변경 화면 -->
+                  <div v-if="isPasswordValid" class="profileList">
+                    <h1>기본정보</h1>
+                    <p class="costom-p">아이디는 변경할 수 없습니다.</p>
+                      <!-- 정보 변경 -->
+                      <v-form ref="profileForm" validate-on="submit" @submit.prevent="profileSubmit">
+                        <div class="costom-box">
+                          <div class = "Contact" >
+                            <div class ="title">
+                              <h3>연락처 정보</h3>
+                              <p>[ <span class="red">*</span> 는 필수 입력 사항입니다.]</p>
+                            </div>
+                            <div class="info">
+                              <p>휴대전화 번호 <span class="red">*</span> </p>
+                              <v-text-field
+                                  class="costom-text-field"
+                                  v-model="contact"
+                                  type="contact"
+                                  variant="underlined"
+                                  maxlength="20"
+                                  :rules="[rules.required]"
+                                  ref="contactField"
+                                  @keydown.enter.stop.prevent
+                              ></v-text-field>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- 버튼 -->
+                        <div class="button-container">
+                          <v-btn
+                              :loading="loading"
+                              class="submitBtn"
+                              text="변경완료"
+                              type="submit"
+                              block
+                          ></v-btn>
+                        </div>
+                      </v-form>
+                  </div>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
         </div>
         <!-- 비밀번호 변경 박스 -->
         <div class="costom-box">
           <h3>비밀번호</h3>
           <p>회원님의 소중한 개인정보 보호를 위해 비밀번호를 주기적으로 변경해 주세요.</p>
           <v-btn :ripple="false" variant="outlined" @click="togglePanel('password')" class="costom-box-btn">변경</v-btn>
-
           <v-expansion-panels v-model="activePanel">
             <!-- 비밀번호 변경 패널 -->
             <v-expansion-panel value="password">
-              <v-expansion-panel-title>
-                비밀번호 변경
-              </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <p>회원님의 소중한 개인정보 보호를 위해 비밀번호를 주기적으로 변경해 주세요.</p>
-                <v-btn :ripple="false" variant="outlined" router to="/myPageChangePassword">변경</v-btn>
+                <div class="changePassword">
+                  <h1>비밀번호 변경</h1>
+                  <p>새로운 비밀번호를 입력해 주세요.</p>
+                  <p>[ <span class="red">*</span> 는 필수 입력 사항입니다.]</p>
+                    <v-form validate-on="submit" @submit.prevent="submit">
+                      <div class = "inputPassword" >
+                        <!-- 현재 비밀번호 -->
+                        <p>현재 비밀번호 <span class="red">*</span> </p>
+                        <v-text-field
+                            class="costom-text-field"
+                            v-model="currentPassword"
+                            type="password"
+                            variant="underlined"
+                            maxlength="20"
+                            :rules="[rules.required]"
+                            @keydown.enter="submit"
+                        ></v-text-field>
+                        <!-- 신규 비밀번호 -->
+                        <p>신규 비밀번호 <span class="red">*</span> </p>
+                        <v-text-field
+                            class="costom-text-field"
+                            v-model="newPassword"
+                            type="password"
+                            variant="underlined"
+                            maxlength="20"
+                            :rules="[rules.required, rules.password]"
+                            ref="newPasswordField"
+                            @input="validateNewPassword"
+                            @keydown.enter="submit"
+                        ></v-text-field>
+                        <!-- 신규 비밀번호 확인 -->
+                        <p>신규 비밀번호 확인 <span class="red">*</span> </p>
+                        <v-text-field
+                            class="costom-text-field"
+                            v-model="confirmNewPassword"
+                            type="password"
+                            variant="underlined"
+                            maxlength="20"
+                            :rules="[rules.required, rules.matchPassword]"
+                            @keydown.enter="submit"
+                        ></v-text-field>
+                      </div>
+                      <!-- 버튼 -->
+                      <div class="button-container">
+                        <v-btn
+                            :loading="loading"
+                            class="submitBtn"
+                            text="변경하기"
+                            type="submit"
+                            block
+                        ></v-btn>
+                      </div>
+                    </v-form>
+                </div>
               </v-expansion-panel-text>
             </v-expansion-panel>
           </v-expansion-panels>
         </div>
-
-        <!-- 기본정보 변경 박스 -->
+        <!-- 예약내역 -->
         <div class="costom-box">
-          <h3>기본정보</h3>
-          <p>성명, 연락처 정보를 변경할 수 있습니다.</p>
-          <v-btn :ripple="false" variant="outlined" @click="togglePanel('profile')" class="costom-box-btn">변경</v-btn>
-
-          <v-expansion-panels v-model="activePanel">
-            <!-- 기본정보 변경 패널 -->
-            <v-expansion-panel value="profile">
-              <v-expansion-panel-title>
-                기본정보 변경
-              </v-expansion-panel-title>
-              <v-expansion-panel-text>
-                <p>성명, 연락처 정보를 변경할 수 있습니다.</p>
-                <v-btn :ripple="false" variant="outlined" router to="/myPageProfileEdit">변경</v-btn>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
+          <h3>예약내역</h3>
+          <p>예약내역을 확인 할 수 있습니다.</p>
+          <v-btn :ripple="false" variant="outlined" router to="/myPageReservationList" class="costom-box-btn">확인</v-btn>
         </div>
         <!-- 회원탈퇴 -->
         <div class="withdrawal">
@@ -131,8 +254,35 @@ export default {
     data() {
         return {
           activePanel: [], // 현재 열려 있는 패널의 값을 저장
+          currentPassword: '',
+          newPassword: '',
+          confirmNewPassword: '',
+          rules: {
+            required : value => !!value || '필수 입력 항목입니다.',
+            password: value => this.checkPassword(value),
+            matchPassword: value => value === this.newPassword || '비밀번호가 일치하지 않습니다.'
+          },
+          loading: false,
+          id: 'hong',
+          currentPasswordInfo: '',
+          isPasswordValid: false, // 비밀번호 확인 상태
+          contact: '01011111111',
          };
     },
+  watch: {
+    activePanel(newValue) {
+      // 패널이 닫힐 때 특정 값을 설정
+      if (!newValue.includes('profile')) {
+        this.currentPasswordInfo = ''; // 특정 값 초기화
+        this.isPasswordValid = false; // 비밀번호 확인 상태 초기화
+      }
+      if (!newValue.includes('password')) {
+        this.currentPassword = ''; // 특정 값 초기화
+        this.newPassword = '';
+        this.confirmNewPassword = '';
+      }
+    }
+  },
     methods: {
       togglePanel(panelValue) {
         // 클릭한 패널이 이미 열려 있는지 확인
@@ -143,7 +293,50 @@ export default {
           // 닫혀 있으면 열기
           this.activePanel = [panelValue];
         }
-      }
+      },
+      // 비밀번호 변경 상세
+      async submit(event) {
+        this.loading = true;
+        const results = await event;
+        this.loading = false;
+        alert(JSON.stringify(results));
+        this.activePanel = []; // 모든 패널 닫기
+      },
+      checkPassword(value) {
+        if (value.length < 8) {
+          return '비밀번호는 최소 8자 이상이어야 합니다.';
+        }
+        return true;
+      },
+      validateNewPassword() {
+        if (0 < this.newPassword.length) {
+          this.$refs.newPasswordField.validate();
+        }
+      },
+      // 기본정보 변경 상세
+      async submitPassword() {
+        this.loading = true;
+
+        // 비밀번호 확인 로직
+        if (this.currentPasswordInfo === '1234') {
+          this.isPasswordValid = true;
+          console.log('비밀번호가 유효합니다. 추가 작업을 수행합니다.');
+        } else {
+          alert('비밀번호가 일치하지 않습니다.'); // 비밀번호가 일치하지 않으면 에러 메시지 표시
+        }
+        this.loading = false;
+      },
+      async profileSubmit() {
+        this.loading = true;
+        const isValid = await this.$refs.contactField.validate();
+        if (isValid == '') {
+          alert('정보 변경 성공'); // 정보 변경 성공 시
+          this.activePanel = []; // 모든 패널 닫기
+        } else {
+          if (!this.contact) this.$refs.contactField.focus(); // 에러난 필드 포커스
+        }
+        this.loading = false;
+      },
     },
   mounted() {
     const element = this.$el.querySelector('.v-application__wrap');
@@ -224,17 +417,196 @@ export default {
 
 /* 아코디언 패널 커스텀 스타일 */
 .v-expansion-panel {
+  //background-color: #F6F6F6;
   box-shadow: none; /* 그림자 제거 */
   border: none; /* 테두리 제거 */
 }
 
-.v-expansion-panel-title {
-  display: none; /* 제목 숨기기 (문구와 화살표 제거) */
-}
 
 /* 아코디언 패널 텍스트 스타일 */
 .v-expansion-panel-text {
   padding: 0; /* 기본 패딩 제거 */
+}
+
+/* 비밀번호 변경 상세 */
+.changePassword{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 30px;
+}
+
+.changePassword .costom-container{
+  max-width: 1280px;
+  padding: 0;
+}
+
+.changePassword h1{
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.changePassword p{
+  text-align: left;
+}
+
+.changePassword .red{
+  color: red;
+  font-weight: 900;
+}
+
+/* 버튼 가운데 정렬 */
+.button-container {
+  text-align: center; /* 가운데 정렬 */
+}
+
+/* 비밀번호 변경 상세 */
+/* 비밀번호 입력 */
+.changePassword .inputPassword{
+  margin: 20px 0;
+}
+
+.changePassword .inputPassword p{
+  font-size: 14px;
+  color: #555555;
+}
+
+.changePassword .inputPassword .costom-text-field{
+  margin-bottom: 30px;
+}
+
+/* 비밀번호 변경 상세 */
+/* 버튼 */
+
+.changePassword .submitBtn{
+  display: inline-block;
+  width: 280px;
+  height: 60px;
+  min-width: 34px;
+  margin-bottom: 30px;
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 2;
+  border: 1px solid #00256c;
+  border-radius: 10px;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+}
+
+.changePassword .submitBtn {
+  background-color: #00256c;
+  color: #fff;
+}
+
+/* 기본정보 변경 상세*/
+.profileEdit{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 30px;
+}
+
+.profileEdit .costom-container{
+  max-width: 1280px;
+  padding: 0;
+}
+
+.profileEdit h1{
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.profileEdit p{
+  text-align: left;
+}
+
+.profileEdit .red{
+  color: red;
+  font-weight: 900;
+}
+
+/* 기본정보 변경 상세*/
+/* 비밀번호 확인 화면, 기본정보 변경 화면 공통  */
+/* 버튼 */
+.profileEdit .submitBtn{
+  display: inline-block;
+  width: 280px;
+  height: 60px;
+  min-width: 34px;
+  margin-bottom: 30px;
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 2;
+  border: 1px solid #00256c;
+  border-radius: 10px;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+}
+
+.profileEdit .submitBtn {
+  background-color: #00256c;
+  color: #fff;
+}
+
+/* 기본정보 변경 상세*/
+/* 비밀번호 확인 화면 */
+/* 비밀번호 입력 */
+.profileEdit .confirmPassword .inputPassword{
+  margin: 20px 0;
+}
+
+.profileEdit .confirmPassword .inputPassword p{
+  font-size: 14px;
+  color: #555555;
+}
+
+.profileEdit .confirmPassword .inputPassword .costom-text-field{
+  margin-bottom: 30px;
+}
+
+/* 기본정보 변경 상세*/
+/* 기본정보 변경 화면 */
+.profileEdit .costom-p{
+  font-size: 14px;
+  color: #555555;
+  margin-bottom: 20px;
+}
+
+/* 기본정보 변경 상세*/
+/* 정보 변경 */
+.profileEdit .profileList .costom-box{
+  text-align: left;
+  padding: 40px 30px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+.profileEdit .profileList .costom-box .title,
+.profileEdit .profileList .costom-box .info{
+  display: inline-block;
+}
+
+.profileEdit .profileList .costom-box .title{
+  width: 30%;
+}
+
+.profileEdit .profileList .costom-box .title h3{
+  margin-bottom: 15px;
+}
+
+.profileEdit .profileList .costom-box .info{
+  width: 60%;
+}
+
+.profileEdit .profileList .costom-box .info p{
+  font-size: 14px;
+  color: #555555;
+}
+
+.profileEdit .profileList .costom-box .costom-text-field{
+  margin-bottom: 30px;
 }
 
 

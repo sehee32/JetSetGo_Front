@@ -58,18 +58,6 @@ const routes = [
     component: () => import(/* webpackChunkName: "inquiry" */ '../views/./SupportInquiry')
   },
   {
-    path: '/myPageChangePassword',
-    name: 'MyPageChangePassword',
-    component: () => import(/* webpackChunkName: "myPageChangePassword" */ '../views/MyPageChangePassword.vue')
-  }
-  ,
-  {
-    path: '/myPageProfileEdit',
-    name: 'MyPageProfileEdit',
-    component: () => import(/* webpackChunkName: "myPageProfileEdit" */ '../views/MyPageProfileEdit.vue')
-  }
-  ,
-  {
     path: '/myPageReservationList',
     name: 'MyPageReservationList',
     component: () => import(/* webpackChunkName: "myPageReservationList" */ '../views/MyPageReservationList.vue')
