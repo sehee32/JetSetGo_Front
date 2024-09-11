@@ -7,13 +7,13 @@
           <v-col cols="12" md="6">
             <v-autocomplete
                 v-model="departure"
-                :items="cities"
+                :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
                 :rules="[rules.required]"
                 label="출발지"
                 variant="outlined"
                 prepend-inner-icon="mdi-airplane-takeoff"
                 clearable
-                @input="searchAirports('departure')"
+                @keyup="searchAirports($event.target.value, 'departure')"
                 no-data-text="일치하는 도시가 없습니다."
                 item-value="value"
                 item-text="label"
@@ -28,7 +28,7 @@
                 variant="outlined"
                 prepend-inner-icon="mdi-airplane-landing"
                 clearable
-                @input="searchAirports('destination')"
+                @change="searchAirports('destination')"
             no-data-text="일치하는 도시가 없습니다."
             item-value="value"
             item-text="label"
@@ -293,7 +293,7 @@ export default {
 
     try {
       const response = axios.get('/api/flights/airports', {
-        params: { keyword: query }, // 추출된 값 전달
+        params: { keyword: 'MUC' }, // 추출된 값 전달
       });
       console.log('api 요청 성공 : ', response.data); // 응답 데이터 확인
       this.cities = response.data.map(item => ({
@@ -307,26 +307,26 @@ export default {
 
   methods: {
     // 아마데우스 api이용해서 공항검색
-      async searchAirports(type) {
-        const query = type === 'departure' ? this.departure : this.destination;
-
-        if (!query || query.length < 2) { // 최소 2자 이상 입력된 경우에만 검색
-          this.cities = [];
-          return;
-        }
-
-        try {
-          const response = await axios.get('/api/flights/airports', {
-            params: { keyword: query }, // 추출된 값 전달
-          });
-          console.log('api 요청 성공 : ', response.data); // 응답 데이터 확인
-          this.cities = response.data.map(item => ({
-            label: `${item.name} (${item.iataCode})`,
-            value: item.iataCode,
-          }));
-        } catch (error) {
-          console.error('api 요청 실패 : ',error);
-        }
+      async searchAirports(e, type) {
+        console.error('입력값 : ',e, type);
+        // const query = type === 'departure' ? this.departure : this.destination;
+        //
+        // if (!query || query.length < 2) { // 최소 2자 이상 입력된 경우에만 검색
+        //   this.cities = [];
+        //   return;
+        // }
+        //
+        // try {
+        //   const response = await axios.get('/api/flights/airports', {
+        //     params: { keyword: 'MUC' }, // 추출된 값 전달
+        //   });
+        //   this.cities = response.data.map(item => ({
+        //     label: `${item.name} (${item.iataCode})`,
+        //     value: item.iataCode,
+        //   }));
+        // } catch (error) {
+        //   console.error('api 요청 실패 : ',error);
+        // }
       },
 
     formatDate(date) {
