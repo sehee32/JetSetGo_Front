@@ -5,26 +5,34 @@
       <v-form v-model="formValid" @submit.prevent="bookTicket">
         <v-row>
           <v-col cols="12" md="6">
-            <v-select
+            <v-autocomplete
                 v-model="departure"
-                :items="city"
+                :items="cities"
                 :rules="[rules.required]"
                 label="출발지"
                 variant="outlined"
                 prepend-inner-icon="mdi-airplane-takeoff"
                 clearable
-            ></v-select>
+                @input="searchAirports('departure')"
+                no-data-text="일치하는 도시가 없습니다."
+                item-value="value"
+                item-text="label"
+            ></v-autocomplete>
           </v-col>
           <v-col cols="12" md="6">
-            <v-select
+            <v-autocomplete
                 v-model="destination"
-                :items="city"
+                :items="cities"
                 :rules="[rules.required]"
                 label="도착지"
                 variant="outlined"
                 prepend-inner-icon="mdi-airplane-landing"
                 clearable
-            ></v-select>
+                @input="searchAirports('destination')"
+            no-data-text="일치하는 도시가 없습니다."
+            item-value="value"
+            item-text="label"
+            ></v-autocomplete>
           </v-col>
         </v-row>
 
@@ -190,6 +198,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
@@ -200,86 +209,116 @@ export default {
       adults: null, // 성인 수
       children: null, // 아동 수
       formValid: false,
-      city: ['인천','서울','도쿄','오사카','홍콩'],
-      passengerOptions: Array.from({ length: 10 }, (v, i) => i + 1), // 승객 수 (1~10)
+      cities: [], // api로 가져올 도시 목록
+      passengerOptions: Array.from({length: 10}, (v, i) => i + 1), // 승객 수 (1~10)
       rules: {
         required: value => !!value || '이 항목을 입력하지 않았습니다.' // 필수 입력 규칙
       },
       currentIndex: 0, // 현재 슬라이드의 인덱스
       // 하단 부분
       slideItems: [
-        { image: require('@/assets/mainimage1.jpg'), title: '새로워진 홈페이지 콘텐츠를 소개합니다.', route: '/support' },
-        { image: require('@/assets/mainimage2.jpg'), title: '더욱 강력하게 돌아온 카드! 혜택 알아보기', route: '/support' },
-        { image: require('@/assets/mainimage3.jpg'), title: '기프트카드로 여행을 선물하세요', route: '/support' },
-        { image: require('@/assets/mainimage4.jpg'), title: '동영상으로 알아보는 서비스 가이드', route: '/support' },
-        { image: require('@/assets/mainimage5.jpg'), title: '안전한 여행을 위한 필수품, 여행보험\n 간편하게 가입하세요', route: '/support' },
-        { image: require('@/assets/mainimage6.jpg'), title: '신규 취항 및 운항 재개 노선 스케줄을\n 확인하세요', route: '/support' },
+        {image: require('@/assets/mainimage1.jpg'), title: '새로워진 홈페이지 콘텐츠를 소개합니다.', route: '/support'},
+        {image: require('@/assets/mainimage2.jpg'), title: '더욱 강력하게 돌아온 카드! 혜택 알아보기', route: '/support'},
+        {image: require('@/assets/mainimage3.jpg'), title: '기프트카드로 여행을 선물하세요', route: '/support'},
+        {image: require('@/assets/mainimage4.jpg'), title: '동영상으로 알아보는 서비스 가이드', route: '/support'},
+        {image: require('@/assets/mainimage5.jpg'), title: '안전한 여행을 위한 필수품, 여행보험\n 간편하게 가입하세요', route: '/support'},
+        {image: require('@/assets/mainimage6.jpg'), title: '신규 취항 및 운항 재개 노선 스케줄을\n 확인하세요', route: '/support'},
       ], // 슬라이더 아이템
       listItems: [
-        { id: 1, title: '국내선 유류할증료 (2024년 8월)', subtitle: '2024.07.03', route: '/support'},
-        { id: 2, title: '카드 Edition2 출시 안내 (2024년 7월 3일부)', subtitle: '2024.07.03', route: '/support' },
-        { id: 3, title: '국제선 브랜드 운임 개편 계획 안내', subtitle: '2024.06.28', route: '/support' },
-        { id: 4, title: '스카이패스 마일리지 적립 제휴 종료', subtitle: '2024.06.25', route: '/support' },
+        {id: 1, title: '국내선 유류할증료 (2024년 8월)', subtitle: '2024.07.03', route: '/support'},
+        {id: 2, title: '카드 Edition2 출시 안내 (2024년 7월 3일부)', subtitle: '2024.07.03', route: '/support'},
+        {id: 3, title: '국제선 브랜드 운임 개편 계획 안내', subtitle: '2024.06.28', route: '/support'},
+        {id: 4, title: '스카이패스 마일리지 적립 제휴 종료', subtitle: '2024.06.25', route: '/support'},
       ], //리스트 아이템
       cards: [
         {
           title: '항공카드', image: require('@/assets/main_icon1.png'),
           navItems: [
-            { text: '항공카드', route: '/support' }
+            {text: '항공카드', route: '/support'}
           ]
         },
         {
           title: '기프트카드', image: require('@/assets/main_icon2.png'),
           navItems: [
-            { text: '기프트카드', route: '/support' }
+            {text: '기프트카드', route: '/support'}
           ]
         },
         {
-          title: '호텔',  image: require('@/assets/main_icon3.png'),
+          title: '호텔', image: require('@/assets/main_icon3.png'),
           navItems: [
-            { text: '아고다', route: '/support' },
-            { text: 'Hotels.com', route: '/support' }
+            {text: '아고다', route: '/support'},
+            {text: 'Hotels.com', route: '/support'}
           ]
         },
         {
-          title: '렌터카',  image: require('@/assets/main_icon4.png'),
+          title: '렌터카', image: require('@/assets/main_icon4.png'),
           navItems: [
-            { text: 'Hertz', route: '/support' },
-            { text: 'SK렌터카', route: '/support' },
-            { text: '롯데렌터카', route: '/support' },
-            { text: 'Rentalcars.com', route: '/support' }
+            {text: 'Hertz', route: '/support'},
+            {text: 'SK렌터카', route: '/support'},
+            {text: '롯데렌터카', route: '/support'},
+            {text: 'Rentalcars.com', route: '/support'}
           ]
         },
         {
-          title: '기내 면세점',  image: require('@/assets/main_icon5.png'),
+          title: '기내 면세점', image: require('@/assets/main_icon5.png'),
           navItems: [
-            { text: 'SKYSHOP', route: '/support' }
+            {text: 'SKYSHOP', route: '/support'}
           ]
         },
         {
-          title: '여행자 보험',  image: require('@/assets/main_icon6.png'),
+          title: '여행자 보험', image: require('@/assets/main_icon6.png'),
           navItems: [
-            { text: 'Chubb 여행보험', route: '/support' }
+            {text: 'Chubb 여행보험', route: '/support'}
           ]
         },
         {
-          title: '여행 상품',  image: require('@/assets/main_icon7.png'),
+          title: '여행 상품', image: require('@/assets/main_icon7.png'),
           navItems: [
-            { text: '한진관광', route: '/support' },
-            { text: 'KALPAK', route: '/support' }
+            {text: '한진관광', route: '/support'},
+            {text: 'KALPAK', route: '/support'}
           ]
         }
       ],
       hoveredCardIndex: null,
     };
   },
+
   methods: {
+    // 아마데우스 api이용해서 공항검색
+      async searchAirports(type) {
+        const query = type === 'departure' ? this.departure : this.destination;
+
+        if (!query || query.length < 2) { // 최소 2자 이상 입력된 경우에만 검색
+          this.cities = [];
+          return;
+        }
+
+        try {
+          const response = await axios.get('/api/flights/airports', {
+            params: { keyword: query }, // 추출된 값 전달
+          });
+          console.log('api 요청 성공 : ', response.data); // 응답 데이터 확인
+          this.cities = response.data.map(item => ({
+            label: `${item.name} (${item.iataCode})`,
+            value: item.iataCode,
+          }));
+        } catch (error) {
+          console.error('api 요청 실패 : ',error);
+        }
+      },
+
     formatDate(date) {
       const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
       return new Date(date).toLocaleDateString('ko-KR', options);
     },
     // 예매 정보 처리 메서드
     bookTicket() {
+
+      if (!this.departure || !this.destination) {
+        console.log("출발지 또는 도착지가 비어 있습니다.");
+        return;
+      }
+
       const formattedDepartureDate = this.formatDate(this.departureDate);
       const formattedReturnDate = this.formatDate(this.returnDate);
 
