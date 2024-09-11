@@ -98,7 +98,7 @@
       <v-container class="padding0">
         <!-- 슬라이더 컴포넌트 -->
         <v-slide-group v-model="currentIndex" class="marginTop60" show-arrows>
-          <v-slide-item v-for="(slideItems, index) in slideItems" :key="index">
+          <div v-for="(slideItems, index) in slideItems" :key="index">
             <v-card
                 :class="['ma-4', 'custom-card']"
                 height="280"
@@ -109,14 +109,12 @@
                 <v-img
                     :src="slideItems.image"
                     class="custom-img"
-                    @mouseover="handleMouseOver"
-                    @mouseleave="handleMouseLeave"
                     aspect-ratio="1.77">
                 </v-img>
               </div>
               <v-card-title class="custom-card-title">{{ slideItems.title }}</v-card-title>
             </v-card>
-          </v-slide-item>
+          </div>
         </v-slide-group>
         <!-- 리스트 컴포넌트 -->
         <v-toolbar color="white" dark class="marginTop60">
@@ -125,12 +123,12 @@
         </v-toolbar>
         <v-row>
           <v-col cols="7">
-            <v-list lines="two">
-              <v-list-item v-for="listItems in listItems" :key="listItems.id" class="custom-list-item" :class="{ 'custom-list-last-item': index === listItems.length - 1 }">
-                <v-list-item-content  class="d-flex justify-space-between" @click="goToPage(listItems.route)">
+            <v-list>
+              <v-list-item v-for="listItems in listItems" :key="listItems.id" class="custom-list-item">
+                <div class="d-flex justify-space-between" @click="goToPage(listItems.route)">
                   <v-list-item-title class="v-list-title">{{ listItems.title }}</v-list-item-title>
                   <v-list-item-subtitle>{{ listItems.subtitle }}</v-list-item-subtitle>
-                </v-list-item-content>
+                </div>
               </v-list-item>
             </v-list>
           </v-col>
@@ -200,6 +198,9 @@
 <script>
 import axios from "axios";
 export default {
+  type: {
+    default: "index"
+  },
   data() {
     return {
       departure: '', // 출발지
@@ -281,6 +282,27 @@ export default {
       ],
       hoveredCardIndex: null,
     };
+  },
+
+  created() {
+     console.log("beforeCreate");
+    const query = this.departure;
+    if (!query || query.length < 2) { // 최소 2자 이상 입력된 경우에만 검색
+      this.cities = [];
+    }
+
+    try {
+      const response = axios.get('/api/flights/airports', {
+        params: { keyword: query }, // 추출된 값 전달
+      });
+      console.log('api 요청 성공 : ', response.data); // 응답 데이터 확인
+      this.cities = response.data.map(item => ({
+        label: `${item.name} (${item.iataCode})`,
+        value: item.iataCode,
+      }));
+    } catch (error) {
+      console.error('api 요청 실패 : ',error);
+    }
   },
 
   methods: {

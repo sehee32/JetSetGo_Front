@@ -9,7 +9,7 @@
 
 <script>
 // @ is an alias to /src
-import BookingPage from "@/views/BookingPage";
+import BookingPage from "@/components/JetSetGoView/BookingPage";
 import JetSetGoBody from "@/components/JetSetGoBody";
 
 export default {
