@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './JetSetGoMain.vue'
 import router from './router'
 import vuetify from './plugins/vuetify';
+import store from "@/store";
 // import { requestIdentityVerification } from "./identityVerification";
 //import { requestCertification } from "../public/portOneVerification.html";
 
@@ -11,6 +12,7 @@ import vuetify from './plugins/vuetify';
 const app = createApp(App);
 app.use(router);
 app.use(vuetify);
+app.use(store);
 app.mount('#app');
 // requestIdentityVerification();
 //requestCertification();

@@ -13,15 +13,31 @@
       <div class="right-links">   <!--오른쪽 정렬하려고 묶음-->
         <li><router-link to="/faq">고객센터</router-link></li>
         <li><router-link to="/myPage">마이페이지</router-link></li>
-        <li><router-link to="/loginpage">로그인</router-link></li>
+        <li v-if="!isAuthenticated"><router-link to="/loginpage">로그인</router-link></li>
+        <li v-if="isAuthenticated">
+          <a @click="handlelogout">로그아웃</a>
+        </li>
       </div>
     </ul>
   </nav>
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
+
 export default {
-  name: "JetSetGoHeader"
+  name: "JetSetGoHeader",
+  computed: {
+    ...mapGetters(['isAuthenticated'])
+  },
+  methods: {
+    ...mapActions(['logout']),
+    async handlelogout() {
+      await this.logout(); // vuex액션 호출
+      this.$router.push('/loginpage'); // 로그아웃 후 로그인 페이지로 리다이렉트
+    }
+  }
+
 }
 </script>
 

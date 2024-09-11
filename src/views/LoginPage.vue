@@ -8,7 +8,7 @@
     <v-card class="custom-card mx-auto px-6 py-8">
       <v-form
           v-model="formValid"
-          @submit.prevent="onSubmit"
+          @submit.prevent="submitlogin"
       >
         <v-text-field
             v-model="username"
@@ -50,7 +50,6 @@
             type="submit"
             variant="elevated"
             block
-            @click="login"
         >
           로그인
         </v-btn>
@@ -70,6 +69,9 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+// import axios from "axios";
+
 export default {
   name: 'LoginPage',
   data() {
@@ -83,18 +85,23 @@ export default {
     };
   },
   methods: {
-    onSubmit() {
-      console.log('회원가입 정보:', this.username, this.password);
+    ...mapActions(['login']),
+    async submitlogin() {
+      if (!this.formValid) return;
       this.loading = true;
 
-      // 예시로, 2초 후에 로딩을 멈추도록 설정
-      setTimeout(() => {
+      try {
+        // Vuex 액션 호출
+        await this.login({ username: this.username, password: this.password });
+
+        // 메인페이지로 이동
+        this.$router.push('/bookingpage');
+      } catch (error) {
+        console.error('로그인 오류:', error);
+        alert('아이디 또는 비밀번호를 확인해주세요.');
+      } finally {
         this.loading = false;
-      }, 2000);
-    },
-    login() {
-      // this.$router.push('/jetsetgomain');
-      // 로그인 버튼 누르고 난 후
+      }
     },
     goToSignUpPage() {
       this.$router.push('/signup');
