@@ -303,7 +303,7 @@ export default {
     // this.sessionId = localStorage.getItem('session_id'); // 저장된 키에 맞게 수정
     this.sessionId = 1; //임시 아이디 부여
 
-    this.adminId = false;//sessionId로 관리자인지 아닌지 여부 확인
+    this.adminId = true;//sessionId로 관리자인지 아닌지 여부 확인
 
     this.selectSupport();
   },
