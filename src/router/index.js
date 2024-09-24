@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import JetSetGoView from '../views/JetSetGoView.vue'
+import store from '../store'  // Vuex 스토어 불러오기 (인증 상태 확인을 위해 필요)
 
 const routes = [
   {
@@ -25,7 +26,8 @@ const routes = [
   {
     path: '/myPage',
     name: 'MyPage',
-    component: () => import(/* webpackChunkName: "myPage" */ '../views/MyPage.vue')
+    component: () => import(/* webpackChunkName: "myPage" */ '../views/MyPage.vue'),
+    meta: { requiresAuth: true }  // 인증이 필요한 라우트
   },
 
   {
@@ -101,5 +103,23 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+// 네비게이션 가드를 사용하여 라우트 이동 시 인증 상태 확인
+router.beforeEach((to, from, next) => {
+  // 라우트의 메타 정보에 requiresAuth가 있는지 확인
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const isAuthenticated = store.getters.isAuthenticated;  // Vuex에서 인증 상태 확인
+    if (!isAuthenticated) {
+      // 인증되지 않은 경우 로그인 페이지로 리디렉션
+      next('/loginpage');
+    } else {
+      // 인증된 경우 라우트 허용
+      next();
+    }
+  } else {
+    // 인증이 필요 없는 라우트는 그대로 진행
+    next();
+  }
+});
 
 export default router
