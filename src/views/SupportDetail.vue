@@ -285,10 +285,27 @@ export default {
       this.isPublic = response.data.public_Status;
       this.answer = response.data.answer || ''; // null일 경우 빈 문자열로 대체
 
-      if(this.sessionId == response.data.writer_Id){
+      const admin = 'admin'; // admin 문자열 정의
+      // sessionId로 관리자인지 여부 확인
+      this.adminId = this.sessionId.includes(admin); // true 또는 false로 설정
+
+      if(this.sessionId == response.data.writer_Name){
         this.supportWiter = true;//sessionId로 작성자인지 아닌지 여부 확인
       }else{
         this.supportWiter = false;//sessionId로 작성자인지 아닌지 여부 확인
+      }
+    },
+    async fetchUserInfo() {
+      const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+      if (token) {
+        try {
+          const response = await axios.post('/api/getUserInfo', {
+            token: token // 토큰을 본문에 포함
+          });
+          this.sessionId = response.data; // 사용자 정보를 변수에 저장
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
       }
     }
   },
@@ -300,11 +317,8 @@ export default {
   mounted() {
     // localStorage에서 ID 값을 읽어와서 데이터에 저장
     this.supportId = localStorage.getItem('supportId');
-    // this.sessionId = localStorage.getItem('session_id'); // 저장된 키에 맞게 수정
-    this.sessionId = 1; //임시 아이디 부여
-
-    this.adminId = true;//sessionId로 관리자인지 아닌지 여부 확인
-
+    this.fetchUserInfo();
+    // this.sessionId = 1; //임시 아이디 부여
     this.selectSupport();
   },
   beforeUnmount() {
