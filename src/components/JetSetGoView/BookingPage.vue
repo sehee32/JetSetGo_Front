@@ -7,7 +7,7 @@
           <v-col cols="12" md="6">
             <v-autocomplete
                 v-model="departure"
-                :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+                :items="cities"
                 :rules="[rules.required]"
                 label="출발지"
                 variant="outlined"
@@ -28,10 +28,10 @@
                 variant="outlined"
                 prepend-inner-icon="mdi-airplane-landing"
                 clearable
-                @change="searchAirports('destination')"
-            no-data-text="일치하는 도시가 없습니다."
-            item-value="value"
-            item-text="label"
+                @keyup="searchAirports($event.target.value, 'destination')"
+                no-data-text="일치하는 도시가 없습니다."
+                item-value="value"
+                item-text="label"
             ></v-autocomplete>
           </v-col>
         </v-row>
@@ -198,9 +198,9 @@
 <script>
 import axios from "axios";
 export default {
-  type: {
-    default: "index"
-  },
+  // type: {
+  //   default: "index"
+  // },
   data() {
     return {
       departure: '', // 출발지
@@ -211,6 +211,7 @@ export default {
       children: null, // 아동 수
       formValid: false,
       cities: [], // api로 가져올 도시 목록
+      keyword : '',
       passengerOptions: Array.from({length: 10}, (v, i) => i + 1), // 승객 수 (1~10)
       rules: {
         required: value => !!value || '이 항목을 입력하지 않았습니다.' // 필수 입력 규칙
@@ -284,50 +285,76 @@ export default {
     };
   },
 
-  created() {
-     console.log("beforeCreate");
-    const query = this.departure;
-    if (!query || query.length < 2) { // 최소 2자 이상 입력된 경우에만 검색
-      this.cities = [];
-    }
+  // created() {
+  //   console.log("beforeCreate");
+  //   const query = this.departure;
+  //   if (!query || query.length < 2) { // 최소 2자 이상 입력된 경우에만 검색
+  //     this.cities = [];
+  //   }
+  //
+  //   try {
+  //     const response = axios.get('/api/flights/airports', {
+  //       params: { keyword: 'MUC' }, // 추출된 값 전달
+  //     });
+  //     console.log('api 요청 성공 : ', response.data); // 응답 데이터 확인
+  //     this.cities = response.data.map(item => ({
+  //       label: `${item.name} (${item.code})`,
+  //       value: item.code,
+  //     }));
+  //   } catch (error) {
+  //     console.error('api 요청 실패 : ',error);
+  //   }
+  // },
 
-    try {
-      const response = axios.get('/api/flights/airports', {
-        params: { keyword: 'MUC' }, // 추출된 값 전달
-      });
-      console.log('api 요청 성공 : ', response.data); // 응답 데이터 확인
-      this.cities = response.data.map(item => ({
-        label: `${item.name} (${item.iataCode})`,
-        value: item.iataCode,
-      }));
-    } catch (error) {
-      console.error('api 요청 실패 : ',error);
-    }
+  created() {
+    this.loadAirports(); // 컴포넌트가 생성될 때 공항 데이터 불러오기
   },
 
+
   methods: {
-    // 아마데우스 api이용해서 공항검색
-      async searchAirports(e, type) {
-        console.error('입력값 : ',e, type);
-        // const query = type === 'departure' ? this.departure : this.destination;
-        //
-        // if (!query || query.length < 2) { // 최소 2자 이상 입력된 경우에만 검색
-        //   this.cities = [];
-        //   return;
-        // }
-        //
-        // try {
-        //   const response = await axios.get('/api/flights/airports', {
-        //     params: { keyword: 'MUC' }, // 추출된 값 전달
-        //   });
-        //   this.cities = response.data.map(item => ({
-        //     label: `${item.name} (${item.iataCode})`,
-        //     value: item.iataCode,
-        //   }));
-        // } catch (error) {
-        //   console.error('api 요청 실패 : ',error);
-        // }
-      },
+    async loadAirports() {
+      try {
+        const response = await axios.get('/api/flights/airports', {
+          params: { keyword: this.keyword }
+        });
+        console.log(response.data);
+        this.airports = response.data.airports; // 서버에서 받은 airports 배열
+
+        if (Array.isArray(response.data.airports)) {
+          this.cities = response.data.airports.map(airport => ({
+            label: `${airport.city} (${airport.code})`,
+            value: airport.code
+          }));
+          console.log('도시배열확인',this.cities);
+
+        } else {
+          console.error('응답 데이터가 배열이 아닙니다:', response.data);
+          this.cities = []; // 기본값 설정
+        }
+      } catch (error) {
+        console.error('api 요청 실패 : ', error);
+      }
+
+    },
+
+
+    async searchAirports(keyword) {
+      this.keyword = keyword;
+      console.error('입력값 : ', keyword);
+
+      if (keyword) {
+        this.cities = this.cities.filter(item =>
+            item.label.toLowerCase().includes(keyword.toLowerCase())
+        );
+      } else {
+        await this.loadAirports();
+      }
+    }
+    ,
+
+    // async searchAirports(e, type) {
+    //   console.error('입력값 : ',e, type);
+    // },
 
     formatDate(date) {
       const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
