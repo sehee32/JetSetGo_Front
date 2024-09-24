@@ -130,7 +130,7 @@ export default {
       },
       isPublic: true,  // v-switch의 초기 상태를 false로 설정
       loading: false,
-      writerId: ''
+      writerName: ''
     }
   },
   methods: {
@@ -163,7 +163,7 @@ export default {
         }
         console.log('유효성 검사 결과 : ' + isValid.valid); // 유효성 검사 결과 확인
         const response = await axios.post('/api/supportAdd', {
-          writer_Id : this.writerId,
+          writer_Name : this.writerName,
           title: this.title,
           detail: this.detail,
           public_Status: this.isPublic,
@@ -186,17 +186,31 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async fetchUserInfo() {
+      const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+      if (token) {
+        try {
+          const response = await axios.post('/api/getUserInfo', {
+            token: token // 토큰을 본문에 포함
+          });
+          this.writerName = response.data; // 사용자 정보를 변수에 저장
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
+      }
     }
   },
   computed: {
     switchLabel() {
       return this.isPublic ? '공개' : '비공개';  // 상태에 따라 라벨 변경
-    },
+    }
   },
   mounted() {
+  this.fetchUserInfo();
     // localStorage에서 ID 값을 읽어와서 데이터에 저장
     // this.writerId = localStorage.getItem('session_id'); // 저장된 키에 맞게 수정
-    this.writerId = 1;
+    // this.writerId = response.data;
   },
 }
 </script>

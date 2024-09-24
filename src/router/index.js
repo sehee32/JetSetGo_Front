@@ -57,7 +57,8 @@ const routes = [
   {
     path: '/supportInquiry',
     name: 'SupportInquiry',
-    component: () => import(/* webpackChunkName: "inquiry" */ '../views/./SupportInquiry')
+    component: () => import(/* webpackChunkName: "inquiry" */ '../views/./SupportInquiry'),
+    meta: { requiresAuth: true }  // 인증이 필요한 라우트
   },
   {
     path: '/myPageReservationList',
