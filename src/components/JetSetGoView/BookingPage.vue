@@ -7,7 +7,6 @@
           <v-col cols="12" md="6">
             <v-autocomplete
                 v-model="departure"
-                :items="cities"
                 :rules="[rules.required]"
                 label="출발지"
                 variant="outlined"
@@ -15,8 +14,8 @@
                 clearable
                 @keyup="searchAirports($event.target.value, 'departure')"
                 no-data-text="일치하는 도시가 없습니다."
-                item-value="value"
-                item-text="label"
+                :item-value="cities.value"
+                :item-text="cities.label"
             ></v-autocomplete>
           </v-col>
           <v-col cols="12" md="6">
@@ -210,7 +209,7 @@ export default {
       adults: null, // 성인 수
       children: null, // 아동 수
       formValid: false,
-      cities: [], // api로 가져올 도시 목록
+      cities: [{label:'', value:''}], // api로 가져올 도시 목록
       keyword : '',
       passengerOptions: Array.from({length: 10}, (v, i) => i + 1), // 승객 수 (1~10)
       rules: {
@@ -325,7 +324,7 @@ export default {
             label: `${airport.city} (${airport.code})`,
             value: airport.code
           }));
-          console.log('도시배열확인',this.cities);
+          console.log('도시배열확인',this.cities[0]);
 
         } else {
           console.error('응답 데이터가 배열이 아닙니다:', response.data);
@@ -340,12 +339,15 @@ export default {
 
     async searchAirports(keyword) {
       this.keyword = keyword;
-      console.error('입력값 : ', keyword);
+      console.log('입력값 : ', keyword);
 
       if (keyword) {
-        this.cities = this.cities.filter(item =>
+        let keywordData = '';
+        console.log(this.cities);
+        keywordData = this.cities.filter(item =>
             item.label.toLowerCase().includes(keyword.toLowerCase())
         );
+        console.log(keywordData);
       } else {
         await this.loadAirports();
       }
