@@ -110,6 +110,7 @@ export default {
       formValid: false,
       cities: [{label:'', value:''}], // api로 가져올 도시 목록
       keyword : '',
+      keywordData: [],
       passengerOptions: Array.from({length: 10}, (v, i) => i + 1), // 승객 수 (1~10)
       rules: {
         required: value => !!value || '이 항목을 입력하지 않았습니다.' // 필수 입력 규칙
