@@ -28,6 +28,7 @@
               ></v-btn>
             </div>
           </div>
+<!--          <div v-if="noData">예약내역이 없습니다.</div>-->
         </v-container>
       </v-main>
     </v-app>
@@ -48,7 +49,7 @@ export default {
         // Add more items as needed
       ],
       reservations:[],
-      userId: 17
+      userId: ''
     };
   },
   methods: {
@@ -72,13 +73,26 @@ export default {
       };
     },
     async getReservation(){
+      const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+      if (token) {
+        try {
+          const response = await axios.post('/api/getUserInfos', {
+            token: token // 토큰을 본문에 포함
+          });
+          this.userId = response.data.membernum; // 사용자 ID를 변수에 저장
+
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
+      }
+      console.log('userId 확인: ' + this.userId); // 서버에서 받은 데이터 출력
       const response = await axios.post('/api/myPageReservations', {
         userId: this.userId
       });
       // API 요청이 성공한 경우
       console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
       this.reservations = response.data;
-
+      console.log(this.noData);
     }
   },
   mounted() {
