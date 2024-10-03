@@ -262,6 +262,8 @@ export default {
           userPassword: '',
           activePanel: [], // 현재 열려 있는 패널의 값을 저장
           contact: '',
+          currentPasswordInfo: '',
+          isPasswordValid: false, // 비밀번호 확인 상태
           currentPassword: '',
           newPassword: '',
           confirmNewPassword: '',
@@ -270,9 +272,7 @@ export default {
             password: value => this.checkPassword(value),
             matchPassword: value => value === this.newPassword || '비밀번호가 일치하지 않습니다.'
           },
-          loading: false,
-          currentPasswordInfo: '',
-          isPasswordValid: false, // 비밀번호 확인 상태
+          loading: false
          };
     },
   watch: {
@@ -303,10 +303,30 @@ export default {
       // 비밀번호 변경 상세
       async submit(event) {
         this.loading = true;
-        const results = await event;
-        this.loading = false;
-        alert(JSON.stringify(results));
-        this.activePanel = []; // 모든 패널 닫기
+        // 비밀번호 확인 로직
+        if (this.currentPassword === this.userPassword) {
+          const results = await event;
+          if(results.valid){
+            const response = await axios.post('/api/myPageUserPasswordEdit', {
+              userId: this.id,
+              password: this.newPassword
+            });
+            console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+            if(response.data){
+              alert('비밀번호 변경이 완료되었습니다.'); // 비밀번호 변경 성공 시
+              this.userPassword = this.newPassword;
+            }else{
+              alert('비밀번호 변경 불가, 관리자 문의 필요');
+            }
+            this.activePanel = []; // 모든 패널 닫기
+          }else{
+            alert(results.errors[0].errorMessages); // 유효성 검사 실패 시
+          }
+          this.loading = false;
+        } else {
+          alert('현재 비밀번호가 일치하지 않습니다.'); // 비밀번호가 일치하지 않으면 에러 메시지 표시
+          this.loading = false;
+        }
       },
       checkPassword(value) {
         if (value.length < 8) {
@@ -342,9 +362,15 @@ export default {
             contact: this.contact
           });
           console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
-          alert('정보 변경이 완료되었습니다.'); // 정보 변경 성공 시
+          if(response.data){
+            alert('정보 변경이 완료되었습니다.'); // 정보 변경 성공 시
+            this.phoneNumber = this.contact;
+          }else{
+            alert('정보 변경 불가, 관리자 문의 필요');
+            this.contact = this.phoneNumber;
+          }
           this.activePanel = []; // 모든 패널 닫기
-          this.phoneNumber = this.contact;
+
 
         } else {
           if (!this.contact) this.$refs.contactField.focus(); // 에러난 필드 포커스
