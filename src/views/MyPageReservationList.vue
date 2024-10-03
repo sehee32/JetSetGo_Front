@@ -8,20 +8,20 @@
           <div v-for="(item, index) in reservations" :key="index" class="costom-box" :style="getBorderTopStyle(item.status)">
             <div class="list">
               <div class="status">
-                <p><strong>{{ item.status }}</strong> {{ item.reservationId }}</p>
+                <p><strong>{{ item.status }}</strong> {{ item.reservation_Id }}</p>
               </div>
               <div class="airport">
-                <span><strong>{{ item.departureCode }}</strong>{{ item.departureCity }} </span>
-                <span> <strong>{{ item.arrivalCode }}</strong>{{ item.arrivalCity }}</span>
+                <span><strong>{{ item.originlocationcode }}</strong>{{ item.departure_City }} </span>
+                <span> <strong>{{ item.destinationlocationcode }}</strong>{{ item.arrival_City }}</span>
               </div>
               <div class="time">
-                <strong>{{ item.departureTime }} ~ {{ item.arrivalTime }}</strong>
+                <strong>{{ item.departure_Time }} ~ {{ item.arrival_Time }}</strong>
               </div>
             </div>
             <div class="line"></div>
             <div class="btn">
               <v-btn
-                  @click="goDetail(item.reservationId)"
+                  @click="goDetail(item.reservation_Id)"
                   class="detailBtn"
                   text="상세보기"
                   block
@@ -35,16 +35,20 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "MyPageReservationList",
   components: {},
   data() {
     return {
-      reservations: [
-        { reservationId: 1002, status: '미사용', departureCode:'ICN', arrivalCode:'KIX', departureCity: '서울', arrivalCity: '오사카', departureTime: '2025-05-07 15:15', arrivalTime: '2025-05-07 17:15'  },
-        { reservationId: 1001, status: '사용완료', departureCode:'ICN', arrivalCode:'KIX', departureCity: '서울', arrivalCity: '오사카', departureTime: '2025-05-03 13:30', arrivalTime: '2025-05-03 15:30'  },
+      reservation: [
+        { reservation_Id: 1002, status: '미사용', originlocationcode:'ICN', destinationlocationcode:'KIX', departure_City: '서울', arrival_City: '오사카', departure_Time: '2025-05-07 15:15', arrival_Time: '2025-05-07 17:15'  },
+        { reservation_Id: 1001, status: '사용완료', originlocationcode:'ICN', destinationlocationcode:'KIX', departure_City: '서울', arrival_City: '오사카', departure_Time: '2025-05-03 13:30', arrival_Time: '2025-05-03 15:30'  },
         // Add more items as needed
       ],
+      reservations:[],
+      userId: 17
     };
   },
   methods: {
@@ -66,6 +70,15 @@ export default {
       return {
         borderTop: `4px solid ${borderColor}`
       };
+    },
+    async getReservation(){
+      const response = await axios.post('/api/myPageReservations', {
+        userId: this.userId
+      });
+      // API 요청이 성공한 경우
+      console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+      this.reservations = response.data;
+
     }
   },
   mounted() {
@@ -73,6 +86,7 @@ export default {
     if (element) {
       element.style.minHeight = 'initial';
     } //v-app 아래의 div class="v-application__wrap" 요소에 min-height: initial; 스타일을 적용
+    this.getReservation();
     window.scrollTo(0, 0); // 페이지 스크롤 위치 맨 위로
   }
 }
@@ -129,15 +143,16 @@ export default {
 
 .reservationList .costom-box .list .airport{
   display: inline-block;
-  width: 30%;
-  background: url('@/assets/flight.png') no-repeat 88px center;
+  width: 40%;
+  background: url('@/assets/flight.png') no-repeat 118px center;
   background-size: 20px 20px; /* 너비와 높이 모두 지정 */
 }
 
 .reservationList .costom-box .list .airport span{
   display: inline-block;
-  margin-right: 60px;
+  margin-right: 40px;
   text-align: center;
+  width: 110px;
 }
 
 .reservationList .costom-box .list .airport span strong{
