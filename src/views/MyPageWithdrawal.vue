@@ -96,12 +96,16 @@
 </template>
 
 <script>
+import axios from "axios";
+import {mapActions} from "vuex";
+
 export default {
   name: "MyPageWithdrawal",
   components: {},
   data() {
     return {
-      id: 'hong',
+      id: '',
+      userPassword: '',
       currentPassword: '',
       rules: {
         required : value => !!value || '필수 입력 항목입니다.',
@@ -113,11 +117,12 @@ export default {
     };
   },
   methods: {
+    ...mapActions(['logout']),
     async submitPassword() {
       this.loading = true;
 
       // 비밀번호 확인 로직
-      if (this.currentPassword === '1234') {
+      if (this.currentPassword === this.userPassword) {
         this.isPasswordValid = true;
         console.log('비밀번호가 유효합니다. 추가 작업을 수행합니다.');
       } else {
@@ -128,9 +133,29 @@ export default {
     async withdrawalSubmit() {
       this.loading = true;
       if (this.terms == true) {
+        const response = await axios.post('/api/myPageUserRemove', {
+          id: this.id
+        });
+        console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
         alert('회원탈퇴 성공'); // 정보 변경 성공 시
+        await this.logout(); // vuex액션 호출
+        this.$router.push('/');
       }
       this.loading = false;
+    },
+    async fetchUserInfos() {
+      const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+      if (token) {
+        try {
+          const response = await axios.post('/api/getUserInfos', {
+            token: token // 토큰을 본문에 포함
+          });
+          this.id = response.data.username;
+          this.userPassword = response.data.password;
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
+      }
     },
     goBack() {
       this.$router.go(-1); // 이전 페이지로 이동
@@ -141,6 +166,7 @@ export default {
     if (element) {
       element.style.minHeight = 'initial';
     } //v-app 아래의 div class="v-application__wrap" 요소에 min-height: initial; 스타일을 적용
+    this.fetchUserInfos();
   }
 }
 </script>
