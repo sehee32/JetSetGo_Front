@@ -47,7 +47,7 @@
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title class="costom-profile-title"><strong>{{ contact }}</strong></v-list-item-title>
+                    <v-list-item-title class="costom-profile-title"><strong>{{ phoneNumber }}</strong></v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
@@ -257,10 +257,11 @@ export default {
         return {
           name: '',
           id: '',
-          contact: '',
+          phoneNumber: '',
           birthDate: '',
           userPassword: '',
           activePanel: [], // 현재 열려 있는 패널의 값을 저장
+          contact: '',
           currentPassword: '',
           newPassword: '',
           confirmNewPassword: '',
@@ -335,8 +336,16 @@ export default {
         this.loading = true;
         const isValid = await this.$refs.contactField.validate();
         if (isValid == '') {
-          alert('정보 변경 성공'); // 정보 변경 성공 시
+
+          const response = await axios.post('/api/myPageUserInfoEdit', {
+            userId: this.id,
+            contact: this.contact
+          });
+          console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+          alert('정보 변경이 완료되었습니다.'); // 정보 변경 성공 시
           this.activePanel = []; // 모든 패널 닫기
+          this.phoneNumber = this.contact;
+
         } else {
           if (!this.contact) this.$refs.contactField.focus(); // 에러난 필드 포커스
         }
@@ -351,6 +360,7 @@ export default {
             });
             this.name = response.data.name; // 사용자 정보를 변수에 저장
             this.id = response.data.username;
+            this.phoneNumber = response.data.phoneNumber;
             this.contact = response.data.phoneNumber;
             this.birthDate = response.data.birthdate;
             this.userPassword = response.data.password;
