@@ -63,19 +63,22 @@ const routes = [
   {
     path: '/myPageReservationList',
     name: 'MyPageReservationList',
-    component: () => import(/* webpackChunkName: "myPageReservationList" */ '../views/MyPageReservationList.vue')
+    component: () => import(/* webpackChunkName: "myPageReservationList" */ '../views/MyPageReservationList.vue'),
+    meta: { requiresAuth: true }  // 인증이 필요한 라우트
   }
   ,
   {
     path: '/myPageReservationDetail',
     name: 'MyPageReservationDetail',
-    component: () => import(/* webpackChunkName: "myPageReservationDetail" */ '../views/MyPageReservationDetail.vue')
+    component: () => import(/* webpackChunkName: "myPageReservationDetail" */ '../views/MyPageReservationDetail.vue'),
+    meta: { requiresAuth: true }  // 인증이 필요한 라우트
   }
   ,
   {
     path: '/myPageWithdrawal',
     name: 'MyPageWithdrawal',
-    component: () => import(/* webpackChunkName: "myPageWithdrawal" */ '../views/MyPageWithdrawal.vue')
+    component: () => import(/* webpackChunkName: "myPageWithdrawal" */ '../views/MyPageWithdrawal.vue'),
+    meta: { requiresAuth: true }  // 인증이 필요한 라우트
   }
   ,
   {
