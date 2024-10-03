@@ -17,7 +17,7 @@
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title class="costom-profile-title"><strong>홍길동</strong></v-list-item-title>
+                    <v-list-item-title class="costom-profile-title"><strong>{{ name }}</strong></v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
@@ -47,7 +47,7 @@
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title class="costom-profile-title"><strong>01011111111</strong></v-list-item-title>
+                    <v-list-item-title class="costom-profile-title"><strong>{{ contact }}</strong></v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
@@ -62,7 +62,7 @@
                 </v-list-item>
                 <v-list-item>
                   <v-list-item-content>
-                    <v-list-item-title class="costom-profile-title"><strong>20240101</strong></v-list-item-title>
+                    <v-list-item-title class="costom-profile-title"><strong>{{ birthDate }}</strong></v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
@@ -255,6 +255,11 @@ export default {
     components: {},
     data() {
         return {
+          name: '',
+          id: '',
+          contact: '',
+          birthDate: '',
+          userPassword: '',
           activePanel: [], // 현재 열려 있는 패널의 값을 저장
           currentPassword: '',
           newPassword: '',
@@ -265,10 +270,8 @@ export default {
             matchPassword: value => value === this.newPassword || '비밀번호가 일치하지 않습니다.'
           },
           loading: false,
-          id: '',
           currentPasswordInfo: '',
           isPasswordValid: false, // 비밀번호 확인 상태
-          contact: '01011111111',
          };
     },
   watch: {
@@ -320,7 +323,7 @@ export default {
         this.loading = true;
 
         // 비밀번호 확인 로직
-        if (this.currentPasswordInfo === '1234') {
+        if (this.currentPasswordInfo === this.userPassword) {
           this.isPasswordValid = true;
           console.log('비밀번호가 유효합니다. 추가 작업을 수행합니다.');
         } else {
@@ -339,14 +342,18 @@ export default {
         }
         this.loading = false;
       },
-      async fetchUserInfo() {
+      async fetchUserInfos() {
         const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
         if (token) {
           try {
-            const response = await axios.post('/api/getUserInfo', {
+            const response = await axios.post('/api/getUserInfos', {
               token: token // 토큰을 본문에 포함
             });
-            this.id = response.data; // 사용자 정보를 변수에 저장
+            this.name = response.data.name; // 사용자 정보를 변수에 저장
+            this.id = response.data.username;
+            this.contact = response.data.phoneNumber;
+            this.birthDate = response.data.birthdate;
+            this.userPassword = response.data.password;
           } catch (error) {
             console.error('Error fetching user info:', error);
           }
@@ -358,7 +365,7 @@ export default {
     if (element) {
       element.style.minHeight = 'initial';
     } //v-app 아래의 div class="v-application__wrap" 요소에 min-height: initial; 스타일을 적용},
-    this.fetchUserInfo();
+    this.fetchUserInfos();
   }
 }
 </script>
