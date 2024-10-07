@@ -3,7 +3,7 @@
     <!-- 예약 정보 -->
     <div style="max-width: 1280px; margin: 0 auto;">
       <h1>예약번호 : {{ reservationId }}</h1>
-      <h3>{{ flights[0].departureCity }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ flights[0].arrivalCity }}</h3>
+      <h3>{{ flightsDepartureCity }}&nbsp;&nbsp;<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;{{ flightsArrivalCity }}</h3>
     </div>
   </div>
   <div class="reservationDetail">
@@ -14,15 +14,15 @@
           <div v-for="(item, index) in flights" :key="index" class="costom-box">
             <div class="title">
               <span>여정 {{index+1}}</span>
-              <span>{{ item.departureCode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.arrivalCode }}</span>
+              <span>{{ item.originlocationcode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.destinationlocationcode }}</span>
             </div>
             <div class="detail">
               <h4>{{ item.departureDate }}</h4>
               <v-row>
                 <v-col class="departure">
                   <p><strong>{{ item.departureTime }}</strong></p>
-                  <p>{{ item.departureCity }}</p>
-                  <p class="code">{{ item.departureCode }}</p>
+                  <p>{{ item.departure_City }}</p>
+                  <p class="code">{{ item.originlocationcode }}</p>
                 </v-col>
                 <v-col cols="2" class="img">
                   <p>총 {{ item.duration }} 소요</p>
@@ -31,8 +31,8 @@
                 </v-col>
                 <v-col class="arrival">
                   <p><strong>{{ item.arrivalTime }}</strong></p>
-                  <p>{{ item.arrivalCity }}</p>
-                  <p class="code">{{ item.arrivalCode }}</p>
+                  <p>{{ item.arrival_City }}</p>
+                  <p class="code">{{ item.destinationlocationcode }}</p>
                 </v-col>
               </v-row>
             </div>
@@ -42,10 +42,10 @@
             <h5>연락처 및 탑승객 정보</h5>
             <v-row>
               <v-col>
-                <p><strong>{{user.name}}</strong></p>
+                <p><strong>{{userName}}</strong></p>
               </v-col>
               <v-col>
-                <p><strong>연락처</strong> {{user.phoneNumber}}</p>
+                <p><strong>연락처</strong> {{userPhoneNumber}}</p>
               </v-col>
               <v-col>
               </v-col>
@@ -71,33 +71,58 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "MyPageReservationDetail",
   components: {},
   props: ['id'], // Define id as a prop
   data() {
     return {
-      flights: [
-        { flightID:100, departureCode:'ICN', arrivalCode:'KIX', departureCity: '서울', arrivalCity: '오사카', departureDate: '2025-05-07', arrivalDate: '2025-05-07', departureTime: '15:15', arrivalTime: '17:15', duration: '2시간 0분' },
-        { flightID:321, departureCode:'KIX', arrivalCode:'ICN', departureCity: '오사카', arrivalCity: '서울', departureDate: '2025-05-09', arrivalDate: '2025-05-09', departureTime: '14:30', arrivalTime: '16:31', duration: '2시간 1분' },
+      flight: [
+        { flightID:100, departureCode:'ICN', arrivalCode:'KIX', departure_City: '서울', arrivalCity: '오사카', departureDate: '2025-05-07', arrivalDate: '2025-05-07', departureTime: '15:15', arrivalTime: '17:15', duration: '2시간 0분' },
+        { flightID:321, departureCode:'KIX', arrivalCode:'ICN', departure_City: '오사카', arrivalCity: '서울', departureDate: '2025-05-09', arrivalDate: '2025-05-09', departureTime: '14:30', arrivalTime: '16:31', duration: '2시간 1분' },
         // Add more items as needed
       ],
+      flights:[],
       reservationId: null,
       status: '미사용',
       user: {name:'사용자', phoneNumber:'01022222222'},
     };
   },
+  computed: {
+    flightsDepartureCity() {
+      return this.flights.length > 0 ? this.flights[0].arrival_City : '데이터 없음';
+    },
+    flightsArrivalCity() {
+      return this.flights.length > 0 ? this.flights[0].departure_City : '데이터 없음';
+    },
+    userName() {
+      return this.flights.length > 0 ? this.flights[0].name : '데이터 없음';
+    },
+    userPhoneNumber() {
+      return this.flights.length > 0 ? this.flights[0].phoneNumber : '데이터 없음';
+    }
+  },
   methods: {
     goDetail() {
       this.$router.go(-1); // 우선 이전 페이지로 이동
+    },
+    async getReservationDetail(){
+      const response = await axios.post('/api/myPageReservationDetails', {
+        id: this.reservationId
+      });
+      // API 요청이 성공한 경우
+      console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+      this.flights = response.data;
     }
   },
   mounted() {
     // localStorage에서 ID 값을 읽어와서 데이터에 저장
     this.reservationId = localStorage.getItem('reservationId');
+    this.getReservationDetail();
 
-    // 필요에 따라 ID를 기반으로 추가 작업을 수행할 수 있습니다.
-    console.log('예약자 ID:', this.reservationId);
+    console.log('예약 ID:', this.reservationId);
   },
   beforeUnmount() {
     // 컴포넌트가 사라질 때 localStorage에서 ID 값을 삭제할 수 있습니다.
@@ -127,7 +152,10 @@ export default {
 .reservationID h3{
   font-size: 20px;
   font-weight: 500;
-  background: url('@/assets/to_w.svg') no-repeat 50px center;
+}
+
+.reservationID h3 span{
+  background: url('@/assets/to_w.svg') no-repeat center center;
 }
 
 .reservationDetail{
@@ -151,14 +179,13 @@ export default {
 }
 .reservationDetail .costom-box .title{
   border-bottom: 1px solid #eee;
-  background: url('@/assets/to.svg') no-repeat 155px center;
 }
 .reservationDetail .costom-box .title span{
   display: inline-block;
   padding: 13px 25px;
   font-weight: 700;
   font-size: 17px;
-
+  background: url('@/assets/to.svg') no-repeat center center;
 }
 
 .reservationDetail .costom-box .title span:first-of-type {
