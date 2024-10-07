@@ -38,23 +38,49 @@
 
         <v-row>
           <v-col cols="12" md="6">
+            <v-select
+                v-model="travelClass"
+                :rules="[rules.required]"
+                :items="classOptions"
+                label="좌석 등급"
+                variant="outlined"
+                prepend-inner-icon="mdi-airplane"
+                clearable
+            ></v-select>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-select
+                v-model="nonStop"
+                :rules="[rules.required]"
+                :items="nonStopOptions"
+                label="직항 여부"
+                variant="outlined"
+                prepend-inner-icon="mdi-airplane"
+                clearable
+            ></v-select>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col cols="12" md="6">
             <v-date-input
                 v-model="departureDate"
                 :rules="[rules.required]"
-                label="출발 날짜"
+                label="가는 날"
                 prepend-icon=""
                 prepend-inner-icon="mdi-calendar-outline"
                 variant="outlined"
+                clearable
             ></v-date-input>
           </v-col>
           <v-col cols="12" md="6">
             <v-date-input
                 v-model="returnDate"
-                :rules="[rules.required]"
-                label="도착 날짜"
+                label="오는 날"
                 prepend-icon=""
                 prepend-inner-icon="mdi-calendar-outline"
                 variant="outlined"
+                clearable
             ></v-date-input>
           </v-col>
         </v-row>
@@ -62,21 +88,23 @@
         <v-row>
           <v-col cols="12" md="6">
             <v-select
-                v-model="adults"
+                v-model.number="adults"
                 :items="passengerOptions"
                 label="성인"
                 variant="outlined"
                 prepend-inner-icon="mdi-account-outline"
                 :rules="[rules.required]"
+                clearable
             ></v-select>
           </v-col>
           <v-col cols="12" md="6">
             <v-select
-                v-model="children"
+                v-model.number="children"
                 :items="passengerOptions"
                 label="아동"
                 variant="outlined"
                 prepend-inner-icon="mdi-account-child-outline"
+                clearable
             ></v-select>
           </v-col>
         </v-row>
@@ -107,13 +135,17 @@ export default {
       returnDate: null, // 도착 날짜
       adults: null, // 성인 수
       children: null, // 아동 수
+      travelClass: null,
+      nonStop: null,
       formValid: false,
       cities: [{label:'', value:''}], // api로 가져올 도시 목록
       keyword : '',
       keywordData: [],
-      passengerOptions: Array.from({length: 10}, (v, i) => i + 1), // 승객 수 (1~10)
+      classOptions:['ECONOMY','PREMIUM_ECONOMY','BUSINESS','FIRST'],
+      nonStopOptions: [{ title: '직항', value: true }, { title: '경유', value: false }],
+      passengerOptions: Array.from({length: 11}, (v, i) => i), // 승객 수 (0~10)
       rules: {
-        required: value => !!value || '이 항목을 입력하지 않았습니다.' // 필수 입력 규칙
+        required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' // 필수 입력 규칙
       }
     };
   },
@@ -193,8 +225,12 @@ export default {
     // },
 
     formatDate(date) {
-      const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
-      return new Date(date).toLocaleDateString('ko-KR', options);
+      if (!date) return null;
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0'); // 월을 2자리로 맞추기
+      const day = String(d.getDate()).padStart(2, '0'); // 일을 2자리로 맞추기
+      return `${year}-${month}-${day}`;
     },
     // 예매 정보 처리 메서드
     bookTicket() {
@@ -203,6 +239,8 @@ export default {
         console.log("출발지 또는 도착지가 비어 있습니다.");
         return;
       }
+
+      console.log('선택된 travelClass: ', this.travelClass);
 
       const formattedDepartureDate = this.formatDate(this.departureDate);
       const formattedReturnDate = this.formatDate(this.returnDate);
@@ -214,8 +252,10 @@ export default {
           destination: this.destination,
           departureDate: formattedDepartureDate,
           returnDate: formattedReturnDate,
-          adults: this.adults,
-          children: this.children
+          adults: Number(this.adults),
+          children: Number(this.children),
+          travelClass: this.travelClass,
+          nonStop: this.nonStop
         }
       });
     }

@@ -90,8 +90,10 @@ const routes = [
       destination: route.query.destination,
       departureDate: route.query.departureDate,
       returnDate: route.query.returnDate,
-      adults: route.query.adults,
-      children: route.query.children
+      adults: Number(route.query.adults),
+      children: Number(route.query.children),
+      travelClass: route.query.travelClass,
+      nonStop: route.query.nonStop === 'true'
     })
   },
   {

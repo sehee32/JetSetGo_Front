@@ -1,84 +1,69 @@
 <template>
   <v-container>
-<!--    <v-card class="custom-card pa-6 mt-6">-->
     <br>
-      <h1 class="text-center mb-6">항공편 검색 결과</h1>
+    <h1 class="text-center mb-6">항공편 검색 결과</h1>
 
-      <!-- 출발지, 도착지, 날짜, 인원 정보 표시 -->
-      <v-row>
-        <v-col cols="12">
-          <div class="route-info">
-            <h2><p>{{ departure }} - {{ destination }}</p></h2>
-            <h3><p>{{ departureDate }} - {{ returnDate }}</p>
-            <p>성인 {{ adults }}명, 아동 {{ children }}명</p></h3>
-          </div>
-        </v-col>
-      </v-row>
+    <!-- 출발지, 도착지, 날짜, 인원 정보 표시 -->
+    <v-row>
+      <v-col cols="12">
+        <div class="route-info">
+          <h2><p>{{ departureMutable }} - {{ destinationMutable }}</p></h2>
+          <h3>
+            <p>{{ departureDate }} - {{ returnDate }}</p>
+            <p>성인 {{ adults }}명, 아동 {{ children }}명</p>
+          </h3>
+        </div>
+      </v-col>
+    </v-row>
 
-      <!-- 탭 메뉴 표시 -->
-      <v-tabs v-model="page" background-color="#00256c" centered grow>
-        <v-tab v-for="(tab, index) in tabs" :key="index">
-          {{ tab.date }}<br>{{ tab.price }}
-        </v-tab>
-      </v-tabs>
-      <br>
+    <!-- 항공편 리스트 표시 -->
+    <v-row>
+      <v-col cols="12" v-for="flight in currentFlights" :key="flight.id">
+        <v-card
+            class="flight-card pa-4 mb-4"
+            :class="{'selected-flight': selectedFlightId === flight.id}"
+        @click="selectFlight(flight.id)"
+        >
+        <v-row>
+          <!-- 항공편 시간 및 소요시간 정보 표시 -->
+          <v-col cols="12" md="3">
+            <div class="flight-time">
+              <span>{{ flight.departureTime }}</span>
+              <span> -> </span>
+              <span>{{ flight.arrivalTime }}</span>
+            </div>
+            <div class="flight-duration">{{ flight.duration }}</div>
+          </v-col>
 
-      <!-- 항공편 리스트 표시 -->
-      <v-row>
-        <v-col cols="12" v-for="flight in currentFlights" :key="flight.id">
-          <v-card class="flight-card pa-4 mb-4">
-            <v-row>
-              <!-- 항공편 시간 및 소요시간 정보 표시 -->
-              <v-col cols="12" md="3">
-                <div class="flight-time">
-                  <span>{{ flight.departureTime }}</span>
-                  <span> -> </span>
-                  <span>{{ flight.arrivalTime }}</span>
-                </div>
-                <div class="flight-duration">소요시간: {{ flight.duration }}</div>
-              </v-col>
+          <!-- 가격 정보 표시 -->
+          <v-col cols="12" md="8">
+            <div class="flight-price">
+              <strong>{{ formatPrice(flight.price) }} {{ flight.currency }}</strong>
+            </div>
+          </v-col>
+        </v-row>
+        </v-card>
+      </v-col>
+    </v-row>
 
-              <!-- 가격 옵션 표시 -->
-              <v-col cols="12" md="8">
-                <v-row>
-                  <v-col
-                      cols="3"
-                      class="price-option"
-                      v-for="option in flight.priceOptions"
-                      :key="option.type"
-                      :class="{ selected: isSelected(flight.id, option.type) }"
-                      @click="selectSeatOption(flight.id, option.type)"
-                  >
-                    <div>{{ option.type }}</div>
-                    <div>{{ option.price }}</div>
-                    <div>{{ option.availability }}</div>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
+    <!-- 다음여정 버튼 -->
+    <v-row v-if="journeyStage === 'outgoing' && selectedFlightId !== null">
+      <v-col cols="12" class="text-center">
+        <v-btn @click="NextJourney" class="custom-btn mt-4">다음여정</v-btn>
+      </v-col>
+    </v-row>
 
-      <!-- 다음여정 버튼 -->
-      <v-row v-if="journeyStage === 'outgoing' && selectedFlightId !== null">
-        <v-col cols="12" class="text-center">
-          <v-btn @click="NextJourney" class="custom-btn mt-4">다음여정</v-btn>
-        </v-col>
-      </v-row>
-
-      <!-- 결제하기 버튼 -->
-      <v-row v-if="journeyStage === 'return' && selectedFlightId !== null && returnFlightId !== null">
-        <v-col cols="12" class="text-center">
-          <v-btn @click="Payment" class="custom-btn mt-4">결제하기</v-btn>
-        </v-col>
-      </v-row>
-<!--    </v-card>-->
+    <!-- 결제하기 버튼 -->
+    <v-row v-if="journeyStage === 'return' && selectedFlightId !== null && returnFlightId !== null">
+      <v-col cols="12" class="text-center">
+        <v-btn @click="Payment" class="custom-btn mt-4">결제하기</v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
-// import axios from "axios";
+import axios from "axios";
 
 export default {
   props: {
@@ -99,138 +84,124 @@ export default {
       required: true
     },
     adults: {
-      type: String,
+      type: Number,
       required: true
     },
     children: {
+      type: Number,
+      required: true
+    },
+    travelClass: {
       type: String,
+      required: true
+    },
+    nonStop: {
+      type: Boolean,
       required: true
     }
   },
   data() {
     return {
       currentFlights: [], // 현재 화면에 표시되는 항공편 리스트
-      outgoingFlights: [
-        // 가는편 항공편 데이터
-        {
-          id: 1,
-          departureTime: '08:30',
-          arrivalTime: '11:00',
-          duration: '2시간 30분',
-          priceOptions: [
-            { type: '일반석', price: '마감', availability: '' },
-            { type: '프리미엄 일반석', price: '90,000원', availability: '9석' },
-            { type: '비즈니스석', price: '마감', availability: '' }
-          ]
-        },
-        {
-          id: 2,
-          departureTime: '10:35',
-          arrivalTime: '12:55',
-          duration: '2시간 20분',
-          priceOptions: [
-            { type: '일반석', price: '마감', availability: '' },
-            { type: '프리미엄 일반석', price: '120,000원', availability: '1석' },
-            { type: '비즈니스석', price: '180,000원', availability: '3석' }
-          ]
-        }
-        // 더미 데이터 추가 가능
-      ],
-      returnFlights: [
-        // 오는편 항공편 데이터
-        {
-          id: 3,
-          departureTime: '13:00',
-          arrivalTime: '15:30',
-          duration: '2시간 30분',
-          priceOptions: [
-            { type: '일반석', price: '마감', availability: '' },
-            { type: '프리미엄 일반석', price: '95,000원', availability: '5석' },
-            { type: '비즈니스석', price: '마감', availability: '' }
-          ]
-        },
-        {
-          id: 4,
-          departureTime: '15:45',
-          arrivalTime: '18:05',
-          duration: '2시간 20분',
-          priceOptions: [
-            { type: '일반석', price: '마감', availability: '' },
-            { type: '프리미엄 일반석', price: '125,000원', availability: '3석' },
-            { type: '비즈니스석', price: '185,000원', availability: '2석' }
-          ]
-        }
-        // 더미 데이터 추가 가능
-      ],
-      page: 0, // 현재 선택된 탭 인덱스
-      tabs: [
-        { date: '07.24 (월)', price: '90,000원~' },
-        { date: '07.25 (화)', price: '135,000원~' },
-        { date: '07.26 (수)', price: '145,000원~' },
-        { date: '07.27 (목)', price: '155,000원~' }
-      ],
-      selectedFlightId: null, // 선택된 가는편 항공편 ID
-      selectedSeatType: null, // 선택된 가는편 좌석 유형
-      returnFlightId: null, // 선택된 오는편 항공편 ID
-      returnSeatType: null, // 선택된 오는편 좌석 유형
-      journeyStage: 'outgoing' // 현재 여정 단계 ('outgoing' 또는 'return')
+      selectedFlightId: null, // 선택된 항공편 ID
+      returnFlightId: null, // 돌아오는 항공편 ID
+      journeyStage: 'outgoing', // 현재 여정 단계 ('outgoing' 또는 'return')
+      departureMutable: this.departure, // 수정 가능한 출발지
+      destinationMutable: this.destination, // 수정 가능한 도착지
+      departureDateMutable: this.departureDate // 수정 가능한 출발 날짜
     };
   },
   created() {
-    // 초기에 가는편 리스트로 설정
-    this.currentFlights = this.outgoingFlights;
+    this.searchFlights();
   },
+
   methods: {
-    // 좌석 등급 선택 메소드
-    selectSeatOption(flightId, seatType) {
-      if (this.journeyStage === 'outgoing') {
-        if (this.selectedFlightId === flightId && this.selectedSeatType === seatType) {
-          this.selectedFlightId = null;
-          this.selectedSeatType = null;
+    async searchFlights() {
+      try {
+        const response = await axios.get('/api/flights/search', {
+          params: {
+            origin: this.departureMutable,
+            destination: this.destinationMutable,
+            departureDate: this.departureDateMutable,
+            adults: this.adults,
+            children: this.children,
+            travelClass: this.travelClass,
+            nonStop: this.nonStop ? 'true' : 'false'
+          }
+        });
+
+        // API 응답 JSON에서 필요한 데이터만 추출
+        const flightOffers = response.data;
+        const resultArray = [];
+
+        if (flightOffers.length === 0) {
+          console.log('검색된 항공편이 없습니다.');
         } else {
-          this.selectedFlightId = flightId;
-          this.selectedSeatType = seatType;
+          for (const offer of flightOffers) {
+            const flightData = {
+              id: offer.id,
+              departureTime: offer.departureTime,
+              arrivalTime: offer.arrivalTime,
+              duration: this.formatDuration(offer.duration),
+              price: offer.price,
+              currency: offer.currency
+            };
+            resultArray.push(flightData);
+          }
         }
-      } else if (this.journeyStage === 'return') {
-        if (this.returnFlightId === flightId && this.returnSeatType === seatType) {
-          this.returnFlightId = null;
-          this.returnSeatType = null;
-        } else {
-          this.returnFlightId = flightId;
-          this.returnSeatType = seatType;
-        }
+
+        this.currentFlights = resultArray;
+
+      } catch (error) {
+        console.error('항공편 검색 오류:', error);
       }
     },
-    // 선택된 옵션 확인 메소드
-    isSelected(flightId, seatType) {
-      if (this.journeyStage === 'outgoing') {
-        return this.selectedFlightId === flightId && this.selectedSeatType === seatType;
-      } else if (this.journeyStage === 'return') {
-        return this.returnFlightId === flightId && this.returnSeatType === seatType;
-      }
-      return false;
+
+    formatDuration(duration) {
+      const regex = /PT(?:(\d+)H)?(?:(\d+)M)?/;
+      const matches = duration.match(regex);
+      const hours = matches[1] ? matches[1] : '0';
+      const minutes = matches[2] ? matches[2] : '0';
+
+      return `${hours}시간 ${minutes}분`;
     },
-    // 다음 여정으로 진행 메소드
+
+    formatPrice(price) {
+      return Number(price).toLocaleString();
+    },
+
+    selectFlight(flightId) {
+      this.selectedFlightId = flightId; // 선택된 항공편 ID 설정
+    },
+
     NextJourney() {
       if (this.journeyStage === 'outgoing' && this.selectedFlightId !== null) {
-        // 다음 여정으로 전환하고 오는편 리스트로 변경
-        this.currentFlights = this.returnFlights;
-        this.journeyStage = 'return';
-        // // 선택 정보 초기화
-        // this.selectedFlightId = null;
-        // this.selectedSeatType = null;
+        // 출발지와 도착지, 날짜 변경 후 검색
+        const tempDeparture = this.departureMutable;
+        this.departureMutable = this.destinationMutable;
+        this.destinationMutable = tempDeparture;
+        this.departureDateMutable = this.returnDate; // 출발일을 반환일로 변경
+
+        this.journeyStage = 'return'; // 여정 상태를 'return'으로 변경
+        this.selectedFlightId = null; // 선택된 항공편 초기화
+
+        this.searchFlights(); // 다시 항공편 검색 실행
       }
     },
-    // 결제 페이지로 이동
-    Payment() {
 
+    Payment() {
+      if (this.selectedFlightId !== null && this.returnFlightId !== null) {
+        // 결제 로직 처리
+      } else {
+        console.error('결제 정보를 확인해 주세요.');
+      }
     }
   }
 };
+
 </script>
 
 <style scoped>
-
 .custom-card {
   max-width: 2000px;
   margin: auto;
@@ -249,6 +220,11 @@ export default {
   background-color: #f3f4f8;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.flight-card.selected-flight {
+  border: 2px solid #00256c; /* 선택된 항공편의 테두리 변경 */
 }
 
 .flight-time {
@@ -261,23 +237,10 @@ export default {
   color: #666;
 }
 
-.price-option {
+.flight-price {
   text-align: center;
-  cursor: pointer;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin: 5px;
-  background-color: #f3f4f8;
-}
-
-.price-option:hover {
-  background-color: #d0d0d0;
-}
-
-.price-option.selected {
-  border-color: #00256c;
-  background-color: #cce0ff;
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .custom-btn {
@@ -292,5 +255,4 @@ export default {
 .text-center {
   color: #00256c;
 }
-
 </style>
