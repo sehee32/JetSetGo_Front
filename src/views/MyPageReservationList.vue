@@ -15,7 +15,7 @@
                 <span> <strong>{{ item.destinationlocationcode }}</strong>{{ item.arrival_City }}</span>
               </div>
               <div class="time">
-                <strong>{{ item.departure_Time }} ~ {{ item.arrival_Time }}</strong>
+                <strong>{{ item.departureDate }} {{ item.departureTime }} ~ {{ item.arrivalDate }} {{ item.arrivalTime }}</strong>
               </div>
             </div>
             <div class="line"></div>
