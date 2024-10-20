@@ -243,7 +243,7 @@ export default {
       console.log('선택된 travelClass: ', this.travelClass);
 
       const formattedDepartureDate = this.formatDate(this.departureDate);
-      const formattedReturnDate = this.formatDate(this.returnDate);
+      const formattedReturnDate = this.returnDate ? this.formatDate(this.returnDate) : null; // 오는 날이 없을 경우 null로 처리
 
       this.$router.push({
         name: 'TicketSearch',
