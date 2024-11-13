@@ -63,49 +63,53 @@
 
         <v-row>
           <v-col cols="12" md="6">
-            <v-date-input
+            <v-text-field
                 v-model="departureDate"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.departureDate]"
                 label="가는 날"
-                prepend-icon=""
+                type="date"
                 prepend-inner-icon="mdi-calendar-outline"
                 variant="outlined"
                 clearable
-            ></v-date-input>
+            ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
-            <v-date-input
+            <v-text-field
                 v-model="returnDate"
+                :rules="[rules.required, rules.returnDate]"
                 label="오는 날"
-                prepend-icon=""
+                type="date"
                 prepend-inner-icon="mdi-calendar-outline"
                 variant="outlined"
                 clearable
-            ></v-date-input>
+            ></v-text-field>
           </v-col>
         </v-row>
 
         <v-row>
           <v-col cols="12" md="6">
-            <v-select
+            <v-text-field
                 v-model.number="adults"
                 :items="passengerOptions"
                 label="성인"
+                type="number"
                 variant="outlined"
                 prepend-inner-icon="mdi-account-outline"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.adults]"
+                min="1"
                 clearable
-            ></v-select>
+            ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
-            <v-select
+            <v-text-field
                 v-model.number="children"
                 :items="passengerOptions"
                 label="아동"
+                type="number"
                 variant="outlined"
                 prepend-inner-icon="mdi-account-child-outline"
                 clearable
-            ></v-select>
+            ></v-text-field>
           </v-col>
         </v-row>
 
@@ -145,7 +149,14 @@ export default {
       nonStopOptions: [{ title: '직항', value: true }, { title: '경유', value: false }],
       passengerOptions: Array.from({length: 11}, (v, i) => i), // 승객 수 (0~10)
       rules: {
-        required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' // 필수 입력 규칙
+        required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' ,// 필수 입력 규칙
+        adults: value => value >=1 || '성인은 1명이상이어야 합니다.' ,
+        departureDate : value => {
+          const today = new Date();
+          const selectedDate = new Date(value);
+          return selectedDate >= today || '과거 날짜는 선택할 수 없습니다.'
+        },
+        returnDate: value => !this.departureDate || !value || value > this.departureDate || '오는 날은 가는 날 이후여야 합니다.',
       }
     };
   },
