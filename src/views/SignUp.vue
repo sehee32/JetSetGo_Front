@@ -17,19 +17,21 @@
               variant="outlined"
               prepend-inner-icon="mdi-account-outline"
               clearable
+              autocomplete="off"
           ></v-text-field>
 
           <!-- 사용자명 입력과 버튼을 감싸는 div -->
           <div class="username-container">
             <v-text-field
                 v-model="username"
-                :rules="[rules.required]"
+                :rules="[rules.required, () => usernameCheckMessage]"
                 id="username"
                 label="ID"
                 variant="outlined"
                 prepend-inner-icon="mdi-account-outline"
                 clearable
                 class="username-text-field"
+                autocomplete="off"
             ></v-text-field>
             <v-btn
                 class="username-btn"
@@ -53,6 +55,7 @@
               variant="outlined"
               prepend-inner-icon="mdi-lock-outline"
               clearable
+              autocomplete="off"
           >
             <template v-slot:append-inner>
               <v-icon @click="show = !show">
@@ -73,6 +76,7 @@
               variant="outlined"
               prepend-inner-icon="mdi-lock-check-outline"
               clearable
+              autocomplete="off"
           >
             <template v-slot:append-inner>
               <v-icon @click="show = !show">
@@ -86,13 +90,14 @@
         <div class="phone-container">
           <v-text-field
               v-model="phoneNumber"
-              :rules="[rules.required]"
+              :rules="[rules.required, () => verificationMessage]"
               id="phoneNumber"
               label="휴대전화번호"
               variant="outlined"
               prepend-inner-icon="mdi-phone-outline"
               clearable
               class="phone-text-field"
+              autocomplete="off"
           ></v-text-field>
           <v-btn
               class="phone-btn"
@@ -116,6 +121,7 @@
               type="date"
               prepend-inner-icon="mdi-calendar-outline"
               variant="outlined"
+              autocomplete="off"
           ></v-text-field>
         </div>
 
@@ -162,6 +168,8 @@ export default {
       show: false, // 비밀번호 보기/숨기기 아이콘 상태
       verificationSuccess: false, // 인증 성공 여부를 저장하는 변수
       usernameChecked: false, // 아이디 중복 확인 성공 여부를 저장하는 변수
+      usernameCheckMessage: '',
+      verificationMessage: '',
       rules: {
         required: v => !!v || '이 항목을 입력하지 않았습니다.',
         password: v => v.length >= 8 || '비밀번호는 최소 8자 이상이어야 합니다.',
@@ -177,12 +185,12 @@ export default {
       }
 
       if (!this.verificationSuccess) {
-        alert('본인 인증을 완료해주세요.');
+        this.verificationMessage = '본인 인증을 완료해주세요.';
         return;
       }
 
       if (!this.usernameChecked) {
-        alert('아이디 중복 확인을 완료해주세요.');
+        this.usernameCheckMessage = '아이디 중복 확인을 완료해주세요.';
         return;
       }
 
@@ -223,19 +231,19 @@ export default {
               if (rsp.success) {
                 // 인증 성공 시
                 console.log("인증 성공");
-                alert('본인 인증 요청에 성공했습니다.');
+                this.verificationMessage = '본인 인증 요청에 성공했습니다.';
                 this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
               } else {
                 // 인증 실패 시 로직
                 console.log("본인 인증 요청 실패");
-                alert('본인 인증 요청에 실패했습니다.');
+                this.verificationMessage = '본인 인증 요청에 실패했습니다.';
                 this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
               }
             }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
         );
       } catch (error) {
         console.error("본인 인증 요청 실패:", error);
-        alert('본인 인증 요청에 실패했습니다.');
+        this.verificationMessage = '본인 인증 요청에 실패했습니다.';
         this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
       }
     },
@@ -246,17 +254,17 @@ export default {
           .then(response => {
             if (response.data.exists) {
               console.log('이미 사용중인 아이디 입니다.');
-              alert('이미 사용중인 아이디 입니다.');
+              this.usernameCheckMessage = '이미 사용중인 아이디 입니다.';
               this.usernameChecked = false; // 중복된 아이디가 있는 경우 false로 설정
             } else {
               console.log('사용할 수 있는 아이디 입니다.');
-              alert('사용할 수 있는 아이디 입니다.');
+              this.usernameCheckMessage = '사용할 수 있는 아이디 입니다.';
               this.usernameChecked = true; // 사용 가능한 아이디인 경우 true로 설정
             }
           })
           .catch(error => {
             console.error('아이디 중복 확인에 실패했습니다.', error);
-            alert('아이디 중복 확인에 실패했습니다.');
+            this.usernameCheckMessage = '아이디 중복 확인에 실패했습니다.';
             this.usernameChecked = false; // 오류 발생 시 false로 설정
           });
     },
