@@ -185,15 +185,18 @@ export default {
   padding: 13px 25px;
   font-weight: 700;
   font-size: 17px;
-  background: url('@/assets/to.svg') no-repeat center center;
 }
 
 .reservationDetail .costom-box .title span:first-of-type {
   background-color: #5985e1;
   border-radius: 10px 0 3px 0;
   color: white;
-  padding: 17px 29px;
-  font-size: 13px;
+  padding: 16px 28px;
+  font-size: 15px;
+}
+
+.reservationDetail .costom-box .title span:last-child{
+  background: url('@/assets/to.svg') no-repeat center center;
 }
 
 .reservationDetail .costom-box .detail{
