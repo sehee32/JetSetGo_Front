@@ -5,6 +5,9 @@
       <v-main>
         <v-container class="costom-container">
           <!-- 예약 -->
+          <div v-if="noData" class="noData">
+            예약 내역이 없습니다.
+          </div>
           <div v-for="(item, index) in reservations" :key="index" class="costom-box" :style="getBorderTopStyle(item.status)">
             <div class="list">
               <div class="status">
@@ -49,7 +52,8 @@ export default {
         // Add more items as needed
       ],
       reservations:[],
-      userId: ''
+      userId: '',
+      noData : false,
     };
   },
   methods: {
@@ -92,7 +96,12 @@ export default {
       // API 요청이 성공한 경우
       console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
       this.reservations = response.data;
-      console.log(this.noData);
+      if(this.reservations == ''){
+        this.noData = true;
+      }else{
+        this.noData = false;
+      }
+
     }
   },
   mounted() {
@@ -117,6 +126,12 @@ export default {
 .reservationList .costom-container{
   max-width: 1280px;
   padding: 0;
+}
+
+.reservationList .noData{
+  padding-top: 200px;
+  color : #999999;
+  font-size: 20px;
 }
 
 .reservationList h1{
