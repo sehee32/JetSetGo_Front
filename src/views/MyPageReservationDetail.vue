@@ -11,7 +11,7 @@
       <v-main>
         <v-container class="costom-container">
           <!-- 예약 항공편 정보 -->
-          <div v-for="(item, index) in flights" :key="index" class="costom-box">
+          <div v-for="(item, index) in uniqueflights" :key="index" class="costom-box">
             <div class="title">
               <span>여정 {{index+1}}</span>
               <span>{{ item.originlocationcode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.destinationlocationcode }}</span>
@@ -40,14 +40,42 @@
           <!-- 연락처 및 탑승객 정보 -->
           <div class="info">
             <h5>연락처 및 탑승객 정보</h5>
-            <v-row>
-              <v-col>
-                <p><strong>{{userName}}</strong></p>
+            <v-row class="text-left representative">
+              <v-col cols="4">
+                <span><strong>대표자 연락처</strong></span>
+              </v-col>
+              <v-col cols="3">
+                <span><strong>이름</strong>{{userName}}</span>
+              </v-col>
+              <v-col cols="5">
+                <span><strong>연락처</strong> {{userPhoneNumber}}</span>
+              </v-col>
+            </v-row>
+            <v-row class="passengerTitle">
+              <v-col cols="3" class="text-left">
+                <p>탑승객</p>
               </v-col>
               <v-col>
-                <p><strong>연락처</strong> {{userPhoneNumber}}</p>
+                <p>연락처</p>
               </v-col>
               <v-col>
+                <p>여권정보</p>
+              </v-col>
+            </v-row>
+            <v-row v-for="(item, index) in infoflights" :key="index" class="passengerData">
+              <v-col cols="3" class="text-left">
+                <span>{{ item.passenger_Name }}</span>
+              </v-col>
+              <v-col>
+                <span>{{ item.phone_Number }}</span>
+              </v-col>
+              <v-col>
+                <v-btn
+                    text
+                    :disabled="item.status === '사용완료'"
+                >
+                  {{ item.passport_Number ? '수정' : '등록' }}
+                </v-btn>
               </v-col>
             </v-row>
           </div>
@@ -87,10 +115,32 @@ export default {
       flights:[],
       reservationId: null,
       status: '미사용',
-      user: {name:'사용자', phoneNumber:'01022222222'},
+      user: {name:'확인용', phoneNumber:'01022222222'},
     };
   },
   computed: {
+    uniqueflights() {
+      // 중복 제거 로직: 예약 번호와 출발 시간 기준으로 중복 제거
+      const uniqueMap = new Map();
+      this.flights.forEach((item) => {
+        const key = `${item.reservation_Id}-${item.departureDate}-${item.departureTime}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, item);
+        }
+      });
+      return Array.from(uniqueMap.values());
+    },
+    infoflights() {
+      // 중복 제거 로직: 탑승자 이름과 번호 동일할 경우 중복 제거
+      const uniqueMap = new Map();
+      this.flights.forEach((item) => {
+        const key = `${item.passenger_Name}-${item.phone_Number}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, item);
+        }
+      });
+      return Array.from(uniqueMap.values());
+    },
     flightsDepartureCity() {
       return this.flights.length > 0 ? this.flights[0].arrival_City : '데이터 없음';
     },
@@ -242,6 +292,36 @@ export default {
   font-size: 20px;
   line-height: 50px;
   border-bottom: 2px solid #00256c;
+}
+
+.reservationDetail .info span{
+  color: #666666;
+}
+
+.reservationDetail .info .representative{
+  margin: 0px;
+  padding: 20px 20px 10px 20px;
+  border-bottom: 1px solid #00256c;
+}
+
+.reservationDetail .info strong{
+  margin-right: 10px;
+  color: black;
+}
+
+.reservationDetail .info .passengerTitle{
+  margin: 0px;
+  color: #00256c;
+  padding: 5px 20px;
+  background-color: #f3f4f8;
+  border-bottom: 1px solid #cccccc;
+}
+
+.reservationDetail .info .passengerData{
+  margin: 0px;
+  padding: 5px 20px;
+  border-bottom: 1px solid #cccccc;
+  line-height: 36px;
 }
 
 
