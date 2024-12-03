@@ -1,10 +1,18 @@
 <template>
   <v-container class="costom-container">
+    <!-- 로딩 오버레이 -->
+    <v-overlay :value="isLoading" absolute>
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </v-overlay>
     <br>
     <!-- 출발지, 도착지, 날짜, 인원 정보 표시 -->
     <v-row>
       <v-col cols="12">
         <div class="route-info">
+          <div class="journey-stage">
+            <span v-if="journeyStage === 'outgoing'">가는편</span>
+            <span v-if="journeyStage === 'return'">오는편</span>
+          </div>
           <h2 class="route-title">
             {{ departureMutable }} <span class="arrow">→</span> {{ destinationMutable }}
           </h2>
@@ -16,7 +24,16 @@
       </v-col>
     </v-row>
 
+    <!-- 로딩 바 -->
+    <v-row v-if="isLoading">
+      <v-col cols="12" class="text-center">
+        <v-progress-circular indeterminate color="primary" size="50"></v-progress-circular>
+        <p>항공편을 검색 중입니다...</p>
+      </v-col>
+    </v-row>
+
     <!-- 항공편 리스트 표시 -->
+    <div v-if="!isLoading && currentFlights.length > 0">
     <div v-for="flight in paginatedFlights" :key="flight.id"
          class="costom-box"
          :class="{'selected-flight': isSelectedFlight(flight.id)}"
@@ -41,9 +58,15 @@
         <strong>{{ formatPrice(flight.price) }} {{ flight.currency }}</strong>
       </div>
     </div>
+    </div>
+
+    <!-- 항공편이 없을 때 메시지 -->
+    <div v-else-if="!isLoading && currentFlights.length === 0" class="no-flights">
+      <p>검색된 항공편이 없습니다. <br><br> 검색 조건을 변경해보세요.</p>
+    </div>
 
     <!-- 페이지 네비게이션 -->
-    <v-row>
+    <v-row v-if="!isLoading">
       <v-col cols="12" class="text-center">
         <v-btn
             v-for="pageNumber in Math.ceil(currentFlights.length / flightsPerPage)"
@@ -58,21 +81,21 @@
     </v-row>
 
     <!-- 결제하기 버튼 -->
-    <v-row v-if="selectedFlightId !== null && !returnDate">
+    <v-row v-if="!isLoading && selectedFlightId !== null && !returnDate">
       <v-col cols="12" class="text-center">
         <v-btn @click="Payment" class="custom-btn mt-4">결제하기</v-btn>
       </v-col>
     </v-row>
 
     <!-- 다음여정 버튼 -->
-    <v-row v-if="journeyStage === 'outgoing' && selectedFlightId !== null && returnDate">
+    <v-row v-if="!isLoading && journeyStage === 'outgoing' && selectedFlightId !== null && returnDate">
       <v-col cols="12" class="btn">
         <v-btn @click="NextJourney" class="custom-btn mt-4">다음여정</v-btn>
       </v-col>
     </v-row>
 
     <!-- 돌아오는 항공편 선택 후 결제하기 버튼 -->
-    <v-row v-if="journeyStage === 'return' && selectedFlightId !== null && returnFlightId !== null">
+    <v-row v-if="!isLoading && journeyStage === 'return' && selectedFlightId !== null && returnFlightId !== null">
       <v-col cols="12" class="text-center">
         <v-btn @click="Payment" class="custom-btn mt-4">결제하기</v-btn>
       </v-col>
@@ -105,6 +128,7 @@ export default {
       departureDateMutable: this.departureDate, // 수정 가능한 출발 날짜
       flightsPerPage: 5, // 페이지당 항공편 수
       currentPage: 1, // 현재 페이지 번호
+      isLoading: false, // 로딩 상태
     };
   },
   computed: {
@@ -119,6 +143,7 @@ export default {
   },
   methods: {
     async searchFlights() {
+      this.isLoading = true;
       try {
         const response = await axios.get('/api/flights/search', {
           params: {
@@ -132,25 +157,22 @@ export default {
           }
         });
         const flightOffers = response.data;
-        const resultArray = [];
         if (flightOffers.length === 0) {
           console.log('검색된 항공편이 없습니다.');
         } else {
-          for (const offer of flightOffers) {
-            const flightData = {
-              id: offer.id,
-              departureTime: this.formatDateTime(offer.departureTime),
-              arrivalTime: this.formatDateTime(offer.arrivalTime),
-              duration: this.formatDuration(offer.duration),
-              price: offer.price,
-              currency: offer.currency
-            };
-            resultArray.push(flightData);
-          }
+          this.currentFlights = flightOffers.map(offer => ({
+            id: offer.id,
+            departureTime: this.formatDateTime(offer.departureTime),
+            arrivalTime: this.formatDateTime(offer.arrivalTime),
+            duration: this.formatDuration(offer.duration),
+            price: offer.price,
+            currency: offer.currency
+          }));
         }
-        this.currentFlights = resultArray;
       } catch (error) {
         console.error('항공편 검색 오류:', error);
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -418,6 +440,13 @@ export default {
 .pagination-btn.active {
   background-color: #00256c; /* 선택된 버튼 배경색 */
   color: white; /* 선택된 버튼 텍스트 색상 */
+}
+
+.no-flights {
+  text-align: center;
+  color: #666;
+  font-size: 18px;
+  margin-top: 20px;
 }
 
 </style>

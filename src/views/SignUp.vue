@@ -119,6 +119,7 @@
               id="birthdate"
               label="생년월일"
               type="date"
+              :max="today"
               prepend-inner-icon="mdi-calendar-outline"
               variant="outlined"
               autocomplete="off"
@@ -170,6 +171,7 @@ export default {
       usernameChecked: false, // 아이디 중복 확인 성공 여부를 저장하는 변수
       usernameCheckMessage: '',
       verificationMessage: '',
+      today: new Date().toISOString().split('T')[0], // 오늘 날짜
       rules: {
         required: v => !!v || '이 항목을 입력하지 않았습니다.',
         password: v => v.length >= 8 || '비밀번호는 최소 8자 이상이어야 합니다.',
