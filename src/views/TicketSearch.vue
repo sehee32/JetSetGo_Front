@@ -24,6 +24,17 @@
       </v-col>
     </v-row>
 
+    <!-- 정렬 옵션 -->
+    <div class="sort-container">
+      <v-select
+          v-model="sortOption"
+          :items="sortOptions"
+          label="정렬 기준"
+          dense
+          outlined
+      ></v-select>
+    </div>
+
     <!-- 로딩 바 -->
     <v-row v-if="isLoading">
       <v-col cols="12" class="text-center">
@@ -34,30 +45,33 @@
 
     <!-- 항공편 리스트 표시 -->
     <div v-if="!isLoading && currentFlights.length > 0">
-    <div v-for="flight in paginatedFlights" :key="flight.id"
-         class="costom-box"
-         :class="{'selected-flight': isSelectedFlight(flight.id)}"
-         @click="selectFlight(flight.id)">
-      <div class="list">
-        <!-- 항공편 시간 및 소요시간 정보 표시 -->
-        <div class="airport">
-          <span><strong>{{departureMutable}}</strong></span>
-          <span><strong>{{destinationMutable}}</strong></span>
-        </div>
-
-        <div class="time">
-          <div class="flight-time">
-            <span>{{ flight.departureTime }} ~ {{ flight.arrivalTime }}</span>
+      <div v-for="flight in paginatedFlights" :key="flight.id">
+        <div class="flight-container">
+          <div class="costom-box" :class="{'selected-flight': isSelectedFlight(flight.id)}" @click="selectFlight(flight.id)">
+            <div class="list">
+              <div class="airport">
+                <span><strong>{{departureMutable}}</strong></span>
+                <span><strong>{{destinationMutable}}</strong></span>
+              </div>
+              <div class="time">
+                <div class="flight-time">
+                  <span>{{ flight.departureTime }} ~ {{ flight.arrivalTime }}</span>
+                </div>
+                <div class="flight-duration">{{ flight.duration }}</div>
+              </div>
+            </div>
+            <div class="line"></div>
+            <div class="price">
+              <strong>{{ formatPrice(flight.price) }} {{ flight.currency }}</strong>
+            </div>
           </div>
-          <div class="flight-duration">{{ flight.duration }}</div>
+          <!-- 선택된 항공편의 버튼을 바로 아래에 표시 -->
+          <div v-if="isSelectedFlight(flight.id)" class="button-container">
+            <v-btn v-if="journeyStage === 'outgoing' && returnDate" @click="NextJourney" class="custom-btn">다음여정</v-btn>
+            <v-btn v-if="journeyStage === 'return' || !returnDate" @click="Payment" class="custom-btn">결제하기</v-btn>
+          </div>
         </div>
       </div>
-      <div class="line"></div>
-      <!-- 가격 정보 표시 -->
-      <div class="price">
-        <strong>{{ formatPrice(flight.price) }} {{ flight.currency }}</strong>
-      </div>
-    </div>
     </div>
 
     <!-- 항공편이 없을 때 메시지 -->
@@ -70,34 +84,13 @@
       <v-col cols="12" class="text-center">
         <v-btn
             v-for="pageNumber in Math.ceil(currentFlights.length / flightsPerPage)"
-            :key="pageNumber"
-            :class="['pagination-btn', {'active': currentPage === pageNumber}]"
-            @click="changePage(pageNumber)"
-            class="mx-2"
+               :key="pageNumber"
+               :class="['pagination-btn', {'active': currentPage === pageNumber}]"
+               @click="changePage(pageNumber)"
+               class="mx-2"
         >
           {{ pageNumber }}
         </v-btn>
-      </v-col>
-    </v-row>
-
-    <!-- 결제하기 버튼 -->
-    <v-row v-if="!isLoading && selectedFlightId !== null && !returnDate">
-      <v-col cols="12" class="text-center">
-        <v-btn @click="Payment" class="custom-btn mt-4">결제하기</v-btn>
-      </v-col>
-    </v-row>
-
-    <!-- 다음여정 버튼 -->
-    <v-row v-if="!isLoading && journeyStage === 'outgoing' && selectedFlightId !== null && returnDate">
-      <v-col cols="12" class="btn">
-        <v-btn @click="NextJourney" class="custom-btn mt-4">다음여정</v-btn>
-      </v-col>
-    </v-row>
-
-    <!-- 돌아오는 항공편 선택 후 결제하기 버튼 -->
-    <v-row v-if="!isLoading && journeyStage === 'return' && selectedFlightId !== null && returnFlightId !== null">
-      <v-col cols="12" class="text-center">
-        <v-btn @click="Payment" class="custom-btn mt-4">결제하기</v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -129,8 +122,21 @@ export default {
       flightsPerPage: 5, // 페이지당 항공편 수
       currentPage: 1, // 현재 페이지 번호
       isLoading: false, // 로딩 상태
+      sortOption: '출발시간 빠른순', // 항공편 리스트 정렬
+      sortOptions: [
+        '출발시간 빠른순',
+        '출발시간 늦은순',
+        '최저가순'
+      ]
     };
   },
+
+  watch: {
+    sortOption() {
+      this.sortFlights();
+    }
+  },
+
   computed: {
     paginatedFlights() {
       const start = (this.currentPage - 1) * this.flightsPerPage;
@@ -168,6 +174,7 @@ export default {
             price: offer.price,
             currency: offer.currency
           }));
+          this.sortFlights();
         }
       } catch (error) {
         console.error('항공편 검색 오류:', error);
@@ -176,30 +183,35 @@ export default {
       }
     },
 
+    sortFlights() {
+      if (this.sortOption === '출발시간 빠른순') {
+        this.currentFlights.sort((a, b) => new Date(a.departureTime) - new Date(b.departureTime));
+      } else if (this.sortOption === '출발시간 늦은순') {
+        this.currentFlights.sort((a, b) => new Date(b.departureTime) - new Date(a.departureTime));
+      } else if (this.sortOption === '최저가순') {
+        this.currentFlights.sort((a, b) => a.price - b.price);
+      }
+    },
+
     formatDuration(duration) {
       const regex = /PT(?:(\d+)H)?(?:(\d+)M)?/;
       const matches = duration.match(regex);
       const hours = matches[1] ? matches[1] : '0';
       const minutes = matches[2] ? matches[2] : '0';
-
       return `${hours}시간 ${minutes}분`;
     },
-
     formatPrice(price) {
       return Number(price).toLocaleString();
     },
-
     formatDateTime(dateTime) {
       const date = new Date(dateTime);
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 1을 더함
+      const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
-
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     },
-
     isSelectedFlight(flightId) {
       if (this.journeyStage === 'outgoing') {
         return this.selectedFlightId === flightId;
@@ -208,7 +220,6 @@ export default {
       }
       return false;
     },
-
     selectFlight(flightId) {
       if (this.journeyStage === 'outgoing') {
         this.selectedFlightId = flightId; // 출발 항공편 선택
@@ -216,7 +227,6 @@ export default {
         this.returnFlightId = flightId; // 돌아오는 항공편 선택
       }
     },
-
     NextJourney() {
       if (this.journeyStage === 'outgoing' && this.selectedFlightId !== null) {
         const tempDeparture = this.departureMutable;
@@ -238,18 +248,15 @@ export default {
           // 선택된 항공편 가격 계산
           const selectedFlight = this.currentFlights.find(flight => flight.id === this.selectedFlightId);
           this.totalPrice = selectedFlight.price;
-
           if (this.returnFlightId) {
             const returnFlight = this.currentFlights.find(flight => flight.id === this.returnFlightId);
             this.totalPrice += returnFlight.price;
           }
-
           console.log('결제 정보:', {
             user: this.userInfo,
             totalAmount: this.totalPrice
           });
-
-          // 여기서 실제 결제 API 호출 등을 처리하면 됩니다.
+          // 결제 api 호출 여기서 하기
         } catch (error) {
           console.error('결제 오류:', error);
         }
@@ -257,18 +264,14 @@ export default {
         console.error('결제 정보를 확인해 주세요.');
       }
     },
-
-
     changePage(pageNumber) {
       this.currentPage = pageNumber;
     }
   }
 };
-
 </script>
 
 <style scoped>
-
 .costom-container {
   max-width: 1200px; /* 원하는 최대 너비 설정 */
   margin: 0 auto; /* 중앙 정렬 */
@@ -311,7 +314,7 @@ export default {
 }
 
 .passengers {
-  font-weight: normal; /* 일반 두께 */
+  font-weight: normal;
 }
 
 .selected-flight {
@@ -339,6 +342,8 @@ export default {
   background-color: #00256c;
   color: white;
   transition: background-color 0.3s, transform 0.3s; /* 전환 효과 */
+  margin: 0 10px;
+  min-width: 150px;
 }
 
 .custom-btn:hover {
@@ -350,10 +355,14 @@ export default {
   color: #00256c;
 }
 
+.flight-container {
+  position: relative;
+  margin-bottom: 60px;
+}
+
 .costom-box {
   text-align: left;
   padding: 25px 40px;
-  margin-bottom: 40px;
   border-radius: 10px;
   box-shadow: 1px 5px 5px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -372,10 +381,10 @@ export default {
   position: absolute; /* 절대 위치 지정 */
   top: 0; /* 상단에 위치 */
   left: 0; /* 왼쪽에 위치 */
-  width: 100%; /* 전체 너비 */
-  height: 4px; /* 원하는 높이 */
+  width: 100%;
+  height: 4px;
   background-color: #00256c; /* 라인 색상 */
-  border-radius: 10px 10px 0 0; /* 모서리 둥글게 */
+  border-radius: 10px 10px 0 0;
 }
 
 .costom-box .list,
@@ -419,6 +428,13 @@ export default {
   margin-left: 100px;
 }
 
+.button-container {
+  position: absolute;
+  right: 0;
+  margin-top: 10px;
+  text-align: right;
+}
+
 /* 페이지 네비게이션 버튼 스타일 */
 .pagination-btn {
   background-color: #f0f0f0;
@@ -436,7 +452,7 @@ export default {
   cursor: pointer; /* 마우스 포인터 변경 */
 }
 
- /*선택된 페이지 버튼 스타일 */
+/*선택된 페이지 버튼 스타일 */
 .pagination-btn.active {
   background-color: #00256c; /* 선택된 버튼 배경색 */
   color: white; /* 선택된 버튼 텍스트 색상 */
@@ -449,4 +465,9 @@ export default {
   margin-top: 20px;
 }
 
+.sort-container {
+  width: 200px;
+  margin-left: auto;
+  margin-bottom: 20px;
+}
 </style>
