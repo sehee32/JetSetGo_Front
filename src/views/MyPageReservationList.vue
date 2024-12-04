@@ -69,6 +69,9 @@ export default {
         case '사용완료':
           borderColor = '#cccccc';
           break;
+        case '예약취소':
+          borderColor = '#666666';
+          break;
         default:
           borderColor = '#000256'; // 기본 색상
       }

@@ -13,7 +13,7 @@
           <!-- 예약 항공편 정보 -->
           <div v-for="(item, index) in uniqueflights" :key="index" class="costom-box">
             <div class="title">
-              <span>여정 {{index+1}}</span>
+              <span :style="getBackgroundStyle(item.status)">여정 {{index+1}}</span>
               <span>{{ item.originlocationcode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.destinationlocationcode }}</span>
             </div>
             <div class="detail">
@@ -72,26 +72,90 @@
               <v-col>
                 <v-btn
                     text
-                    :disabled="item.status === '사용완료'"
+                    @click="updatePassport(item)"
+                    :disabled="item.status === '사용완료' || item.status === '예약취소'"
+                    class="btn"
                 >
                   {{ item.passport_Number ? '수정' : '등록' }}
                 </v-btn>
               </v-col>
             </v-row>
+            <!-- 여권정보 입력 -->
+            <v-dialog v-model="currentPassportDialog" max-width="400px">
+              <v-card>
+                <v-card-title class="headline">여권 정보</v-card-title>
+                <v-card-text>
+                  <!-- 여권번호 입력 -->
+                  <v-text-field
+                      v-model="currentPassport.passport_Number"
+                      label="여권번호"
+                      required
+                  ></v-text-field>
+
+                  <!-- 여권만료일 입력 -->
+                  <v-menu
+                      v-model:passportExpiryDateMenu="passportExpiryDateMenu"
+                      :close-on-content-click="false"
+                      transition="slide-x-reverse-transition"
+                      max-width="290px"
+                      offset-y
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                          v-model="currentPassport.passport_ExpiryDate"
+                          label="여권 만료일"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          v-bind="attrs"
+                      v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                        v-model="currentPassport.passport_ExpiryDate"
+                        @input="passportExpiryDateMenu = false"
+                    ></v-date-picker>
+                  </v-menu>
+
+
+                  <!-- 여권발행국 선택 -->
+                  <v-select
+                      v-model="currentPassport.passport_IssuingCountry"
+                      :items="countries"
+                      label="여권 발행국"
+                      item-title="name"
+                      item-value="code"
+                      required
+                  ></v-select>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="primary" text @click="currentPassportDialog = false">취소</v-btn>
+                  <v-btn color="primary" text @click="goUpdatePassport">확인</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </div>
           <div class="info">
             <h5>여행 변경 및 취소</h5>
-            <v-row>
+            <v-row class="changeCencel">
               <v-col>
-                <v-btn></v-btn>
-                <p>예약변경</p>
+                <v-btn @click="goDialog('change')" :disabled="status !== '예약확정'" class="btn">예약변경</v-btn>
               </v-col>
               <v-col>
-                <v-btn></v-btn>
-                <p>예약취소/환불</p>
+                <v-btn @click="goDialog('cancel')" :disabled="status !== '예약확정'" class="btn">예약취소/환불</v-btn>
               </v-col>
             </v-row>
           </div>
+          <!-- 알림창 -->
+          <v-dialog v-model="showDialog" max-width="400px">
+            <v-card>
+              <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
+              <v-card-text v-html="dialogDetail"></v-card-text>
+              <v-card-actions>
+                <v-btn color="primary" text @click="showDialog = false">취소</v-btn>
+                <v-btn color="primary" text @click="goAction">확인</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-container>
       </v-main>
     </v-app>
@@ -114,8 +178,24 @@ export default {
       ],
       flights:[],
       reservationId: null,
-      status: '미사용',
       user: {name:'확인용', phoneNumber:'01022222222'},
+      showDialog: false,
+      dialogTitle: '',
+      dialogDetail: '',
+      countries: [
+        { name: '대한민국', code: 'KR' },
+        { name: '미국', code: 'US' },
+        { name: '일본', code: 'JP' },
+        { name: '영국', code: 'GB' },
+        // 더 많은 국가 리스트 추가
+      ],
+      currentPassport: {
+        passport_Number: '',
+        passport_ExpiryDate: null,
+        passport_IssuingCountry: null,
+      },
+      passportExpiryDateMenu: false,
+      currentPassportDialog: false
     };
   },
   computed: {
@@ -152,12 +232,12 @@ export default {
     },
     userPhoneNumber() {
       return this.flights.length > 0 ? this.flights[0].phoneNumber : '데이터 없음';
-    }
+    },
+    status() {
+      return this.flights.length > 0 ? this.flights[0].status : '데이터 없음';
+    },
   },
   methods: {
-    goDetail() {
-      this.$router.go(-1); // 우선 이전 페이지로 이동
-    },
     async getReservationDetail(){
       const response = await axios.post('/api/myPageReservationDetails', {
         id: this.reservationId
@@ -165,6 +245,62 @@ export default {
       // API 요청이 성공한 경우
       console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
       this.flights = response.data;
+    },
+    getBackgroundStyle(status) {
+      let backgroundColor;
+      switch (status) {
+        case '사용완료':
+          backgroundColor = '#cccccc';
+          break;
+        case '예약취소':
+          backgroundColor = '#666666';
+          break;
+        default:
+          backgroundColor = '#5985e1'; // 기본 색상
+      }
+      return {
+        'background-color' : `${backgroundColor}`
+      };
+    },
+    goDialog(action){
+      if (action === 'cancel') {
+        this.dialogTitle = '예약 취소/환불';
+        this.dialogDetail = '환불 신청 시 예약과 항공권이 모두 취소되며 취소 이후에는 사용이 불가합니다.<br> 승객 본인의 의사에 따라 신청한 것으로 간주하며 그에 따른 책임은 신청인에게 있습니다.';
+        this.showDialog = true;
+      } else if (action === 'change') {
+        this.dialogTitle = '예약 변경';
+        this.dialogDetail = '예약 변경은 출발 24시간 전까지만 가능합니다.<br> 변경 수수료가 부과될 수 있습니다.';
+        this.showDialog = true;
+      }
+    },
+    async goAction(){
+      if (this.dialogTitle === '예약 취소/환불') {
+        const response = await axios.post('/api/myPageCancelReservation', {
+          id: this.reservationId
+        });
+        // API 요청이 성공한 경우
+        console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+        this.showDialog = false;
+        this.$router.go(0);
+        alert('예약 취소 되었습니다.');
+      } else if (this.dialogTitle === '예약 변경'){
+        this.$router.push({ name: 'MyPageReservationList' });
+      }
+    },
+    updatePassport(item) {
+      // 현재 클릭한 항목의 데이터를 currentPassport에 넣어서 다이얼로그에 표시
+      this.currentPassport = { ...item };
+      this.currentPassportDialog = true;
+    },
+    goUpdatePassport() {
+      // 여권 정보 업데이트 처리
+      console.log('여권 정보:', this.currentPassport);
+      // 현재 항목의 passport 정보 갱신
+      const index = this.infoflights.findIndex(item => item.passenger_Name === this.currentPassport.passenger_Name);
+      if (index !== -1) {
+        this.infoflights[index] = { ...this.currentPassport };
+      }
+      this.currentPassportDialog = false;
     }
   },
   mounted() {
@@ -238,7 +374,6 @@ export default {
 }
 
 .reservationDetail .costom-box .title span:first-of-type {
-  background-color: #5985e1;
   border-radius: 10px 0 3px 0;
   color: white;
   padding: 16px 28px;
@@ -324,5 +459,45 @@ export default {
   line-height: 36px;
 }
 
+.reservationDetail .info .passengerData .btn{
+  font-weight: 700;
+  border: 1px solid #5985e1;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: #5985e1;
+  color: #fff;
+}
+
+.reservationDetail .info .passengerData .btn:hover{
+background-color: #fff;
+color: #5985e1;
+}
+
+.reservationDetail .info .changeCencel{
+margin: 0 0 100px 0;
+padding: 20px;
+border-bottom: 1px solid #cccccc;
+}
+
+.reservationDetail .info .changeCencel .btn{
+font-size: 18px;
+font-weight: 700;
+width: 280px;
+height: 50px;
+font-size: 18px;
+font-weight: 700;
+border: 1px solid #5985e1;
+border-radius: 10px;
+text-decoration: none;
+cursor: pointer;
+background-color: #5985e1;
+color: #fff;
+}
+
+.reservationDetail .info .changeCencel .btn:hover{
+background-color: #fff;
+color: #5985e1;
+}
 
 </style>
