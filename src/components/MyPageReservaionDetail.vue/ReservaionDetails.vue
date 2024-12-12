@@ -88,38 +88,28 @@
                   <!-- 여권번호 입력 -->
                   <v-text-field
                       v-model="currentPassport.passport_Number"
+                      :rules="[rules.required]"
                       label="여권번호"
                       required
+                      clearable
                   ></v-text-field>
 
                   <!-- 여권만료일 입력 -->
-                  <v-menu
-                      v-model:passportExpiryDateMenu="passportExpiryDateMenu"
-                      :close-on-content-click="false"
-                      transition="slide-x-reverse-transition"
-                      max-width="290px"
-                      offset-y
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                          v-model="currentPassport.passport_ExpiryDate"
-                          label="여권 만료일"
-                          prepend-icon="mdi-calendar"
-                          readonly
-                          v-bind="attrs"
-                          v-on="on"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                        v-model="currentPassport.passport_ExpiryDate"
-                        @input="passportExpiryDateMenu = false"
-                    ></v-date-picker>
-                  </v-menu>
-
+                  <v-text-field
+                      v-model="currentPassport.passport_ExpiryDate"
+                      :rules="[rules.required]"
+                      label="여권 만료일"
+                      type="date"
+                      :min="today"
+                      prepend-inner-icon="mdi-calendar"
+                      required
+                      clearable
+                  ></v-text-field>
 
                   <!-- 여권발행국 선택 -->
                   <v-select
                       v-model="currentPassport.passport_IssuingCountry"
+                      :rules="[rules.required]"
                       :items="countries"
                       label="여권 발행국"
                       item-title="name"
@@ -157,12 +147,18 @@ export default {
         // 더 많은 국가 리스트 추가
       ],
       currentPassport: {
+        passenger_Name:'',
+        phone_Number: '',
         passport_Number: '',
         passport_ExpiryDate: null,
         passport_IssuingCountry: null,
       },
       passportExpiryDateMenu: false,
-      currentPassportDialog: false
+      currentPassportDialog: false,
+      rules: {
+        required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' ,// 필수 입력 규칙
+      },
+      today: new Date().toISOString().split('T')[0], // 오늘 날짜
     };
   },
   computed: {
@@ -231,16 +227,25 @@ export default {
       this.currentPassport = { ...item };
       this.currentPassportDialog = true;
     },
-    goUpdatePassport() {
-      // 여권 정보 업데이트 처리
-      console.log('여권 정보:', this.currentPassport);
+    async goUpdatePassport() {
       // 현재 항목의 passport 정보 갱신
-      const index = this.infoflights.findIndex(item => item.passenger_Name === this.currentPassport.passenger_Name);
-      if (index !== -1) {
-        this.infoflights[index] = { ...this.currentPassport };
+      if (!this.currentPassport.passport_Number || !this.currentPassport.passport_ExpiryDate || !this.currentPassport.passport_IssuingCountry) {
+        alert('여권정보를 입력하세요');
+      }else {
+        const response = await axios.post('/api/myPageEditPassport', {
+          id: this.reservationId,
+          passengerName: this.currentPassport.passenger_Name,
+          phoneNumber: this.currentPassport.phone_Number,
+          passportNumber: this.currentPassport.passport_Number,
+          passportExpiryDate: this.currentPassport.passport_ExpiryDate,
+          passportIssuingCountry: this.currentPassport.passport_IssuingCountry
+        });
+        // API 요청이 성공한 경우
+        console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+        this.$router.go(0);
+        alert('여권정보가 저장되었습니다.');
       }
-      this.currentPassportDialog = false;
-    }
+      }
   },
   mounted() {
       const element = document.querySelector('.v-application__wrap');
