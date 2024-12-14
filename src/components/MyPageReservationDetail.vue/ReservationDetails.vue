@@ -258,10 +258,6 @@ export default {
     this.getReservationDetail();
 
     console.log('예약 ID:', this.reservationId);
-  },
-  beforeUnmount() {
-    // 컴포넌트가 사라질 때 localStorage에서 ID 값을 삭제할 수 있습니다.
-    localStorage.removeItem('reservationId');
   }
 }
 </script>

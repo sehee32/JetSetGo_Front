@@ -1,21 +1,37 @@
 <template>
-  <ReservaionDetails />
-  <ReservaionBtns />
-
+  <ReservaionDetails v-if="!isCancelMode" />
+  <ReservationPayment v-if="!isCancelMode" />
+  <ReservationBtns @activateCancel="activateCancel" v-if="!isCancelMode" />
+  <ReservationCancel v-if="isCancelMode" />
 </template>
 
 <script>
-import ReservaionDetails from "@/components/MyPageReservaionDetail.vue/ReservaionDetails.vue";
-import ReservaionBtns from "@/components/MyPageReservaionDetail.vue/ReservaionBtns.vue";
+import ReservaionDetails from "@/components/MyPageReservationDetail.vue/ReservationDetails.vue";
+import ReservationBtns from "@/components/MyPageReservationDetail.vue/ReservationBtns.vue";
+import ReservationPayment from "@/components/MyPageReservationDetail.vue/ReservationPayment.vue";
+import ReservationCancel from "@/components/MyPageReservationDetail.vue/ReservationCancel.vue";
 
 export default {
   name: "MyPageReservationDetail",
   components: {
     ReservaionDetails,
-    ReservaionBtns
+    ReservationPayment,
+    ReservationBtns,
+    ReservationCancel
   },
-  mounted() {
-
+  data() {
+    return {
+      isCancelMode: false, // 취소 모드 상태 관리
+    };
+  },
+  methods: {
+    activateCancel() {
+      this.isCancelMode = true; // 취소 모드 활성화
+    },
+  },
+  beforeUnmount() {
+    // 컴포넌트가 사라질 때 localStorage에서 ID 값을 삭제할 수 있습니다.
+    localStorage.removeItem('reservationId');
   }
 }
 </script>

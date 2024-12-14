@@ -75,17 +75,16 @@ export default {
         const response = await axios.post('/api/myPageCancelReservation', {
           id: this.reservationId
         });
-        const response2 = await axios.post('/api/환불필요', { // 환불요청 api
-
-        });
+        // const response2 = await axios.post('/api/환불필요', { // 환불요청 api
+        //
+        // });
         // API 요청이 성공한 경우
         console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
-        console.log('결과 확인: ' + response2.data); // 서버에서 받은 데이터 출력
         this.showDialog = false;
         this.$router.go(0);
         alert('예약 취소 되었습니다.');
       } else if (this.dialogTitle === '예약 변경'){
-        this.$router.push({ name: 'MyPageReservationList' });
+        this.$emit('activateCancel');
       }
     }
   },
@@ -101,10 +100,6 @@ export default {
     this.getReservationDetail();
 
     console.log('예약 ID:', this.reservation_Id);
-  },
-  beforeUnmount() {
-    // 컴포넌트가 사라질 때 localStorage에서 ID 값을 삭제할 수 있습니다.
-    localStorage.removeItem('reservationId');
   }
 }
 </script>
