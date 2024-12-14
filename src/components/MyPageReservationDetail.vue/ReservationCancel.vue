@@ -6,7 +6,7 @@
       <h3>{{ flightsDepartureCity }}&nbsp;&nbsp;<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;{{ flightsArrivalCity }}</h3>
     </div>
   </div>
-  <div class="reservationDetail">
+  <div v-if="selectPage" class="reservationDetail">
     <v-app>
       <v-main>
         <v-container class="costom-container">
@@ -123,20 +123,37 @@
               </v-card>
             </v-dialog>
           </div>
+          <!-- 버튼 -->
+          <div>
+            <v-row class="changeCencel">
+              <v-col class="first">
+                <v-btn @click="goBack" class="btn">취소</v-btn>
+              </v-col>
+              <v-col>
+                <v-btn @click="goChange" class="btn">다음</v-btn>
+              </v-col>
+            </v-row>
+          </div>
         </v-container>
       </v-main>
     </v-app>
   </div>
+  <BookingPage v-if="!selectPage"/>
 </template>
 
 <script>
 import axios from "axios";
+import BookingPage from "@/components/MyPageReservationDetail.vue/BookingPage.vue";
 
 export default {
   name: "ReservationCancel",
+  components: {
+    BookingPage
+  },
   data() {
     return {
       reservationId: null,
+      selectPage: true,
       flights:[],
       countries: [
         { name: '대한민국', code: 'KR' },
@@ -242,6 +259,13 @@ export default {
       }
 
       console.log('현재 선택된 Flight ID:', this.selectedFlightId);
+    },
+    goBack(){
+      this.$emit('deactivateCancel');
+    },
+    goChange(){
+      this.selectPage = false;
+
     }
   },
   mounted() {
@@ -426,4 +450,39 @@ export default {
   border: 2px solid #00256c; /* 선택된 항공편의 테두리 변경 */
 }
 
+/* 버튼 */
+.reservationDetail .changeCencel{
+  margin: 50px 0 100px 0;
+  padding: 20px;
+}
+
+.reservationDetail .changeCencel .btn{
+  font-size: 18px;
+  font-weight: 700;
+  width: 280px;
+  height: 60px;
+  font-size: 18px;
+  font-weight: 700;
+  border: 1px solid #00256c;
+  border-radius: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: #00256c;
+  color: #fff;
+}
+
+.reservationDetail .changeCencel .first .btn{
+  background-color: #fff;
+  color: #00256c;
+}
+
+.reservationDetail .changeCencel .btn:hover{
+  background-color: #fff;
+  color: #00256c;
+}
+
+.reservationDetail .changeCencel .first .btn:hover{
+  background-color: #00256c;
+  color: #fff;
+}
 </style>

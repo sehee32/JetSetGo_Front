@@ -2,7 +2,7 @@
   <ReservaionDetails v-if="!isCancelMode" />
   <ReservationPayment v-if="!isCancelMode" />
   <ReservationBtns @activateCancel="activateCancel" v-if="!isCancelMode" />
-  <ReservationCancel v-if="isCancelMode" />
+  <ReservationCancel @deactivateCancel="deactivateCancel" v-if="isCancelMode" />
 </template>
 
 <script>
@@ -27,6 +27,9 @@ export default {
   methods: {
     activateCancel() {
       this.isCancelMode = true; // 취소 모드 활성화
+    },
+    deactivateCancel() {
+      this.isCancelMode = false; // 취소 모드 비활성화
     },
   },
   beforeUnmount() {
