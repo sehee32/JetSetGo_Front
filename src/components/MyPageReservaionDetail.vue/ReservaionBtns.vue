@@ -75,8 +75,12 @@ export default {
         const response = await axios.post('/api/myPageCancelReservation', {
           id: this.reservationId
         });
+        const response2 = await axios.post('/api/환불필요', { // 환불요청 api
+
+        });
         // API 요청이 성공한 경우
         console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+        console.log('결과 확인: ' + response2.data); // 서버에서 받은 데이터 출력
         this.showDialog = false;
         this.$router.go(0);
         alert('예약 취소 되었습니다.');
