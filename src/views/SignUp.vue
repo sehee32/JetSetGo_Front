@@ -20,11 +20,10 @@
               autocomplete="off"
           ></v-text-field>
 
-          <!-- 사용자명 입력과 버튼을 감싸는 div -->
           <div class="username-container">
             <v-text-field
                 v-model="username"
-                :rules="[rules.required, () => usernameCheckMessage]"
+                :rules="usernameRules"
                 id="username"
                 label="ID"
                 variant="outlined"
@@ -33,15 +32,14 @@
                 class="username-text-field"
                 autocomplete="off"
             ></v-text-field>
-            <v-btn
-                class="username-btn"
-                color="#00256c"
-                size="small"
-                @click="checkUsername"
-            >
+            <v-btn class="username-btn" color="#00256c" size="small" @click="checkUsername">
               중복확인
             </v-btn>
           </div>
+          <!-- 중복 확인 메시지 -->
+          <span v-if="usernameCheckMessage" :class="{'success-message': usernameChecked, 'error-message': !usernameChecked}">
+      {{ usernameCheckMessage }}
+    </span>
 
           <br>
 
@@ -90,7 +88,7 @@
         <div class="phone-container">
           <v-text-field
               v-model="phoneNumber"
-              :rules="[rules.required, () => verificationMessage]"
+              :rules="phoneRules"
               id="phoneNumber"
               label="휴대전화번호"
               variant="outlined"
@@ -108,6 +106,10 @@
             인증하기
           </v-btn>
         </div>
+        <!-- 인증 메시지 -->
+        <span v-if="verificationMessage" :class="{'success-message': verificationSuccess, 'error-message': !verificationSuccess}">
+         {{ verificationMessage }}
+        </span>
 
         <br>
 
@@ -179,7 +181,49 @@ export default {
       }
     }
   },
+  created() {
+    this.resetForm();
+  },
+  computed: {
+    usernameRules() {
+      return [
+        () => !!this.username || '이 항목을 입력하지 않았습니다.',
+        () =>
+            !this.usernameCheckMessage || this.usernameChecked || this.usernameCheckMessage,
+      ];
+    },
+
+    phoneRules() {
+      return [
+        () => !!this.phoneNumber || '이 항목을 입력하지 않았습니다.',
+        () =>
+            !this.verificationMessage || this.verificationSuccess || this.verificationMessage,
+      ];
+    },
+  },
+  watch: {
+    // username이 변경될 때 처리
+    username() {
+      this.usernameCheckMessage = '';
+      this.usernameChecked = false;
+    }
+  },
   methods: {
+    resetForm() {
+      this.name = '';
+      this.username = '';
+      this.password = '';
+      this.confirmPassword = '';
+      this.birthdate = '';
+      this.phoneNumber = '';
+      this.agreeTerms = false;
+      this.formValid = false;
+      this.show = false;
+      this.verificationSuccess = false;
+      this.usernameChecked = false;
+      this.usernameCheckMessage = '';
+      this.verificationMessage = '';
+    },
     Signup() {
       if (this.password !== this.confirmPassword) {
         console.error('비밀번호가 일치하지 않습니다.');
@@ -280,6 +324,7 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
+  margin-bottom: -15px;
 }
 
 .username-text-field,
@@ -307,5 +352,21 @@ export default {
   background-color: white;
   max-width: 600px;
   width: 100%;
+}
+
+.success-message {
+  color: green;
+  font-size: 12px;
+  margin-top: -17px;
+  margin-bottom: -17px;
+  display: block;
+}
+
+.error-message {
+  color: #B00020;
+  font-size: 12px;
+  margin-top: -17px;
+  margin-bottom: -17px;
+  display: block;
 }
 </style>
