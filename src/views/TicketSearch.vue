@@ -165,7 +165,8 @@ export default {
         '최저가순'
       ],
       isScheduleChangeOpen: false,
-      showSchedulePanel: false
+      showSchedulePanel: false,
+      totalPrice : 0
     };
   },
 
@@ -305,7 +306,7 @@ export default {
       }
     },
 
-    Payment() {
+    async Payment() {
       if (this.selectedFlightId !== null && (this.returnFlightId !== null || !this.returnDate)) {
         try {
           // // 사용자 정보 가져오기
@@ -323,6 +324,40 @@ export default {
             user: this.userInfo,
             totalAmount: this.totalPrice
           });
+
+          const IMP = window.IMP;
+          IMP.init("imp12777257");
+
+          try {
+            IMP.request_pay(
+                {
+                  // param
+                  pg: "kakaopay",
+                  merchant_uid: `uid-${crypto.randomUUID()}`, // 주문 번호
+                  channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
+                  paymentId: `payment-${crypto.randomUUID()}`,
+                  name: "항공권~~",
+                  pay_method: "card",
+                  amount: 100000
+                },
+                function (rsp) {
+                  // callback
+                  if (rsp.success) {
+                    // 결제 성공 시
+                    console.log("결제 성공");
+                    this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
+                  } else {
+                    // 실패 시 로직
+                    console.log("결제 실패", rsp);
+                    this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
+                  }
+                }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
+            );
+          } catch (error) {
+            console.error("본인 인증 요청 실패:", error);
+            this.verificationMessage = '본인 인증 요청에 실패했습니다.';
+            this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
+          }
           // 결제 api 호출 여기서 하기
         } catch (error) {
           console.error('결제 오류:', error);
