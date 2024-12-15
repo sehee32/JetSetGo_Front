@@ -65,24 +65,27 @@
           <v-col cols="12" md="6">
             <v-text-field
                 v-model="departureDate"
-                :rules="[rules.required]"
+                :rules="[rules.required, rules.minDate]"
                 label="가는 날"
                 type="date"
                 :min="today"
                 prepend-inner-icon="mdi-calendar-outline"
                 variant="outlined"
                 clearable
+                @input="validateDate($event, 'departureDate')"
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
                 v-model="returnDate"
+                :rules="[rules.minDate, rules.afterDepartureDate]"
                 label="오는 날"
                 type="date"
                 :min="today"
                 prepend-inner-icon="mdi-calendar-outline"
                 variant="outlined"
                 clearable
+                @input="validateDate($event, 'returnDate')"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -140,8 +143,8 @@ export default {
       returnDate: null, // 도착 날짜
       adults: null, // 성인 수
       children: null, // 아동 수
-      travelClass: null,
-      nonStop: null,
+      travelClass: null, // 여행 클래스
+      nonStop: '', // 직항여부
       formValid: false,
       cities: [{label:'', value:''}], // api로 가져올 도시 목록
       keyword : '',
@@ -153,36 +156,15 @@ export default {
       rules: {
         required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' ,// 필수 입력 규칙
         adults: value => value >=1 || '성인은 1명이상이어야 합니다.' ,
+        minDate: value => new Date(value) >= new Date(this.today) || '오늘 이후의 날짜를 선택해주세요.',
+        afterDepartureDate: value => !this.departureDate || new Date(value) > new Date(this.departureDate) || '오는 날은 가는 날 이후여야 합니다.'
       }
     };
   },
 
-  // created() {
-  //   console.log("beforeCreate");
-  //   const query = this.departure;
-  //   if (!query || query.length < 2) { // 최소 2자 이상 입력된 경우에만 검색
-  //     this.cities = [];
-  //   }
-  //
-  //   try {
-  //     const response = axios.get('/api/flights/airports', {
-  //       params: { keyword: 'MUC' }, // 추출된 값 전달
-  //     });
-  //     console.log('api 요청 성공 : ', response.data); // 응답 데이터 확인
-  //     this.cities = response.data.map(item => ({
-  //       label: `${item.name} (${item.code})`,
-  //       value: item.code,
-  //     }));
-  //   } catch (error) {
-  //     console.error('api 요청 실패 : ',error);
-  //   }
-  // },
-
   created() {
     this.loadAirports(); // 컴포넌트가 생성될 때 공항 데이터 불러오기
   },
-
-
   methods: {
     async loadAirports() {
       try {
@@ -227,10 +209,6 @@ export default {
     }
     ,
 
-    // async searchAirports(e, type) {
-    //   console.error('입력값 : ',e, type);
-    // },
-
     formatDate(date) {
       if (!date) return null;
       const d = new Date(date);
@@ -239,6 +217,29 @@ export default {
       const day = String(d.getDate()).padStart(2, '0'); // 일을 2자리로 맞추기
       return `${year}-${month}-${day}`;
     },
+
+    validateDate(event, field) {
+      const input = event.target.value;
+      const [year, month, day] = input.split('-').map(Number);
+
+      const inputDate = new Date(year, month - 1, day);
+      const isValidDate = inputDate.getFullYear() === year &&
+          inputDate.getMonth() === month - 1 &&
+          inputDate.getDate() === day;
+
+      if (isValidDate) {
+        const minDate = new Date(this.today);
+        if (inputDate >= minDate) {
+          this[field] = input;
+        } else {
+
+          console.warn('선택한 날짜가 오늘 이전입니다.');
+        }
+      } else {
+        console.warn('유효하지 않은 날짜입니다.');
+      }
+    },
+
     // 예매 정보 처리 메서드
     bookTicket() {
 
