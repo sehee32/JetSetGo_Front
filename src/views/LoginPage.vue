@@ -84,8 +84,19 @@ export default {
       required: v => !!v || '이 항목을 입력하지 않았습니다.'
     };
   },
+  created() {
+    this.resetForm();
+  }
+  ,
   methods: {
     ...mapActions(['login']),
+    resetForm() {
+      this.username = '';
+      this.password = '';
+      this.formValid = false;
+      this.loading = false;
+      this.show = false;
+    },
     async submitlogin() {
       if (!this.formValid) return;
       this.loading = true;
