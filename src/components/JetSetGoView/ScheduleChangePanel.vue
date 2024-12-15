@@ -157,16 +157,16 @@ export default {
       travelClass: this.initialTravelClass,
       nonStop: this.initialNonStop,
       formValid: false,
-      cities: [{label:'', value:''}], // api로 가져올 도시 목록
-      keyword : '',
+      cities: [{label: '', value: ''}], // api로 가져올 도시 목록
+      keyword: '',
       keywordData: [],
-      classOptions:['ECONOMY','PREMIUM_ECONOMY','BUSINESS','FIRST'],
-      nonStopOptions: [{ title: '직항', value: true }, { title: '경유', value: false }],
+      classOptions: ['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST'],
+      nonStopOptions: [{title: '직항', value: true}, {title: '경유', value: false}],
       passengerOptions: Array.from({length: 11}, (v, i) => i), // 승객 수 (0~10)
       today: new Date().toISOString().split('T')[0], // 오늘 날짜
       rules: {
-        required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' ,// 필수 입력 규칙
-        adults: value => value >=1 || '성인은 1명이상이어야 합니다.' ,
+        required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.',// 필수 입력 규칙
+        adults: value => value >= 1 || '성인은 1명이상이어야 합니다.',
         minDate: value => new Date(value) >= new Date(this.today) || '오늘 이후의 날짜를 선택해주세요.',
         afterDepartureDate: value => !this.departureDate || new Date(value) > new Date(this.departureDate) || '오는 날은 가는 날 이후여야 합니다.'
       }
@@ -180,7 +180,7 @@ export default {
     async loadAirports() {
       try {
         const response = await axios.get('/api/flights/airports', {
-          params: { keyword: this.keyword }
+          params: {keyword: this.keyword}
         });
         console.log(response.data);
         this.airports = response.data.airports; // 서버에서 받은 airports 배열
@@ -190,7 +190,7 @@ export default {
             label: `${airport.city} (${airport.code})`,
             value: airport.code
           }));
-          console.log('도시배열확인',this.cities);
+          console.log('도시배열확인', this.cities);
 
         } else {
           console.error('응답 데이터가 배열이 아닙니다:', response.data);
@@ -261,8 +261,8 @@ export default {
         travelClass: this.travelClass,
         nonStop: this.nonStop
       });
-    }
-  },
+    },
+
     // 예매 정보 처리 메서드
     async bookTicket() {
       if (!this.departure || !this.destination) {
@@ -291,7 +291,9 @@ export default {
         }
       });
     }
-};
+  }
+}
+
 </script>
 
 <style scoped>
