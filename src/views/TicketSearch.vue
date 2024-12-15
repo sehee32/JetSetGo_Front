@@ -1,3 +1,5 @@
+<!--TicketSearch.vue-->
+
 <template>
   <v-container class="costom-container">
     <!-- 로딩 오버레이 -->
@@ -20,9 +22,31 @@
             <p class="date">{{ departureDate }} - {{ returnDate }}</p>
             <p class="passengers">성인 {{ adults }}명, 아동 {{ children }}명</p>
           </h3>
+
+          <!-- 일정 변경 버튼 -->
+          <v-btn color="#00256c" class="mt-4" @click="toggleSchedulePanel">
+            일정 변경
+          </v-btn>
+
+          <v-expand-transition>
+            <div v-show="showSchedulePanel">
+              <ScheduleChangePanel
+                  @update-schedule="handleScheduleUpdate"
+                  :initialDeparture="departureMutable"
+                  :initialDestination="destinationMutable"
+                  :initialDepartureDate="departureDateMutable"
+                  :initialReturnDate="localReturnDate"
+                  :initialAdults="adults"
+                  :initialChildren="children"
+                  :initialTravelClass="travelClass"
+                  :initialNonStop="nonStop"
+              />
+            </div>
+          </v-expand-transition>
         </div>
       </v-col>
     </v-row>
+
 
     <!-- 정렬 옵션 -->
     <div class="sort-container">
@@ -98,13 +122,20 @@
 
 <script>
 import axios from "axios";
+import ScheduleChangePanel from "@/components/JetSetGoView/ScheduleChangePanel";
 
 export default {
+  components: {
+    ScheduleChangePanel
+  },
   props: {
     departure: String,
     destination: String,
     departureDate: String,
-    returnDate: String,
+    returnDate: {
+      type: String,
+      required: true,
+    },
     adults: Number,
     children: Number,
     travelClass: String,
@@ -119,6 +150,7 @@ export default {
       departureMutable: this.departure, // 수정 가능한 출발지
       destinationMutable: this.destination, // 수정 가능한 도착지
       departureDateMutable: this.departureDate, // 수정 가능한 출발 날짜
+      returnDateMutable: this.returnDate,
       flightsPerPage: 5, // 페이지당 항공편 수
       currentPage: 1, // 현재 페이지 번호
       isLoading: false, // 로딩 상태
@@ -127,14 +159,21 @@ export default {
         '출발시간 빠른순',
         '출발시간 늦은순',
         '최저가순'
-      ]
+      ],
+      isScheduleChangeOpen: false
     };
   },
 
   watch: {
     sortOption() {
       this.sortFlights();
-    }
+    },
+    localReturnDate(newVal) {
+      this.$emit("update:returnDate", newVal); // 부모로 변경 사항 전달
+    },
+    returnDate(newVal) {
+      this.localReturnDate = newVal; // 부모 변경 사항 감지
+    },
   },
 
   computed: {
@@ -191,6 +230,19 @@ export default {
       } else if (this.sortOption === '최저가순') {
         this.currentFlights.sort((a, b) => a.price - b.price);
       }
+    },
+
+    toggleSchedulePanel() {
+      this.showSchedulePanel = !this.showSchedulePanel;
+    },
+    handleScheduleUpdate(newSchedule) {
+      this.departureMutable = newSchedule.departure;
+      this.destinationMutable = newSchedule.destination;
+      this.departureDateMutable = newSchedule.departureDate;
+      this.returnDateMutable = newSchedule.returnDate;
+
+      this.showSchedulePanel = false;
+      this.searchFlights(); // 항공권 재검색
     },
 
     formatDuration(duration) {
@@ -469,5 +521,17 @@ export default {
   width: 200px;
   margin-left: auto;
   margin-bottom: 20px;
+}
+
+.change-panel {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 600px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
 }
 </style>
