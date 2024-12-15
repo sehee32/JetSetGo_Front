@@ -19,7 +19,7 @@
             {{ departureMutable }} <span class="arrow">→</span> {{ destinationMutable }}
           </h2>
           <h3 class="route-details">
-            <p class="date">{{ departureDate }} - {{ returnDate }}</p>
+            <p class="date">{{ departureDateMutable }} - {{ returnDateMutable }}</p>
             <p class="passengers">성인 {{ adults }}명, 아동 {{ children }}명</p>
           </h3>
 
@@ -35,7 +35,7 @@
                   :initialDeparture="departureMutable"
                   :initialDestination="destinationMutable"
                   :initialDepartureDate="departureDateMutable"
-                  :initialReturnDate="localReturnDate"
+                  :initialReturnDate="returnDateMutable"
                   :initialAdults="adults"
                   :initialChildren="children"
                   :initialTravelClass="travelClass"
@@ -160,7 +160,8 @@ export default {
         '출발시간 늦은순',
         '최저가순'
       ],
-      isScheduleChangeOpen: false
+      isScheduleChangeOpen: false,
+      showSchedulePanel: false
     };
   },
 
@@ -284,7 +285,8 @@ export default {
         const tempDeparture = this.departureMutable;
         this.departureMutable = this.destinationMutable;
         this.destinationMutable = tempDeparture;
-        this.departureDateMutable = this.returnDate;
+        this.departureDateMutable = this.returnDateMutable;
+        this.showSchedulePanel = false;
         this.journeyStage = 'return';
         this.searchFlights(); // 돌아오는 항공편 검색
       }
