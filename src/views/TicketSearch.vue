@@ -20,7 +20,7 @@
           </h2>
           <h3 class="route-details">
             <p class="date">{{ departureDateMutable }} - {{ returnDateMutable }}</p>
-            <p class="passengers">성인 {{ adults }}명, 아동 {{ children }}명</p>
+            <p class="passengers">성인 {{ adultsMutable }}명, 아동 {{ childrenMutable }}명</p>
           </h3>
 
           <!-- 일정 변경 버튼 -->
@@ -151,6 +151,10 @@ export default {
       destinationMutable: this.destination, // 수정 가능한 도착지
       departureDateMutable: this.departureDate, // 수정 가능한 출발 날짜
       returnDateMutable: this.returnDate,
+      adultsMutable: this.adults,
+      childrenMutable: this.children,
+      travelClassMutable: this.travelClass,
+      nonStopMutable: this.nonStop,
       flightsPerPage: 5, // 페이지당 항공편 수
       currentPage: 1, // 현재 페이지 번호
       isLoading: false, // 로딩 상태
@@ -241,6 +245,15 @@ export default {
       this.destinationMutable = newSchedule.destination;
       this.departureDateMutable = newSchedule.departureDate;
       this.returnDateMutable = newSchedule.returnDate;
+      this.adultsMutable = newSchedule.adults;
+      this.childrenMutable = newSchedule.children;
+      this.travelClassMutable = newSchedule.travelClass;
+      this.nonStopMutable = newSchedule.nonStop;
+
+      // 일정 변경 후 항상 가는 여정으로 리셋
+      this.journeyStage = 'outgoing';
+      this.selectedFlightId = null;
+      this.returnFlightId = null;
 
       this.showSchedulePanel = false;
       this.searchFlights(); // 항공권 재검색
