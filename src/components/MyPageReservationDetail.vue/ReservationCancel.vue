@@ -12,7 +12,7 @@
         <v-container class="costom-container">
           <!-- 예약 항공편 정보 -->
           <h2>1. 변경할 여정을 선택하세요.</h2>
-          <div v-for="(item, index) in uniqueflights" :key="index" class="costom-box" :class="{'selected-flight': isSelectedFlight(flights.flight_Id)}" @click="selectFlight(flights.flight_Id)">
+          <div v-for="(item, index) in uniqueflights" :key="index" class="costom-box" :class="{'selected-flight': isSelectedFlight(item.flight_Id)}" @click="selectFlight(item.flight_Id)">
             <div class="title">
               <span :style="getBackgroundStyle(item.status)">여정 {{index+1}}</span>
               <span>{{ item.originlocationcode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.destinationlocationcode }}</span>
@@ -138,18 +138,13 @@
       </v-main>
     </v-app>
   </div>
-  <BookingPage v-if="!selectPage"/>
 </template>
 
 <script>
 import axios from "axios";
-import BookingPage from "@/components/MyPageReservationDetail.vue/BookingPage.vue";
 
 export default {
   name: "ReservationCancel",
-  components: {
-    BookingPage
-  },
   data() {
     return {
       reservationId: null,
@@ -265,7 +260,33 @@ export default {
     },
     goChange(){
       this.selectPage = false;
+      // 예매 정보 처리 메서드
 
+        const formattedDepartureDate = this.formatDate('2024-12-30');
+        const formattedReturnDate = this.returnDate ? this.formatDate('2024-12-31') : null; // 오는 날이 없을 경우 null로 처리
+
+        this.$router.push({
+          name: 'TicketCencelSearch',
+          query: {
+            departure: 'ICN',
+            destination: 'NRT',
+            departureDate: formattedDepartureDate,
+            returnDate: formattedReturnDate,
+            adults: Number(1),
+            children: Number(0),
+            travelClass: 'ECONOMY',
+            nonStop: true
+          }
+        });
+
+    },
+    formatDate(date) {
+      if (!date) return null;
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0'); // 월을 2자리로 맞추기
+      const day = String(d.getDate()).padStart(2, '0'); // 일을 2자리로 맞추기
+      return `${year}-${month}-${day}`;
     }
   },
   mounted() {
