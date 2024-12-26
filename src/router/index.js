@@ -72,8 +72,22 @@ const routes = [
     name: 'MyPageReservationDetail',
     component: () => import(/* webpackChunkName: "myPageReservationDetail" */ '../views/MyPageReservationDetail.vue'),
     meta: { requiresAuth: true }  // 인증이 필요한 라우트
-  }
-  ,
+  },
+  {
+    path: '/TicketCencelSearch',
+    name: 'TicketCencelSearch',
+    component: () => import(/* webpackChunkName: "about" */ '../views/TicketCencelSearch.vue'),
+    props: route => ({
+      departure: route.query.departure,
+      destination: route.query.destination,
+      departureDate: route.query.departureDate,
+      returnDate: route.query.returnDate,
+      adults: Number(route.query.adults),
+      children: Number(route.query.children),
+      travelClass: route.query.travelClass,
+      nonStop: route.query.nonStop === 'true'
+    })
+  },
   {
     path: '/myPageWithdrawal',
     name: 'MyPageWithdrawal',
