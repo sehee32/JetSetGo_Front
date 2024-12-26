@@ -100,6 +100,11 @@ const routes = [
     path: '/bookingpage',
     name: 'BookingPage',
     component: () => import(/* webpackChunkName: "about" */ '../components/JetSetGoView/BookingPage.vue')
+  },
+  {
+    path: '/BookingDetail',
+    name: 'BookingDetail',
+    component: () => import(/* webpackChunkName: "about" */ '../views/BookingDetail.vue'),
   }
 
 

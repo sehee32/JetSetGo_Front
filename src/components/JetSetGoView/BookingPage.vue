@@ -141,7 +141,7 @@ export default {
       destination: '', // 도착지
       departureDate: null, // 출발 날짜
       returnDate: null, // 도착 날짜
-      adults: null, // 성인 수
+      adults: '1', // 성인 수
       children: null, // 아동 수
       travelClass: null, // 여행 클래스
       nonStop: '', // 직항여부

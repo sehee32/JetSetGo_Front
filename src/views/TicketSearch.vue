@@ -19,7 +19,7 @@
             {{ departureMutable }} <span class="arrow">→</span> {{ destinationMutable }}
           </h2>
           <h3 class="route-details">
-            <p class="date">{{ departureDateMutable }} - {{ returnDateMutable }}</p>
+            <p class="date"> {{ journeyStage === 'outgoing' ? departureDateMutable : returnDateMutable }}</p>
             <p class="passengers">성인 {{ adultsMutable }}명, 아동 {{ childrenMutable }}명</p>
           </h3>
 
@@ -296,76 +296,114 @@ export default {
     },
     NextJourney() {
       if (this.journeyStage === 'outgoing' && this.selectedFlightId !== null) {
+        // 출발지랑 목적지 스왑
         const tempDeparture = this.departureMutable;
         this.departureMutable = this.destinationMutable;
         this.destinationMutable = tempDeparture;
         this.departureDateMutable = this.returnDateMutable;
-        this.showSchedulePanel = false;
+
+        // 여정 단계를 'return'으로 변경
         this.journeyStage = 'return';
         this.searchFlights(); // 돌아오는 항공편 검색
       }
     },
 
-    async Payment() {
-      if (this.selectedFlightId !== null && (this.returnFlightId !== null || !this.returnDate)) {
-        try {
-          // // 사용자 정보 가져오기
-          // const userResponse = await axios.get('/api/user/info');
-          // this.userInfo = userResponse.data;
+    Payment() {
+      // 선택한 항공권 정보 가져오기
+      const outgoingFlight = {
+        ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
+        departure: this.departure,
+        destination: this.destination,
+        departureDate: this.departureMutable,
+        returnDate: this.returnDateMutable
+      };
 
-          // 선택된 항공편 가격 계산
-          const selectedFlight = this.currentFlights.find(flight => flight.id === this.selectedFlightId);
-          this.totalPrice = selectedFlight.price;
-          if (this.returnFlightId) {
-            const returnFlight = this.currentFlights.find(flight => flight.id === this.returnFlightId);
-            this.totalPrice += returnFlight.price;
-          }
-          console.log('결제 정보:', {
-            user: this.userInfo,
-            totalAmount: this.totalPrice
-          });
+      const returnFlight = {
+        ...this.currentFlights.find(flight => flight.id === this.returnFlightId),
+        departure: this.destination,
+        destination: this.departure,
+        departureDate: this.departureMutable,
+        returnDate: this.returnDateMutable
+      };
 
-          const IMP = window.IMP;
-          IMP.init("imp12777257");
+      // 총 가격 계산
+      const totalPrice = parseFloat(outgoingFlight.price) + parseFloat(returnFlight.price);
 
-          try {
-            IMP.request_pay(
-                {
-                  // param
-                  pg: "kakaopay",
-                  merchant_uid: `uid-${crypto.randomUUID()}`, // 주문 번호
-                  channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
-                  paymentId: `payment-${crypto.randomUUID()}`,
-                  name: "항공권~~",
-                  pay_method: "card",
-                  amount: 100000
-                },
-                function (rsp) {
-                  // callback
-                  if (rsp.success) {
-                    // 결제 성공 시
-                    console.log("결제 성공");
-                    this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
-                  } else {
-                    // 실패 시 로직
-                    console.log("결제 실패", rsp);
-                    this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
-                  }
-                }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
-            );
-          } catch (error) {
-            console.error("본인 인증 요청 실패:", error);
-            this.verificationMessage = '본인 인증 요청에 실패했습니다.';
-            this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
-          }
-          // 결제 api 호출 여기서 하기
-        } catch (error) {
-          console.error('결제 오류:', error);
+      // BookingDetail로 라우팅하며 데이터 전달
+      this.$router.push({
+        name: 'BookingDetail',
+        query: {
+          outgoing: JSON.stringify(outgoingFlight),
+          returning: JSON.stringify(returnFlight),
+          adults: this.adultsMutable,
+          children: this.childrenMutable,
+          travelClass: this.travelClassMutable,
+          departureDate: this.departureDateMutable,
+          returnDate: this.returnDateMutable,
+          departure: this.departure,
+          destination: this.destination,
+          totalPrice: totalPrice
         }
-      } else {
-        console.error('결제 정보를 확인해 주세요.');
-      }
+      });
     },
+
+    // async Payment() {
+    //   if (this.selectedFlightId !== null && (this.returnFlightId !== null || !this.returnDate)) {
+    //     try {
+    //
+    //       // 선택된 항공편 가격 계산
+    //       const selectedFlight = this.currentFlights.find(flight => flight.id === this.selectedFlightId);
+    //       this.totalPrice = selectedFlight.price;
+    //       if (this.returnFlightId) {
+    //         const returnFlight = this.currentFlights.find(flight => flight.id === this.returnFlightId);
+    //         this.totalPrice += returnFlight.price;
+    //       }
+    //       console.log('결제 정보:', {
+    //         user: this.userInfo,
+    //         totalAmount: this.totalPrice
+    //       });
+    //
+    //       const IMP = window.IMP;
+    //       IMP.init("imp12777257");
+    //
+    //       try {
+    //         IMP.request_pay(
+    //             {
+    //               // param
+    //               pg: "kakaopay",
+    //               merchant_uid: `uid-${crypto.randomUUID()}`, // 주문 번호
+    //               channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
+    //               paymentId: `payment-${crypto.randomUUID()}`,
+    //               name: "항공권~~",
+    //               pay_method: "card",
+    //               amount: 100000
+    //             },
+    //             function (rsp) {
+    //               // callback
+    //               if (rsp.success) {
+    //                 // 결제 성공 시
+    //                 console.log("결제 성공");
+    //                 this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
+    //               } else {
+    //                 // 실패 시 로직
+    //                 console.log("결제 실패", rsp);
+    //                 this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
+    //               }
+    //             }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
+    //         );
+    //       } catch (error) {
+    //         console.error("본인 인증 요청 실패:", error);
+    //         this.verificationMessage = '본인 인증 요청에 실패했습니다.';
+    //         this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
+    //       }
+    //       // 결제 api 호출 여기서 하기
+    //     } catch (error) {
+    //       console.error('결제 오류:', error);
+    //     }
+    //   } else {
+    //     console.error('결제 정보를 확인해 주세요.');
+    //   }
+    // },
     changePage(pageNumber) {
       this.currentPage = pageNumber;
     }
