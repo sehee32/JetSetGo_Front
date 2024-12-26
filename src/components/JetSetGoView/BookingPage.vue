@@ -119,7 +119,7 @@
 
         <v-btn
             class="mt-4 custom-btn"
-            :disabled="!formValid"
+            :disabled="!departure || !destination || !departureDate || !adults"
             @click="bookTicket"
         >
           예매하기

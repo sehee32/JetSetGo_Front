@@ -122,7 +122,7 @@
         <div class="d-flex justify-center mt-4">
           <v-btn
               class="custom-btn"
-              :disabled="!formValid"
+              :disabled="!departure || !destination || !departureDate || !adults"
               @click="updateSchedule"
           >
             변경하기
