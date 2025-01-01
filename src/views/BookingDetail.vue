@@ -25,7 +25,7 @@
       </div>
 
       <!-- 오는 편 -->
-      <div class="journey-item">
+      <div v-if="returnFlight && returnFlight.departure" class="journey-item">
         <div class="journey-header">
           <h3>오는 편</h3>
           <div class="route">
@@ -51,26 +51,28 @@
         <p class="journey-passenger">성인: {{ adults }}명 아동: {{ children }}명</p>
       </div>
 
-      <div class="passenger-form">
-        <div class="passenger-header">
-          <span class="passenger-number">승객 1</span>
+      <!-- 승객 정보 폼 -->
+      <div v-for="(passenger, index) in passengers" :key="index" class="passenger-form">
+        <div class="passenger-header" @click="toggleForm(index)">
+          <span class="passenger-number">승객 {{ index + 1 }}</span>
+          <span class="toggle-icon">{{ expandedForms[index] ? '▲' : '▼' }}</span>
         </div>
 
-        <div class="form-content">
+        <div v-if= expandedForms[index] class="form-content">
           <div class="form-row">
             <label class="form-text">국적<span class="required">*</span></label>
-            <input type="text" placeholder="예) 대한민국 또는 KOREA">
+            <input type="text" v-model="passenger.nationality" placeholder="예) 대한민국 또는 KOREA">
           </div>
 
           <div class="form-row">
             <div class="name-inputs">
               <div class="input-group">
                 <label class="form-text">승객 성<span class="required">*</span></label>
-                <input type="text" placeholder="예) 김 또는 KIM">
+                <input type="text" v-model="passenger.lastName" placeholder="예) 김 또는 KIM">
               </div>
               <div class="input-group">
                 <label class="form-text">승객 이름<span class="required">*</span></label>
-                <input type="text" placeholder="예) 대한 또는 DAEHAN">
+                <input type="text" v-model="passenger.firstName" placeholder="예) 대한 또는 DAEHAN">
               </div>
             </div>
           </div>
@@ -78,26 +80,26 @@
           <div class="form-row">
             <div class="input-group">
               <label class="form-text">성별<span class="required">*</span></label>
-              <select>
-                <option>여성</option>
-                <option>남성</option>
+              <select v-model="passenger.gender">
+                <option value="female">여성</option>
+                <option value="male">남성</option>
               </select>
             </div>
             <div class="input-group">
               <label class="form-text">생년월일(YYYY.MM.DD.)<span class="required">*</span></label>
-              <input type="text">
+              <input type="text" v-model="passenger.birthDate" placeholder="예) 1990.01.01">
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
     <div class="payment-section">
-      <div class="total-amount">
-        <span>최종 결제 금액</span>
+
+        <span class="total-amount">최종 결제 금액</span>
         <span class="amount">{{totalPrice}}원</span>
-      </div>
+
+      <button @click="Back" class="back-button">뒤로가기</button>
       <button @click="Payment" class="payment-button">결제하기</button>
     </div>
   </div>
@@ -113,22 +115,25 @@ export default {
   data() {
     return {
       totalPrice : 0,
-      outgoingFlight: null,
-      returnFlight: null,
+      totalPassenger: 0,
+      outgoingFlight: {},
+      returnFlight: {},
       adults: 0,
       children: 0,
       travelClass: "",
       departureDate: "",
       returnDate: "",
       departure: "",
-      destination: ""
+      destination: "",
+      passengers: [],
+      expandedForms: []
     };
   },
   created() {
     // 라우터에서 데이터 파싱
     const query = this.$route.query;
-    this.outgoingFlight = JSON.parse(decodeURIComponent(query.outgoing || '{}'));
-    this.returnFlight = JSON.parse(decodeURIComponent(query.returning || '{}'));
+    this.outgoingFlight = JSON.parse(decodeURIComponent(query.outgoingFlight || '{}'));
+    this.returnFlight = JSON.parse(decodeURIComponent(query.returnFlight || '{}'));
     this.adults = parseInt(query.adults || 0, 10);
     this.children = parseInt(query.children || 0, 10);
     this.travelClass = query.travelClass;
@@ -137,10 +142,41 @@ export default {
     this.departure = query.departure;
     this.destination = query.destination;
     this.totalPrice = parseFloat(query.totalPrice || 0);
+
+    // 총 승객 수 계산 및 초기화
+    this.totalPassenger = this.adults + this.children;
+
+    this.passengers = Array.from({ length: this.totalPassenger }, () => ({
+      nationality: '',
+      lastName: '',
+      firstName: '',
+      gender: '',
+      birthDate: ''
+    }));
+    this.expandedForms = Array(this.totalPassenger).fill(false);  // expandedForms도 총 승객 수에 맞게 초기화
+    this.expandedForms[0] = true; // 첫번째 폼은 펼쳐짐
   },
 
   methods : {
     async Payment() {
+      if (!this.$store.getters.isAuthenticated) {
+        // 현재 예약 정보를 Vuex에 저장
+        this.$store.dispatch('saveBookingData', {
+          outgoingFlight: this.outgoingFlight,
+          returnFlight: this.returnFlight,
+          adults: this.adults,
+          children: this.children,
+          travelClass: this.travelClass,
+          totalPrice: this.totalPrice,
+          passengers: this.passengers
+        });
+
+        // 로그인 페이지로 리다이렉트
+        this.$router.push('/loginpage');
+        return;
+      }
+
+
       // if (this.selectedFlightId !== null && (this.returnFlightId !== null || !this.returnDate)) {
       //   try {
       //
@@ -196,6 +232,12 @@ export default {
       // } else {
       //   console.error('결제 정보를 확인해 주세요.');
       // }
+    },
+    Back() {
+      this.$router.go(-1);
+    },
+    toggleForm(index) {
+      this.expandedForms[index] = !this.expandedForms[index];
     }
   }
 }
@@ -290,6 +332,7 @@ export default {
 .passenger-form {
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+  margin-bottom: 30px;
 }
 
 .passenger-header {
@@ -299,6 +342,11 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+}
+
+.toggle-icon {
+  font-size: 12px;
 }
 
 .journey-passenger {
@@ -348,18 +396,33 @@ input, select {
 }
 
 .payment-section {
-  margin-top: 30px;
-  text-align: right;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .total-amount {
   font-size: 18px;
-  margin-bottom: 15px;
 }
 
 .amount {
   font-weight: bold;
+  font-size: 18px;
   margin-left: 10px;
+  margin-right: 10px;
+}
+.booking-container {
+  padding-bottom: 80px; /* payment-section 높이만큼 패딩 추가 */
 }
 
 .payment-button {
@@ -370,5 +433,16 @@ input, select {
   border-radius: 4px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.back-button {
+  background: white;
+  color: #002c5f;
+  padding: 12px 30px;
+  border: 1px solid #002c5f;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 10px;
 }
 </style>
