@@ -5,7 +5,8 @@ export default createStore({
     state() {
         return {
             token: localStorage.getItem('jwtToken') || '',
-            user: {} // 사용자 정보 저장
+            user: {}, // 사용자 정보 저장
+            bookingData: null   // 예약 정보 저장
         };
     },
     mutations: {
@@ -19,6 +20,12 @@ export default createStore({
         },
         setUser(state, user) {
             state.user = user;
+        },
+        setBookingData(state, data) {
+            state.bookingData = data;
+        },
+        clearBookingData(state) {
+            state.bookingData = null;
         }
     },
     actions: {
@@ -35,11 +42,18 @@ export default createStore({
         },
         logout({ commit }) {
             commit('clearToken');
+            commit('clearBookingData')
+        },
+        saveBookingData({commit}, bookingData) {
+            commit('setBookingData', bookingData);
         }
     },
     getters: {
         isAuthenticated(state) {
             return !!state.token;
+        },
+        getBookingData(state) {
+            return state.bookingData;
         }
     }
 });
