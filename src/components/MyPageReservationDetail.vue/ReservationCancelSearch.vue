@@ -11,8 +11,9 @@
       <v-main>
         <v-container class="costom-container">
           <!-- 예약 항공편 정보 -->
-          <h2>1. 변경할 여정을 선택하세요.</h2>
-          <div v-for="(item, index) in uniqueflights" :key="index" class="costom-box" :class="{'selected-flight': isSelectedFlight(item.flight_Id)}" @click="selectFlight(item.flight_Id)">
+          <h2>여정 변경하기</h2>
+          <p>{{ selectedFlightCancelId }}</p>
+          <div v-for="(item, index) in uniqueflights" :key="index" class="costom-box" :class="{'selected-flight': this.selectedFlightId}" @click="selectFlight(item.flight_Id)">
             <div class="title">
               <span :style="getBackgroundStyle(item.status)">여정 {{index+1}}</span>
               <span>{{ item.originlocationcode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.destinationlocationcode }}</span>
@@ -38,91 +39,6 @@
               </v-row>
             </div>
           </div>
-          <!-- 연락처 및 탑승객 정보 -->
-          <h2>2. 변경 대상 승객을 확인하세요.</h2>
-          <div class="info">
-            <h5>연락처 및 탑승객 정보</h5>
-            <v-row class="text-left representative">
-              <v-col cols="4">
-                <span><strong>대표자 연락처</strong></span>
-              </v-col>
-              <v-col cols="3">
-                <span><strong>이름</strong>{{userName}}</span>
-              </v-col>
-              <v-col cols="5">
-                <span><strong>연락처</strong> {{userPhoneNumber}}</span>
-              </v-col>
-            </v-row>
-            <v-row class="passengerTitle">
-              <v-col cols="3" class="text-left">
-                <p>탑승객</p>
-              </v-col>
-              <v-col>
-                <p>연락처</p>
-              </v-col>
-              <v-col>
-                <p>여권정보</p>
-              </v-col>
-            </v-row>
-            <v-row v-for="(item, index) in infoflights" :key="index" class="passengerData">
-              <v-col cols="3" class="text-left">
-                <span>{{ item.passenger_Name }}</span>
-              </v-col>
-              <v-col>
-                <span>{{ item.phone_Number }}</span>
-              </v-col>
-              <v-col>
-                <v-btn
-                    text
-                    @click="updatePassport(item)"
-                    :disabled="item.status === '사용완료' || item.status === '예약취소' || !item.passport_Number"
-                    class="btn"
-                >
-                  {{ item.passport_Number ? '확인' : '미등록' }}
-                </v-btn>
-              </v-col>
-            </v-row>
-            <!-- 여권정보 입력 -->
-            <v-dialog v-model="currentPassportDialog" max-width="400px">
-              <v-card>
-                <v-card-title class="headline">여권 정보</v-card-title>
-                <v-card-text>
-                  <!-- 여권번호 입력 -->
-                  <v-text-field
-                      v-model="currentPassport.passport_Number"
-                      :rules="[rules.required]"
-                      label="여권번호"
-                      readonly
-                  ></v-text-field>
-
-                  <!-- 여권만료일 입력 -->
-                  <v-text-field
-                      v-model="currentPassport.passport_ExpiryDate"
-                      :rules="[rules.required]"
-                      label="여권 만료일"
-                      type="date"
-                      :min="today"
-                      prepend-inner-icon="mdi-calendar"
-                      readonly
-                  ></v-text-field>
-
-                  <!-- 여권발행국 선택 -->
-                  <v-select
-                      v-model="currentPassport.passport_IssuingCountry"
-                      :rules="[rules.required]"
-                      :items="countries"
-                      label="여권 발행국"
-                      item-title="name"
-                      item-value="code"
-                      readonly
-                  ></v-select>
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn color="primary" text @click="currentPassportDialog = false">확인</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </div>
           <!-- 버튼 -->
           <div>
             <v-row class="changeCencel">
@@ -130,7 +46,7 @@
                 <v-btn @click="goBack" class="btn">취소</v-btn>
               </v-col>
               <v-col>
-                <v-btn @click="goChange" class="btn">다음</v-btn>
+                <v-btn @click="goChange" class="btn">결제/환불 하기</v-btn>
               </v-col>
             </v-row>
           </div>
@@ -144,10 +60,11 @@
 import axios from "axios";
 
 export default {
-  name: "ReservationCancel",
+  name: "ReservationCancelSearch",
   data() {
     return {
       reservationId: null,
+      selectedFlightChangeId: [], // 배열로 초기화
       selectPage: true,
       flights:[],
       countries: [
@@ -166,7 +83,7 @@ export default {
       },
       passportExpiryDateMenu: false,
       currentPassportDialog: false,
-      selectedFlightId: [], // 배열로 초기화
+      selectedFlightId: '',
       rules: {
         required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' ,// 필수 입력 규칙
       },
@@ -210,9 +127,10 @@ export default {
     }
   },
   methods: {
-    async getReservationDetail(){
-      const response = await axios.post('/api/myPageReservationDetails', {
-        id: this.reservationId
+    async getReservationChangeDetail(){
+      const response = await axios.post('/api/myPageReservationChangeDetails', {
+        id: this.reservationId,
+        selectedFlightChangeId: this.selectedFlightChangeId
       });
       // API 요청이 성공한 경우
       console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
@@ -234,24 +152,8 @@ export default {
         'background-color' : `${backgroundColor}`
       };
     },
-    updatePassport(item) {
-      // 현재 클릭한 항목의 데이터를 currentPassport에 넣어서 다이얼로그에 표시
-      this.currentPassport = { ...item };
-      this.currentPassportDialog = true;
-    },
-    isSelectedFlight(flightId) {
-      return this.selectedFlightId.includes(flightId);
-    },
     selectFlight(flightId) {
-      const index = this.selectedFlightId.indexOf(flightId);
-
-      if (index === -1) {
-        // 배열에 flightId가 없으면 추가
-        this.selectedFlightId.push(flightId);
-      } else {
-        // 배열에 flightId가 있으면 제거
-        this.selectedFlightId.splice(index, 1);
-      }
+      this.selectedFlightId = flightId;
 
       console.log('현재 선택된 Flight ID:', this.selectedFlightId);
     },
@@ -263,32 +165,25 @@ export default {
         alert('선택한 항공편이 없습니다.');
       } else {
         // 선택한 항공편이 있을 경우 처리할 로직
+        this.selectPage = false;
+        // 예매 정보 처리 메서드
 
-        // 선택한 id 값 저장
-        localStorage.setItem('selectedFlightId', JSON.stringify(this.selectedFlightId));
-        this.$emit('activateCancelSearch');
+        const formattedDepartureDate = this.formatDate('2024-12-30');
+        const formattedReturnDate = this.returnDate ? this.formatDate('2024-12-31') : null; // 오는 날이 없을 경우 null로 처리
 
-        // localStorage.removeItem('reservationId');
-
-        // this.selectPage = false;
-        // // 예매 정보 처리 메서드
-        //
-        // const formattedDepartureDate = this.formatDate('2024-12-30');
-        // const formattedReturnDate = this.returnDate ? this.formatDate('2024-12-31') : null; // 오는 날이 없을 경우 null로 처리
-        //
-        // this.$router.push({
-        //   name: 'TicketCancelSearch' ,
-        //   query: {
-        //     departure: 'ICN',
-        //     destination: 'NRT',
-        //     departureDate: formattedDepartureDate,
-        //     returnDate: formattedReturnDate,
-        //     adults: Number(1),
-        //     children: Number(0),
-        //     travelClass: 'ECONOMY',
-        //     nonStop: true
-        //   }
-        // });
+        this.$router.push({
+          name: 'TicketCancelSearch' ,
+          query: {
+            departure: 'ICN',
+            destination: 'NRT',
+            departureDate: formattedDepartureDate,
+            returnDate: formattedReturnDate,
+            adults: Number(1),
+            children: Number(0),
+            travelClass: 'ECONOMY',
+            nonStop: true
+          }
+        });
       }
 
 
@@ -310,7 +205,8 @@ export default {
 
     // localStorage에서 ID 값을 읽어와서 데이터에 저장
     this.reservationId = localStorage.getItem('reservationId');
-    this.getReservationDetail();
+    this.selectedFlightChangeId = JSON.parse(localStorage.getItem('selectedFlightId')) || [];
+    this.getReservationChangeDetail();
 
     console.log('예약 ID:', this.reservationId);
   }
@@ -431,60 +327,6 @@ export default {
 .reservationDetail .costom-box .detail .arrival p{
   text-align: left;
 }
-
-/* 연락처 및 탑승객 정보 */
-.reservationDetail .info h5{
-  text-align: left;
-  font-size: 20px;
-  line-height: 50px;
-  border-bottom: 2px solid #00256c;
-}
-
-.reservationDetail .info span{
-  color: #666666;
-}
-
-.reservationDetail .info .representative{
-  margin: 0px;
-  padding: 20px 20px 10px 20px;
-  border-bottom: 1px solid #00256c;
-}
-
-.reservationDetail .info strong{
-  margin-right: 10px;
-  color: black;
-}
-
-.reservationDetail .info .passengerTitle{
-  margin: 0px;
-  color: #00256c;
-  padding: 5px 20px;
-  background-color: #f3f4f8;
-  border-bottom: 1px solid #cccccc;
-}
-
-.reservationDetail .info .passengerData{
-  margin: 0px;
-  padding: 5px 20px;
-  border-bottom: 1px solid #cccccc;
-  line-height: 36px;
-}
-
-.reservationDetail .info .passengerData .btn{
-  font-weight: 700;
-  border: 1px solid #5985e1;
-  border-radius: 10px;
-  text-decoration: none;
-  cursor: pointer;
-  background-color: #5985e1;
-  color: #fff;
-}
-
-.reservationDetail .info .passengerData .btn:hover{
-  background-color: #fff;
-  color: #5985e1;
-}
-
 
 .selected-flight {
   border: 2px solid #00256c; /* 선택된 항공편의 테두리 변경 */

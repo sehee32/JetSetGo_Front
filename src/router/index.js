@@ -74,9 +74,9 @@ const routes = [
     meta: { requiresAuth: true }  // 인증이 필요한 라우트
   },
   {
-    path: '/TicketCencelSearch',
-    name: 'TicketCencelSearch',
-    component: () => import(/* webpackChunkName: "about" */ '../views/TicketCencelSearch.vue'),
+    path: '/TicketCancelSearch',
+    name: 'TicketCancelSearch',
+    component: () => import(/* webpackChunkName: "about" */ '../views/TicketCancelSearch.vue'),
     props: route => ({
       departure: route.query.departure,
       destination: route.query.destination,

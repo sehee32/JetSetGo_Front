@@ -1,8 +1,9 @@
 <template>
-  <ReservaionDetails v-if="!isCancelMode" />
-  <ReservationPayment v-if="!isCancelMode" />
-  <ReservationBtns @activateCancel="activateCancel" v-if="!isCancelMode" />
-  <ReservationCancel @deactivateCancel="deactivateCancel" v-if="isCancelMode" />
+  <ReservaionDetails v-if="!isCancelMode && !isCancelSearchMode" />
+  <ReservationPayment v-if="!isCancelMode && !isCancelSearchMode" />
+  <ReservationBtns @activateCancel="activateCancel" v-if="!isCancelMode && !isCancelSearchMode" />
+  <ReservationCancel @deactivateCancel="deactivateCancel" @activateCancelSearch="activateCancelSearch" v-if="isCancelMode" />
+  <ReservationCancelSearch @deactivateCancelSearch="deactivateCancelSearch" v-if="isCancelSearchMode" />
 </template>
 
 <script>
@@ -10,6 +11,7 @@ import ReservaionDetails from "@/components/MyPageReservationDetail.vue/Reservat
 import ReservationBtns from "@/components/MyPageReservationDetail.vue/ReservationBtns.vue";
 import ReservationPayment from "@/components/MyPageReservationDetail.vue/ReservationPayment.vue";
 import ReservationCancel from "@/components/MyPageReservationDetail.vue/ReservationCancel.vue";
+import ReservationCancelSearch from "@/components/MyPageReservationDetail.vue/ReservationCancelSearch.vue";
 
 export default {
   name: "MyPageReservationDetail",
@@ -17,11 +19,13 @@ export default {
     ReservaionDetails,
     ReservationPayment,
     ReservationBtns,
-    ReservationCancel
+    ReservationCancel,
+    ReservationCancelSearch
   },
   data() {
     return {
       isCancelMode: false, // 취소 모드 상태 관리
+      isCancelSearchMode: false // 취소 검색 모드 상태 관리
     };
   },
   methods: {
@@ -30,6 +34,13 @@ export default {
     },
     deactivateCancel() {
       this.isCancelMode = false; // 취소 모드 비활성화
+    },
+    activateCancelSearch() {
+      this.isCancelMode = false; // 취소 모드 비활성화
+      this.isCancelSearchMode = true; // 취소 검색 모드 활성화
+    },
+    deactivateCancelSearch() {
+      this.isCancelSearchMode = false; // 취소 검색 모드 비활성화
     },
   },
   beforeUnmount() {
