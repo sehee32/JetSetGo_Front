@@ -149,8 +149,11 @@ export default {
       journeyStage: 'outgoing', // 현재 여정 단계 ('outgoing' 또는 'return')
       departureMutable: this.departure, // 수정 가능한 출발지
       destinationMutable: this.destination, // 수정 가능한 도착지
+
       departureDateMutable: this.departureDate, // 수정 가능한 출발 날짜
       returnDateMutable: this.returnDate,
+      returnDepartureDateMutable: this.returnDate,
+
       adultsMutable: this.adults,
       childrenMutable: this.children,
       travelClassMutable: this.travelClass,
@@ -171,14 +174,15 @@ export default {
   },
 
   watch: {
+    // 정렬옵션이 변경될 때마다 재정렬
     sortOption() {
       this.sortFlights();
     },
     localReturnDate(newVal) {
-      this.$emit("update:returnDate", newVal); // 부모로 변경 사항 전달
+      this.$emit("update:returnDate", newVal); // 로컬 returnDate가 변경될 때 부모로 변경 사항 전달
     },
     returnDate(newVal) {
-      this.localReturnDate = newVal; // 부모 변경 사항 감지
+      this.localReturnDate = newVal; // 부모 컴포넌트에서 returnDate가 변경될 때 변경 사항 감지
     },
   },
 
@@ -186,27 +190,30 @@ export default {
     paginatedFlights() {
       const start = (this.currentPage - 1) * this.flightsPerPage;
       const end = start + this.flightsPerPage;
-      return this.currentFlights.slice(start, end);
+      return this.currentFlights.slice(start, end); // 현재 페이지에 해당하는 항공편 목록 반환
     }
   },
   created() {
     this.searchFlights();
   },
   methods: {
+    //항공권 검색
     async searchFlights() {
       this.isLoading = true;
+
       try {
         const response = await axios.get('/api/flights/search', {
           params: {
             origin: this.departureMutable,
             destination: this.destinationMutable,
-            departureDate: this.departureDateMutable,
+            departureDate: this.journeyStage === 'outgoing' ? this.departureDateMutable : this.returnDateMutable,
             adults: this.adults,
             children: this.children,
             travelClass: this.travelClass,
             nonStop: this.nonStop ? 'true' : 'false'
           }
         });
+
         const flightOffers = response.data;
         if (flightOffers.length === 0) {
           console.log('검색된 항공편이 없습니다.');
@@ -228,6 +235,7 @@ export default {
       }
     },
 
+    // 항공권 정렬
     sortFlights() {
       if (this.sortOption === '출발시간 빠른순') {
         this.currentFlights.sort((a, b) => new Date(a.departureTime) - new Date(b.departureTime));
@@ -238,6 +246,7 @@ export default {
       }
     },
 
+    // 일정수정 패널
     toggleSchedulePanel() {
       this.showSchedulePanel = !this.showSchedulePanel;
     },
@@ -260,6 +269,7 @@ export default {
       this.searchFlights(); // 항공권 재검색
     },
 
+    // 소요시간 형식 변경
     formatDuration(duration) {
       const regex = /PT(?:(\d+)H)?(?:(\d+)M)?/;
       const matches = duration.match(regex);
@@ -267,9 +277,13 @@ export default {
       const minutes = matches[2] ? matches[2] : '0';
       return `${hours}시간 ${minutes}분`;
     },
+
+    // 가격 형식 변경
     formatPrice(price) {
       return Number(price).toLocaleString();
     },
+
+    // 시간 형식 변경
     formatDateTime(dateTime) {
       const date = new Date(dateTime);
       const year = date.getFullYear();
@@ -279,6 +293,8 @@ export default {
       const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     },
+
+    // 선택된 항공편인지 확인
     isSelectedFlight(flightId) {
       if (this.journeyStage === 'outgoing') {
         return this.selectedFlightId === flightId;
@@ -287,6 +303,8 @@ export default {
       }
       return false;
     },
+
+    // 항공편 선택
     selectFlight(flightId) {
       if (this.journeyStage === 'outgoing') {
         this.selectedFlightId = flightId; // 출발 항공편 선택
@@ -294,116 +312,64 @@ export default {
         this.returnFlightId = flightId; // 돌아오는 항공편 선택
       }
     },
+
+    // 다음 여정으로 넘어가기
     NextJourney() {
       if (this.journeyStage === 'outgoing' && this.selectedFlightId !== null) {
         // 출발지랑 목적지 스왑
         const tempDeparture = this.departureMutable;
         this.departureMutable = this.destinationMutable;
         this.destinationMutable = tempDeparture;
-        this.departureDateMutable = this.returnDateMutable;
+
 
         // 여정 단계를 'return'으로 변경
         this.journeyStage = 'return';
+
         this.searchFlights(); // 돌아오는 항공편 검색
       }
     },
 
     Payment() {
+
+      debugger;  // eslint-disable-line no-debugger
       // 선택한 항공권 정보 가져오기
       const outgoingFlight = {
         ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
         departure: this.departure,
         destination: this.destination,
-        departureDate: this.departureMutable,
-        returnDate: this.returnDateMutable
+        departureDate: this.departureDateMutable
       };
 
-      const returnFlight = {
-        ...this.currentFlights.find(flight => flight.id === this.returnFlightId),
-        departure: this.destination,
-        destination: this.departure,
-        departureDate: this.departureMutable,
-        returnDate: this.returnDateMutable
-      };
+      let returnFlight = null;
+      let totalPrice = parseFloat(outgoingFlight.price);
 
-      // 총 가격 계산
-      const totalPrice = parseFloat(outgoingFlight.price) + parseFloat(returnFlight.price);
+      if (this.returnDateMutable) {
+        returnFlight = {
+          ...this.currentFlights.find(flight => flight.id === this.returnFlightId),
+          departure: this.destination,
+          destination: this.departure,
+          departureDate: this.returnDepartureDateMutable,
+        };
+
+        totalPrice += parseFloat(returnFlight.price);
+      }
 
       // BookingDetail로 라우팅하며 데이터 전달
       this.$router.push({
         name: 'BookingDetail',
         query: {
-          outgoing: JSON.stringify(outgoingFlight),
-          returning: JSON.stringify(returnFlight),
+          outgoingFlight: JSON.stringify(outgoingFlight),
+          returnFlight: JSON.stringify(returnFlight || {}),
           adults: this.adultsMutable,
           children: this.childrenMutable,
           travelClass: this.travelClassMutable,
-          departureDate: this.departureDateMutable,
-          returnDate: this.returnDateMutable,
           departure: this.departure,
           destination: this.destination,
-          totalPrice: totalPrice
+          totalPrice: totalPrice,
         }
       });
     },
 
-    // async Payment() {
-    //   if (this.selectedFlightId !== null && (this.returnFlightId !== null || !this.returnDate)) {
-    //     try {
-    //
-    //       // 선택된 항공편 가격 계산
-    //       const selectedFlight = this.currentFlights.find(flight => flight.id === this.selectedFlightId);
-    //       this.totalPrice = selectedFlight.price;
-    //       if (this.returnFlightId) {
-    //         const returnFlight = this.currentFlights.find(flight => flight.id === this.returnFlightId);
-    //         this.totalPrice += returnFlight.price;
-    //       }
-    //       console.log('결제 정보:', {
-    //         user: this.userInfo,
-    //         totalAmount: this.totalPrice
-    //       });
-    //
-    //       const IMP = window.IMP;
-    //       IMP.init("imp12777257");
-    //
-    //       try {
-    //         IMP.request_pay(
-    //             {
-    //               // param
-    //               pg: "kakaopay",
-    //               merchant_uid: `uid-${crypto.randomUUID()}`, // 주문 번호
-    //               channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
-    //               paymentId: `payment-${crypto.randomUUID()}`,
-    //               name: "항공권~~",
-    //               pay_method: "card",
-    //               amount: 100000
-    //             },
-    //             function (rsp) {
-    //               // callback
-    //               if (rsp.success) {
-    //                 // 결제 성공 시
-    //                 console.log("결제 성공");
-    //                 this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
-    //               } else {
-    //                 // 실패 시 로직
-    //                 console.log("결제 실패", rsp);
-    //                 this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
-    //               }
-    //             }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
-    //         );
-    //       } catch (error) {
-    //         console.error("본인 인증 요청 실패:", error);
-    //         this.verificationMessage = '본인 인증 요청에 실패했습니다.';
-    //         this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
-    //       }
-    //       // 결제 api 호출 여기서 하기
-    //     } catch (error) {
-    //       console.error('결제 오류:', error);
-    //     }
-    //   } else {
-    //     console.error('결제 정보를 확인해 주세요.');
-    //   }
-    // },
     changePage(pageNumber) {
       this.currentPage = pageNumber;
     }
