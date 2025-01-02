@@ -12,14 +12,17 @@
         <v-container class="costom-container">
           <!-- 예약 항공편 정보 -->
           <h2>여정 변경하기</h2>
-          <p>{{ selectedFlightCancelId }}</p>
-          <div v-for="(item, index) in uniqueflights" :key="index" class="costom-box" :class="{'selected-flight': this.selectedFlightId}" @click="selectFlight(item.flight_Id)">
+          <P> 예약 변경시 출발 시간 정보만 변경이 가능합니다.</P>
+          <div v-for="(item, index) in uniqueflights" :key="index" class="costom-box" :class="{'selected-flight': isSelectedFlight(item.flight_Id)}" @click="selectFlight(item)">
             <div class="title">
               <span :style="getBackgroundStyle(item.status)">여정 {{index+1}}</span>
               <span>{{ item.originlocationcode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.destinationlocationcode }}</span>
             </div>
             <div class="detail">
-              <h4>{{ item.departureDate }}</h4>
+              <div class="detailTitle">
+                <h4>{{ item.departureDate }}</h4>
+                <h5>{{ item.travelclass }} / {{ isnonstop(item.nonstop) }}</h5>
+              </div>
               <v-row>
                 <v-col class="departure">
                   <p><strong>{{ item.departureTime }}</strong></p>
@@ -37,8 +40,16 @@
                   <p class="code">{{ item.destinationlocationcode }}</p>
                 </v-col>
               </v-row>
+              <h4 class="paymentAmount">결제 금액 : {{paymentAmount(item.payment_Amount)}} 원</h4>
             </div>
           </div>
+
+          <div v-if="selectedFlightId" class="view">
+            <!-- 중첩 라우팅 -->
+            <router-view :key="selectedFlightId"></router-view>
+          </div>
+
+
           <!-- 버튼 -->
           <div>
             <v-row class="changeCencel">
@@ -152,10 +163,48 @@ export default {
         'background-color' : `${backgroundColor}`
       };
     },
-    selectFlight(flightId) {
-      this.selectedFlightId = flightId;
+    paymentAmount(pay) {
+      // 금액에 쉼표 추가
+      return new Intl.NumberFormat().format(pay);
+    },
+    isnonstop(value){
+      if(value === 1){
+        return '직항';
+      }else{
+        return '경유';
+      }
+    },
+    isSelectedFlight(flightId) {
+      return this.selectedFlightId === flightId;
+    },
+    selectFlight(item) {
+      if(this.selectedFlightId === item.flight_Id){
+        this.selectedFlightId = '';
+      }else {
 
-      console.log('현재 선택된 Flight ID:', this.selectedFlightId);
+        const formattedDepartureDate = this.formatDate(item.departureDate);
+        const formattedReturnDate = item.returnDate ? this.formatDate(item.returnDate) : null;
+
+        this.$router.push({
+          name: 'TicketChangeSearch',
+          query: {
+            departure: item.originlocationcode,
+            destination: item.destinationlocationcode,
+            departureDate: formattedDepartureDate,
+            returnDate: formattedReturnDate,
+            adults: item.adults,
+            children: item.children,
+            travelClass: item.travelclass,
+            nonStop: item.nonstop === 1
+          }
+        }).then(() => {
+          // 라우팅이 완료된 후에 설정
+          this.selectedFlightId = item.flight_Id;
+        });
+        console.log('현재 선택된 Flight ID:', this.selectedFlightId);
+
+      }
+
     },
     goBack(){
       this.$emit('deactivateCancelSearch');
@@ -185,6 +234,9 @@ export default {
           }
         });
       }
+
+      // 리렌더링 강제
+      this.$forceUpdate();
 
 
     },
@@ -258,6 +310,12 @@ export default {
   margin-bottom: 10px;
 }
 
+.reservationDetail p{
+  text-align: left;
+  color: #00256c;
+  margin-bottom: 10px;
+}
+
 /* 예약 항공편 정보 */
 .reservationDetail .costom-box{
   text-align: left;
@@ -296,6 +354,22 @@ export default {
   padding: 30px 40px 50px 40px;
 }
 
+.reservationDetail .costom-box .detail .detailTitle{
+  overflow: hidden; /* float로 인해 깨질 수 있는 레이아웃 문제 해결 */
+  margin-bottom: 15px;
+}
+
+.reservationDetail .costom-box .detail .detailTitle h4{
+  float: left; /* 왼쪽 정렬 */
+}
+
+.reservationDetail .costom-box .detail .detailTitle h5{
+  float: right; /* 오른쪽 정렬 */
+  font-size: 14px;
+  text-align: right;
+  color: #666666;
+}
+
 .reservationDetail .costom-box .detail p{
   text-align: center;
   line-height: 30px;
@@ -328,10 +402,24 @@ export default {
   text-align: left;
 }
 
+.reservationDetail .costom-box .detail .paymentAmount{
+  text-align: right;
+  color: #00256c;
+}
+
 .selected-flight {
   border: 2px solid #00256c; /* 선택된 항공편의 테두리 변경 */
 }
 
+
+
+
+/* 검색화면 */
+.reservationDetail .view{
+  padding: 25px;
+  border: 2px solid #00256c; /* 선택된 항공편의 테두리 변경 */
+  border-radius: 10px;
+}
 /* 버튼 */
 .reservationDetail .changeCencel{
   margin: 50px 0 100px 0;

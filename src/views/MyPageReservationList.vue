@@ -73,7 +73,7 @@ export default {
           borderColor = '#666666';
           break;
         default:
-          borderColor = '#000256'; // 기본 색상
+          borderColor = '#5985e1'; // 기본 색상
       }
       return {
         borderTop: `4px solid ${borderColor}`

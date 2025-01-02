@@ -17,7 +17,10 @@
               <span>{{ item.originlocationcode }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ item.destinationlocationcode }}</span>
             </div>
             <div class="detail">
-              <h4>{{ item.departureDate }}</h4>
+              <div class="detailTitle">
+                <h4>{{ item.departureDate }}</h4>
+                <h5>{{ item.travelclass }} / {{ isnonstop(item.nonstop) }}</h5>
+              </div>
               <v-row>
                 <v-col class="departure">
                   <p><strong>{{ item.departureTime }}</strong></p>
@@ -245,7 +248,14 @@ export default {
         this.$router.go(0);
         alert('여권정보가 저장되었습니다.');
       }
+    },
+    isnonstop(value){
+      if(value === 1){
+        return '직항';
+      }else{
+        return '경유';
       }
+    }
   },
   mounted() {
       const element = document.querySelector('.v-application__wrap');
@@ -331,6 +341,22 @@ export default {
 
 .reservationDetail .costom-box .detail{
   padding: 30px 40px 50px 40px;
+}
+
+.reservationDetail .costom-box .detail .detailTitle{
+  overflow: hidden; /* float로 인해 깨질 수 있는 레이아웃 문제 해결 */
+  margin-bottom: 15px;
+}
+
+.reservationDetail .costom-box .detail .detailTitle h4{
+  float: left; /* 왼쪽 정렬 */
+}
+
+.reservationDetail .costom-box .detail .detailTitle h5{
+  float: right; /* 오른쪽 정렬 */
+  font-size: 14px;
+  text-align: right;
+  color: #666666;
 }
 
 .reservationDetail .costom-box .detail p{

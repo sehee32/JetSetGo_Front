@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import JetSetGoView from '../views/JetSetGoView.vue'
-import store from '../store'  // Vuex 스토어 불러오기 (인증 상태 확인을 위해 필요)
+import store from '../store'
+import TicketSearch from "@/views/TicketSearch.vue";  // Vuex 스토어 불러오기 (인증 상태 확인을 위해 필요)
 
 const routes = [
   {
@@ -71,22 +72,24 @@ const routes = [
     path: '/myPageReservationDetail',
     name: 'MyPageReservationDetail',
     component: () => import(/* webpackChunkName: "myPageReservationDetail" */ '../views/MyPageReservationDetail.vue'),
-    meta: { requiresAuth: true }  // 인증이 필요한 라우트
-  },
-  {
-    path: '/TicketCancelSearch',
-    name: 'TicketCancelSearch',
-    component: () => import(/* webpackChunkName: "about" */ '../views/TicketCancelSearch.vue'),
-    props: route => ({
-      departure: route.query.departure,
-      destination: route.query.destination,
-      departureDate: route.query.departureDate,
-      returnDate: route.query.returnDate,
-      adults: Number(route.query.adults),
-      children: Number(route.query.children),
-      travelClass: route.query.travelClass,
-      nonStop: route.query.nonStop === 'true'
-    })
+    meta: { requiresAuth: true },  // 인증이 필요한 라우트
+    children: [
+      {
+        path: 'ticketsearch',
+        name: 'TicketChangeSearch',
+        component: TicketSearch,
+        props: route => ({
+          departure: route.query.departure,
+          destination: route.query.destination,
+          departureDate: route.query.departureDate,
+          returnDate: route.query.returnDate,
+          adults: Number(route.query.adults),
+          children: Number(route.query.children),
+          travelClass: route.query.travelClass,
+          nonStop: route.query.nonStop === 'true'
+        })
+      }
+    ]
   },
   {
     path: '/myPageWithdrawal',
