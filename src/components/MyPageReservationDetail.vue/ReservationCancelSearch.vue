@@ -158,7 +158,7 @@ export default {
       console.log('현재 선택된 Flight ID:', this.selectedFlightId);
     },
     goBack(){
-      this.$emit('deactivateCancel');
+      this.$emit('deactivateCancelSearch');
     },
     goChange(){
       if (!Array.isArray(this.selectedFlightId) || this.selectedFlightId.length === 0) {

@@ -40,6 +40,7 @@ export default {
       this.isCancelSearchMode = true; // 취소 검색 모드 활성화
     },
     deactivateCancelSearch() {
+      this.isCancelMode = true; // 취소 모드 활성화
       this.isCancelSearchMode = false; // 취소 검색 모드 비활성화
     },
   },
