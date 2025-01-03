@@ -4,6 +4,7 @@
   <ReservationBtns @activateCancel="activateCancel" v-if="!isCancelMode && !isCancelSearchMode" />
   <ReservationCancel @deactivateCancel="deactivateCancel" @activateCancelSearch="activateCancelSearch" v-if="isCancelMode" />
   <ReservationCancelSearch @deactivateCancelSearch="deactivateCancelSearch" v-if="isCancelSearchMode" />
+  {{$route.query.changeFlight}}
 </template>
 
 <script>
@@ -47,6 +48,7 @@ export default {
   beforeUnmount() {
     // 컴포넌트가 사라질 때 localStorage에서 ID 값을 삭제할 수 있습니다.
     localStorage.removeItem('reservationId');
+    localStorage.removeItem('selectedFlightId');
   }
 }
 </script>

@@ -24,7 +24,7 @@
           </h3>
 
           <!-- 일정 변경 버튼 -->
-          <v-btn color="#00256c" class="mt-4" @click="toggleSchedulePanel">
+          <v-btn v-if="!this.reservationChangeMode" color="#00256c" class="mt-4" @click="toggleSchedulePanel">
             일정 변경
           </v-btn>
 
@@ -92,7 +92,7 @@
           <!-- 선택된 항공편의 버튼을 바로 아래에 표시 -->
           <div v-if="isSelectedFlight(flight.id)" class="button-container">
             <v-btn v-if="journeyStage === 'outgoing' && returnDate" @click="NextJourney" class="custom-btn">다음여정</v-btn>
-            <v-btn v-if="journeyStage === 'return' || !returnDate" @click="Payment" class="custom-btn">결제하기</v-btn>
+            <v-btn v-if="journeyStage === 'return' || !returnDate" @click="Payment" class="custom-btn">{{ this.reservationChangeMode ? '선택하기' : '결제하기' }}</v-btn>
           </div>
         </div>
       </div>
@@ -169,7 +169,8 @@ export default {
       ],
       isScheduleChangeOpen: false,
       showSchedulePanel: false,
-      totalPrice : 0
+      totalPrice : 0,
+      reservationChangeMode : true // 예약 변경 시 사용 모드
     };
   },
 
@@ -353,21 +354,35 @@ export default {
 
         totalPrice += parseFloat(returnFlight.price);
       }
+      if(this.reservationChangeMode){
+        //예약 변경 시 사용 부분 추가
+        this.$router.push({
+          name: 'MyPageReservationDetail',
+          query: {
+            changeFlight: JSON.stringify(outgoingFlight)
+          },
+        });
+        alert(JSON.stringify(outgoingFlight));
+        alert(JSON.stringify(outgoingFlight.departureTime));
+        alert(JSON.stringify(outgoingFlight.arrivalTime));
+        alert(JSON.stringify(outgoingFlight.price));
+      }else{
+        // BookingDetail로 라우팅하며 데이터 전달
+        this.$router.push({
+          name: 'BookingDetail',
+          query: {
+            outgoingFlight: JSON.stringify(outgoingFlight),
+            returnFlight: JSON.stringify(returnFlight || {}),
+            adults: this.adultsMutable,
+            children: this.childrenMutable,
+            travelClass: this.travelClassMutable,
+            departure: this.departure,
+            destination: this.destination,
+            totalPrice: totalPrice,
+          }
+        });
+      }
 
-      // BookingDetail로 라우팅하며 데이터 전달
-      this.$router.push({
-        name: 'BookingDetail',
-        query: {
-          outgoingFlight: JSON.stringify(outgoingFlight),
-          returnFlight: JSON.stringify(returnFlight || {}),
-          adults: this.adultsMutable,
-          children: this.childrenMutable,
-          travelClass: this.travelClassMutable,
-          departure: this.departure,
-          destination: this.destination,
-          totalPrice: totalPrice,
-        }
-      });
     },
 
     changePage(pageNumber) {

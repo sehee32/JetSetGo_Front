@@ -43,7 +43,8 @@
               <h4 class="paymentAmount">결제 금액 : {{paymentAmount(item.payment_Amount)}} 원</h4>
             </div>
           </div>
-
+          <p>결과 :{{ changeFlight }}</p>
+          <p>test: {{$route.query.changeFlight}}</p>
           <div v-if="selectedFlightId" class="view">
             <!-- 중첩 라우팅 -->
             <router-view :key="selectedFlightId"></router-view>
@@ -94,7 +95,8 @@ export default {
       },
       passportExpiryDateMenu: false,
       currentPassportDialog: false,
-      selectedFlightId: '',
+      selectedFlightId: '', //현재 선택된 ID
+      changeFlight: this.$route.query.changeFlight || [], // 결과
       rules: {
         required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' ,// 필수 입력 규칙
       },
@@ -261,7 +263,23 @@ export default {
     this.getReservationChangeDetail();
 
     console.log('예약 ID:', this.reservationId);
-  }
+    console.log('예약 ID:', this.selectedFlightId);
+    console.log('예약 ID:', this.$route.query.changeFlight);
+  },
+  watch: {
+    // $route 객체를 직접 감시
+    '$route.query.changeFlight': function(newValue) {
+      if (newValue && this.selectedFlightId) {
+        // 값이 변경되었을 때 수행할 작업
+        alert('changeFlight 값이 변경되었습니다: ' + newValue);
+      }
+    }
+  },
+  // updated() {
+  //   if (this.$route.query.changeFlight) {
+  //     alert('changeFlight 값이 변경되었습니다: ' + this.$route.query.changeFlight);
+  //   }
+  // }
 }
 </script>
 
