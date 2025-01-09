@@ -321,6 +321,13 @@ export default {
         this.departureMutable = this.destinationMutable;
         this.destinationMutable = tempDeparture;
 
+        this.$outgoingFlight = {
+          ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
+          departure: this.departure,
+          destination: this.destination,
+          departureDate: this.departureDateMutable
+        };
+
 
         // 여정 단계를 'return'으로 변경
         this.journeyStage = 'return';
@@ -333,15 +340,15 @@ export default {
 
       debugger;  // eslint-disable-line no-debugger
       // 선택한 항공권 정보 가져오기
-      const outgoingFlight = {
-        ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
-        departure: this.departure,
-        destination: this.destination,
-        departureDate: this.departureDateMutable
-      };
+      // const outgoingFlight = {
+      //   ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
+      //   departure: this.departure,
+      //   destination: this.destination,
+      //   departureDate: this.departureDateMutable
+      // };
 
       let returnFlight = null;
-      let totalPrice = parseFloat(outgoingFlight.price);
+      let totalPrice = parseFloat(this.$outgoingFlight.price);
 
       if (this.returnDateMutable) {
         returnFlight = {
@@ -358,7 +365,7 @@ export default {
       this.$router.push({
         name: 'BookingDetail',
         query: {
-          outgoingFlight: JSON.stringify(outgoingFlight),
+          outgoingFlight: JSON.stringify(this.$outgoingFlight),
           returnFlight: JSON.stringify(returnFlight || {}),
           adults: this.adultsMutable,
           children: this.childrenMutable,
@@ -366,6 +373,7 @@ export default {
           departure: this.departure,
           destination: this.destination,
           totalPrice: totalPrice,
+          nonStop: this.nonStop
         }
       });
     },
