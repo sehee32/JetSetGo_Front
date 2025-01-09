@@ -13,6 +13,7 @@ const app = createApp(App);
 app.use(router);
 app.use(vuetify);
 app.use(store);
+app.config.globalProperties.$outgoingFlight = null;
 app.mount('#app');
 // requestIdentityVerification();
 //requestCertification();

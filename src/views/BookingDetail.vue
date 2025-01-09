@@ -67,26 +67,22 @@
           <div class="form-row">
             <div class="name-inputs">
               <div class="input-group">
-                <label class="form-text">승객 성<span class="required">*</span></label>
-                <input type="text" v-model="passenger.lastName" placeholder="예) 김 또는 KIM">
+                <label class="form-text">승객 이름<span class="required">*</span></label>
+                <input type="text" v-model="passenger.passengerName">
               </div>
               <div class="input-group">
-                <label class="form-text">승객 이름<span class="required">*</span></label>
-                <input type="text" v-model="passenger.firstName" placeholder="예) 대한 또는 DAEHAN">
+                <label class="form-text">성별<span class="required">*</span></label>
+                <select v-model="passenger.gender">
+                  <option value="female">여성</option>
+                  <option value="male">남성</option>
+                </select>
               </div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="input-group">
-              <label class="form-text">성별<span class="required">*</span></label>
-              <select v-model="passenger.gender">
-                <option value="female">여성</option>
-                <option value="male">남성</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <label class="form-text">생년월일(YYYY.MM.DD.)<span class="required">*</span></label>
+              <label class="form-text">생년월일(YYYY-MM-DD)<span class="required">*</span></label>
               <input type="text" v-model="passenger.birthDate" placeholder="예) 1990.01.01">
             </div>
           </div>
@@ -107,6 +103,8 @@
 
 <script>
 
+import axios from "axios";
+
 export default {
   props : {
 
@@ -120,14 +118,26 @@ export default {
       returnFlight: {},
       adults: 0,
       children: 0,
+      nonStop:"",
+      tripType:"왕복",
       travelClass: "",
       departureDate: "",
       returnDate: "",
       departure: "",
       destination: "",
       passengers: [],
-      expandedForms: []
+      expandedForms: [],
+      token : localStorage.getItem('token'), // JWT 토큰 저장
+      birthDate: "",
+      name: "",
+      id: "",
+      phoneNumber: "",
+      contact: "",
+      userPassword: ""
     };
+  },
+  mounted() {
+    this.fetchUserInfos();
   },
   created() {
     // 라우터에서 데이터 파싱
@@ -142,23 +152,52 @@ export default {
     this.departure = query.departure;
     this.destination = query.destination;
     this.totalPrice = parseFloat(query.totalPrice || 0);
+    this.nonStop = query.nonStop;
 
     // 총 승객 수 계산 및 초기화
     this.totalPassenger = this.adults + this.children;
 
     this.passengers = Array.from({ length: this.totalPassenger }, () => ({
-      nationality: '',
-      lastName: '',
-      firstName: '',
-      gender: '',
-      birthDate: ''
+      nationality: "",
+      passengerName: "",
+      gender: "",
+      birthDate: "",
     }));
     this.expandedForms = Array(this.totalPassenger).fill(false);  // expandedForms도 총 승객 수에 맞게 초기화
     this.expandedForms[0] = true; // 첫번째 폼은 펼쳐짐
+
   },
 
   methods : {
+    async fetchUserInfos() {
+
+      const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+      if (token) {
+        try {
+          const response = await axios.post('/api/getUserInfos', {
+            token: token // 토큰을 본문에 포함
+          });
+          this.name = response.data.name; // 사용자 정보를 변수에 저장
+          this.id = response.data.username;
+          this.phoneNumber = response.data.phoneNumber;
+          this.contact = response.data.phoneNumber;
+          this.birthDate = response.data.birthdate;
+          this.userPassword = response.data.password;
+
+          if (this.passengers.length > 0) {
+            this.passengers[0].passengerName = response.data.name;
+            this.passengers[0].birthDate = response.data.birthdate;
+          }
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
+      }
+    },
+
     async Payment() {
+      // eslint-disable-next-line no-debugger
+      debugger;
+
       if (!this.$store.getters.isAuthenticated) {
         // 현재 예약 정보를 Vuex에 저장
         this.$store.dispatch('saveBookingData', {
@@ -168,70 +207,65 @@ export default {
           children: this.children,
           travelClass: this.travelClass,
           totalPrice: this.totalPrice,
-          passengers: this.passengers
+          passengers: this.passengers,
+          nonStop: this.nonStop
         });
 
         // 로그인 페이지로 리다이렉트
         this.$router.push('/loginpage');
+
         return;
       }
 
 
-      // if (this.selectedFlightId !== null && (this.returnFlightId !== null || !this.returnDate)) {
-      //   try {
-      //
-      //     // 선택된 항공편 가격 계산
-      //     const selectedFlight = this.currentFlights.find(flight => flight.id === this.selectedFlightId);
-      //     this.totalPrice = selectedFlight.price;
-      //     if (this.returnFlightId) {
-      //       const returnFlight = this.currentFlights.find(flight => flight.id === this.returnFlightId);
-      //       this.totalPrice += returnFlight.price;
-      //     }
-      //     console.log('결제 정보:', {
-      //       user: this.userInfo,
-      //       totalAmount: this.totalPrice
-      //     });
+      try {
+        // 예약 데이터 저장
+        const reservationResponse = await axios.post('http://localhost:8080/api/reservation', {
+          member_Id: 6,
+          reservation_Id: Math.floor(Math.random() * 1000000), // 임의의 예약 ID 생성
+          flight_Id: this.outgoingFlight.id,
+          status: "예약대기",
+          trip_Type: this.tripType,
+          reservation_Date: new Date().toISOString(),
+          passenger_Name: this.passengers[0].passengerName,
+          phone_Number: this.phoneNumber,
+          passport_Number: "123123123",
+          passport_Expirydate: "123123123",
+          passport_Issuingcountry: "123123",
+          payment_Amount: this.totalPrice,
+          payment_Method: "카드",
+          nonstop: this.nonStop === "true" ? 1 : 0,
+          travelclass: this.travelClass,
+          adults: this.adults,
+          children: this.children
+        });
 
+        if (reservationResponse.data) {
+          // 결제 진행
           const IMP = window.IMP;
           IMP.init("imp12777257");
 
-          try {
-            IMP.request_pay(
-                {
-                  // param
-                  pg: "kakaopay",
-                  merchant_uid: `uid-${crypto.randomUUID()}`, // 주문 번호
-                  channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
-                  paymentId: `payment-${crypto.randomUUID()}`,
-                  name: "항공권~~",
-                  pay_method: "card",
-                  amount: 100000
-                },
-                function (rsp) {
-                  // callback
-                  if (rsp.success) {
-                    // 결제 성공 시
-                    console.log("결제 성공");
-                    this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
-                  } else {
-                    // 실패 시 로직
-                    console.log("결제 실패", rsp);
-                    this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
-                  }
-                }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
-            );
-          } catch (error) {
-            console.error("본인 인증 요청 실패:", error);
-            this.verificationMessage = '본인 인증 요청에 실패했습니다.';
-            this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
-          }
-          // 결제 api 호출 여기서 하기
-      //   } catch (error) {
-      //     console.error('결제 오류:', error);
-      //   }
-      // } else {
-      //   console.error('결제 정보를 확인해 주세요.');
-      // }
+          IMP.request_pay({
+            pg: "kakaopay",
+            merchant_uid: `uid-${crypto.randomUUID()}`,
+            channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
+            paymentId: `payment-${crypto.randomUUID()}`,
+            name: "항공권 예약",
+            pay_method: "card",
+            amount: this.totalPrice
+          }, function(rsp) {
+            if (rsp.success) {
+              console.log("결제 성공");
+              this.verificationSuccess = true;
+            } else {
+              console.log("결제 실패", rsp);
+              this.verificationSuccess = false;
+            }
+          }.bind(this));
+        }
+      } catch (error) {
+        console.error('예약 처리 중 오류 발생:', error);
+      }
     },
     Back() {
       this.$router.go(-1);

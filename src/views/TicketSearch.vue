@@ -322,6 +322,13 @@ export default {
         this.departureMutable = this.destinationMutable;
         this.destinationMutable = tempDeparture;
 
+        this.$outgoingFlight = {
+          ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
+          departure: this.departure,
+          destination: this.destination,
+          departureDate: this.departureDateMutable
+        };
+
 
         // 여정 단계를 'return'으로 변경
         this.journeyStage = 'return';
@@ -331,18 +338,16 @@ export default {
     },
 
     Payment() {
-
-      debugger;  // eslint-disable-line no-debugger
       // 선택한 항공권 정보 가져오기
-      const outgoingFlight = {
-        ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
-        departure: this.departure,
-        destination: this.destination,
-        departureDate: this.departureDateMutable
-      };
+      // const outgoingFlight = {
+      //   ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
+      //   departure: this.departure,
+      //   destination: this.destination,
+      //   departureDate: this.departureDateMutable
+      // };
 
       let returnFlight = null;
-      let totalPrice = parseFloat(outgoingFlight.price);
+      let totalPrice = parseFloat(this.$outgoingFlight.price);
 
       if (this.returnDateMutable) {
         returnFlight = {
@@ -359,19 +364,19 @@ export default {
         this.$router.push({
           name: 'MyPageReservationDetail',
           query: {
-            changeFlight: JSON.stringify(outgoingFlight)
+            changeFlight: JSON.stringify(this.$outgoingFlight)
           },
         });
-        alert(JSON.stringify(outgoingFlight));
-        alert(JSON.stringify(outgoingFlight.departureTime));
-        alert(JSON.stringify(outgoingFlight.arrivalTime));
-        alert(JSON.stringify(outgoingFlight.price));
+        alert(JSON.stringify(this.$outgoingFlight));
+        alert(JSON.stringify(this.$outgoingFlight.departureTime));
+        alert(JSON.stringify(this.$outgoingFlight.arrivalTime));
+        alert(JSON.stringify(this.$outgoingFlight.price));
       }else{
         // BookingDetail로 라우팅하며 데이터 전달
         this.$router.push({
           name: 'BookingDetail',
           query: {
-            outgoingFlight: JSON.stringify(outgoingFlight),
+            outgoingFlight: JSON.stringify(this.$outgoingFlight),
             returnFlight: JSON.stringify(returnFlight || {}),
             adults: this.adultsMutable,
             children: this.childrenMutable,
@@ -379,10 +384,27 @@ export default {
             departure: this.departure,
             destination: this.destination,
             totalPrice: totalPrice,
+            nonStop: this.nonStop
           }
         });
       }
 
+
+      // BookingDetail로 라우팅하며 데이터 전달
+      this.$router.push({
+        name: 'BookingDetail',
+        query: {
+          outgoingFlight: JSON.stringify(this.$outgoingFlight),
+          returnFlight: JSON.stringify(returnFlight || {}),
+          adults: this.adultsMutable,
+          children: this.childrenMutable,
+          travelClass: this.travelClassMutable,
+          departure: this.departure,
+          destination: this.destination,
+          totalPrice: totalPrice,
+          nonStop: this.nonStop
+        }
+      });
     },
 
     changePage(pageNumber) {
