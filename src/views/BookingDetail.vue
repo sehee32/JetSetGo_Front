@@ -119,7 +119,7 @@ export default {
       adults: 0,
       children: 0,
       nonStop:"",
-      tripType:"",
+      tripType:"왕복",
       travelClass: "",
       departureDate: "",
       returnDate: "",
@@ -127,7 +127,13 @@ export default {
       destination: "",
       passengers: [],
       expandedForms: [],
-      token : localStorage.getItem('token') // JWT 토큰 저장
+      token : localStorage.getItem('token'), // JWT 토큰 저장
+      birthDate: "",
+      name: "",
+      id: "",
+      phoneNumber: "",
+      contact: "",
+      userPassword: ""
     };
   },
   mounted() {
@@ -146,6 +152,7 @@ export default {
     this.departure = query.departure;
     this.destination = query.destination;
     this.totalPrice = parseFloat(query.totalPrice || 0);
+    this.nonStop = query.nonStop;
 
     // 총 승객 수 계산 및 초기화
     this.totalPassenger = this.adults + this.children;
@@ -163,6 +170,7 @@ export default {
 
   methods : {
     async fetchUserInfos() {
+
       const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
       if (token) {
         try {
@@ -187,6 +195,9 @@ export default {
     },
 
     async Payment() {
+      // eslint-disable-next-line no-debugger
+      debugger;
+
       if (!this.$store.getters.isAuthenticated) {
         // 현재 예약 정보를 Vuex에 저장
         this.$store.dispatch('saveBookingData', {
@@ -196,66 +207,65 @@ export default {
           children: this.children,
           travelClass: this.travelClass,
           totalPrice: this.totalPrice,
-          passengers: this.passengers
+          passengers: this.passengers,
+          nonStop: this.nonStop
         });
 
         // 로그인 페이지로 리다이렉트
         this.$router.push('/loginpage');
+
         return;
       }
 
-      await axios.post('http://localhost:8080/api/reservation', {
-        status: "예약대기",
-        tripType: this.tripType,
-        passengerName: this.passengerName,
-        totalPrice: this.totalPrice,
-        nonstop: this.nonstop,
-        travelClass: this.travelClass,
-        adults: this.adults,
-        children: this.children
-      })
 
+      try {
+        // 예약 데이터 저장
+        const reservationResponse = await axios.post('http://localhost:8080/api/reservation', {
+          member_Id: 6,
+          reservation_Id: Math.floor(Math.random() * 1000000), // 임의의 예약 ID 생성
+          flight_Id: this.outgoingFlight.id,
+          status: "예약대기",
+          trip_Type: this.tripType,
+          reservation_Date: new Date().toISOString(),
+          passenger_Name: this.passengers[0].passengerName,
+          phone_Number: this.phoneNumber,
+          passport_Number: "123123123",
+          passport_Expirydate: "123123123",
+          passport_Issuingcountry: "123123",
+          payment_Amount: this.totalPrice,
+          payment_Method: "카드",
+          nonstop: this.nonStop === "true" ? 1 : 0,
+          travelclass: this.travelClass,
+          adults: this.adults,
+          children: this.children
+        });
 
+        if (reservationResponse.data) {
+          // 결제 진행
           const IMP = window.IMP;
           IMP.init("imp12777257");
 
-          try {
-            IMP.request_pay(
-                {
-                  // param
-                  pg: "kakaopay",
-                  merchant_uid: `uid-${crypto.randomUUID()}`, // 주문 번호
-                  channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
-                  paymentId: `payment-${crypto.randomUUID()}`,
-                  name: "항공권~~",
-                  pay_method: "card",
-                  amount: 100000
-                },
-                function (rsp) {
-                  // callback
-                  if (rsp.success) {
-                    // 결제 성공 시
-                    console.log("결제 성공");
-                    this.verificationSuccess = true; // 인증 성공 시 변수 값을 true로 설정
-                  } else {
-                    // 실패 시 로직
-                    console.log("결제 실패", rsp);
-                    this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
-                  }
-                }.bind(this) // 함수 내부에서 this를 사용할 수 있도록 바인딩
-            );
-          } catch (error) {
-            console.error("본인 인증 요청 실패:", error);
-            this.verificationMessage = '본인 인증 요청에 실패했습니다.';
-            this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
-          }
-          // 결제 api 호출 여기서 하기
-      //   } catch (error) {
-      //     console.error('결제 오류:', error);
-      //   }
-      // } else {
-      //   console.error('결제 정보를 확인해 주세요.');
-      // }
+          IMP.request_pay({
+            pg: "kakaopay",
+            merchant_uid: `uid-${crypto.randomUUID()}`,
+            channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
+            paymentId: `payment-${crypto.randomUUID()}`,
+            name: "항공권 예약",
+            pay_method: "card",
+            amount: this.totalPrice
+          }, function(rsp) {
+            if (rsp.success) {
+              console.log("결제 성공");
+              this.verificationSuccess = true;
+            } else {
+              console.log("결제 실패", rsp);
+              this.verificationSuccess = false;
+            }
+          }.bind(this));
+        }
+      } catch (error) {
+        console.error('예약 처리 중 오류 발생:', error);
+      }
     },
     Back() {
       this.$router.go(-1);

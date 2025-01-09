@@ -337,8 +337,6 @@ export default {
     },
 
     Payment() {
-
-      debugger;  // eslint-disable-line no-debugger
       // 선택한 항공권 정보 가져오기
       // const outgoingFlight = {
       //   ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
