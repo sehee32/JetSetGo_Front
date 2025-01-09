@@ -67,26 +67,22 @@
           <div class="form-row">
             <div class="name-inputs">
               <div class="input-group">
-                <label class="form-text">승객 성<span class="required">*</span></label>
-                <input type="text" v-model="passenger.lastName" placeholder="예) 김 또는 KIM">
+                <label class="form-text">승객 이름<span class="required">*</span></label>
+                <input type="text" v-model="passenger.passengerName">
               </div>
               <div class="input-group">
-                <label class="form-text">승객 이름<span class="required">*</span></label>
-                <input type="text" v-model="passenger.firstName" placeholder="예) 대한 또는 DAEHAN">
+                <label class="form-text">성별<span class="required">*</span></label>
+                <select v-model="passenger.gender">
+                  <option value="female">여성</option>
+                  <option value="male">남성</option>
+                </select>
               </div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="input-group">
-              <label class="form-text">성별<span class="required">*</span></label>
-              <select v-model="passenger.gender">
-                <option value="female">여성</option>
-                <option value="male">남성</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <label class="form-text">생년월일(YYYY.MM.DD.)<span class="required">*</span></label>
+              <label class="form-text">생년월일(YYYY-MM-DD)<span class="required">*</span></label>
               <input type="text" v-model="passenger.birthDate" placeholder="예) 1990.01.01">
             </div>
           </div>
@@ -107,6 +103,8 @@
 
 <script>
 
+import axios from "axios";
+
 export default {
   props : {
 
@@ -120,14 +118,20 @@ export default {
       returnFlight: {},
       adults: 0,
       children: 0,
+      nonStop:"",
+      tripType:"",
       travelClass: "",
       departureDate: "",
       returnDate: "",
       departure: "",
       destination: "",
       passengers: [],
-      expandedForms: []
+      expandedForms: [],
+      token : localStorage.getItem('token') // JWT 토큰 저장
     };
+  },
+  mounted() {
+    this.fetchUserInfos();
   },
   created() {
     // 라우터에서 데이터 파싱
@@ -147,17 +151,41 @@ export default {
     this.totalPassenger = this.adults + this.children;
 
     this.passengers = Array.from({ length: this.totalPassenger }, () => ({
-      nationality: '',
-      lastName: '',
-      firstName: '',
-      gender: '',
-      birthDate: ''
+      nationality: "",
+      passengerName: "",
+      gender: "",
+      birthDate: "",
     }));
     this.expandedForms = Array(this.totalPassenger).fill(false);  // expandedForms도 총 승객 수에 맞게 초기화
     this.expandedForms[0] = true; // 첫번째 폼은 펼쳐짐
+
   },
 
   methods : {
+    async fetchUserInfos() {
+      const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+      if (token) {
+        try {
+          const response = await axios.post('/api/getUserInfos', {
+            token: token // 토큰을 본문에 포함
+          });
+          this.name = response.data.name; // 사용자 정보를 변수에 저장
+          this.id = response.data.username;
+          this.phoneNumber = response.data.phoneNumber;
+          this.contact = response.data.phoneNumber;
+          this.birthDate = response.data.birthdate;
+          this.userPassword = response.data.password;
+
+          if (this.passengers.length > 0) {
+            this.passengers[0].passengerName = response.data.name;
+            this.passengers[0].birthDate = response.data.birthdate;
+          }
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
+      }
+    },
+
     async Payment() {
       if (!this.$store.getters.isAuthenticated) {
         // 현재 예약 정보를 Vuex에 저장
@@ -176,21 +204,17 @@ export default {
         return;
       }
 
+      await axios.post('http://localhost:8080/api/reservation', {
+        status: "예약대기",
+        tripType: this.tripType,
+        passengerName: this.passengerName,
+        totalPrice: this.totalPrice,
+        nonstop: this.nonstop,
+        travelClass: this.travelClass,
+        adults: this.adults,
+        children: this.children
+      })
 
-      // if (this.selectedFlightId !== null && (this.returnFlightId !== null || !this.returnDate)) {
-      //   try {
-      //
-      //     // 선택된 항공편 가격 계산
-      //     const selectedFlight = this.currentFlights.find(flight => flight.id === this.selectedFlightId);
-      //     this.totalPrice = selectedFlight.price;
-      //     if (this.returnFlightId) {
-      //       const returnFlight = this.currentFlights.find(flight => flight.id === this.returnFlightId);
-      //       this.totalPrice += returnFlight.price;
-      //     }
-      //     console.log('결제 정보:', {
-      //       user: this.userInfo,
-      //       totalAmount: this.totalPrice
-      //     });
 
           const IMP = window.IMP;
           IMP.init("imp12777257");
