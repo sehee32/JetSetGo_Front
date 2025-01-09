@@ -291,8 +291,9 @@ export default {
         if (existingIndex === -1) {
           // flightId가 없는 경우 새 항목 추가
           this.changeFlight.push({
+            reservationId: this.reservationId,
             flightId: this.selectedFlightId,
-            changeDetail: JSON.parse(newValue),
+            changeDetail: JSON.parse(newValue)
           });
         } else {
           // flightId가 있는 경우 changeDetail 값만 변경
