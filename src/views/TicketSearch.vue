@@ -347,6 +347,21 @@ export default {
       //   departureDate: this.departureDateMutable
       // };
 
+      // 바로 결제하기로 넘어왔을 경우 현재 선택한 값 검색 후 변수에 저장 추가
+      if (this.journeyStage === 'outgoing' && this.selectedFlightId !== null) {
+        // 출발지랑 목적지 스왑
+        const tempDeparture = this.departureMutable;
+        this.departureMutable = this.destinationMutable;
+        this.destinationMutable = tempDeparture;
+
+        this.$outgoingFlight = {
+          ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
+          departure: this.departure,
+          destination: this.destination,
+          departureDate: this.departureDateMutable
+        };
+      }
+
       let returnFlight = null;
       let totalPrice = parseFloat(this.$outgoingFlight.price);
 
@@ -358,8 +373,10 @@ export default {
           departureDate: this.returnDepartureDateMutable,
         };
 
+
         totalPrice += parseFloat(returnFlight.price);
       }
+
       if(this.reservationChangeMode){
         //예약 변경 시 사용 부분 추가
         this.$router.push({
@@ -371,7 +388,7 @@ export default {
         alert(JSON.stringify(this.$outgoingFlight));
         alert(JSON.stringify(this.$outgoingFlight.departureTime));
         alert(JSON.stringify(this.$outgoingFlight.arrivalTime));
-        alert(JSON.stringify(this.$outgoingFlight.price));
+        // alert(JSON.stringify(this.$outgoingFlight.price));
       }else{
         // BookingDetail로 라우팅하며 데이터 전달
         this.$router.push({
@@ -390,22 +407,6 @@ export default {
         });
       }
 
-
-      // BookingDetail로 라우팅하며 데이터 전달
-      this.$router.push({
-        name: 'BookingDetail',
-        query: {
-          outgoingFlight: JSON.stringify(this.$outgoingFlight),
-          returnFlight: JSON.stringify(returnFlight || {}),
-          adults: this.adultsMutable,
-          children: this.childrenMutable,
-          travelClass: this.travelClassMutable,
-          departure: this.departure,
-          destination: this.destination,
-          totalPrice: totalPrice,
-          nonStop: this.nonStop
-        }
-      });
     },
 
     changePage(pageNumber) {
