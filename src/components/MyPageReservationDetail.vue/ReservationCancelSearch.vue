@@ -42,9 +42,15 @@
               </v-row>
               <h4 class="paymentAmount">결제 금액 : {{paymentAmount(item.payment_Amount)}} 원</h4>
             </div>
+            <!-- 수정 시 확인 -->
+            <div v-if="getInChangeFlight(item)" class="ChangeFlight">
+              <h4>변경내역</h4>
+              <p>{{ item.departureTime }} ~ {{ item.arrivalTime }} ▶ {{convertToTime(getChangeFlight(item).changeDetail.departureTime)}} ~ {{convertToTime(getChangeFlight(item).changeDetail.arrivalTime)}}</p>
+              <p>{{paymentAmount(item.payment_Amount)}} 원 ▶ {{paymentAmount(getChangeFlight(item).changeDetail.price)}} 원 </p>
+              <p>결과 :{{ changeFlight }}</p>
+            </div>
           </div>
-          <p>결과 :{{ changeFlight }}</p>
-          <p>test: {{$route.query.changeFlight}}</p>
+
           <div v-if="selectedFlightId" class="view">
             <!-- 중첩 라우팅 -->
             <router-view :key="selectedFlightId"></router-view>
@@ -96,7 +102,7 @@ export default {
       passportExpiryDateMenu: false,
       currentPassportDialog: false,
       selectedFlightId: '', //현재 선택된 ID
-      changeFlight: this.$route.query.changeFlight || [], // 결과
+      changeFlight: [], // 결과
       rules: {
         required: value => (value !== null && value !== '') || '이 항목을 입력하지 않았습니다.' ,// 필수 입력 규칙
       },
@@ -212,35 +218,24 @@ export default {
     goBack(){
       this.$emit('deactivateCancelSearch');
     },
-    goChange(){
-      if (!Array.isArray(this.selectedFlightId) || this.selectedFlightId.length === 0) {
-        alert('선택한 항공편이 없습니다.');
+    async goChange(){
+      if (this.selectedFlightChangeId.length === this.changeFlight.length) {
+        const response = await axios.post('/api/myPageReservationChangeDetailsData', this.changeFlight );
+        // API 요청이 성공한 경우
+        console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+        if(response.data){
+          alert('변경되었습니다.');
+          this.$emit('goDetail');
+        }else{
+          alert('변경실패 : 관리자에게 문의하세요.');
+        }
+
       } else {
-        // 선택한 항공편이 있을 경우 처리할 로직
-        this.selectPage = false;
-        // 예매 정보 처리 메서드
-
-        const formattedDepartureDate = this.formatDate('2024-12-30');
-        const formattedReturnDate = this.returnDate ? this.formatDate('2024-12-31') : null; // 오는 날이 없을 경우 null로 처리
-
-        this.$router.push({
-          name: 'TicketCancelSearch' ,
-          query: {
-            departure: 'ICN',
-            destination: 'NRT',
-            departureDate: formattedDepartureDate,
-            returnDate: formattedReturnDate,
-            adults: Number(1),
-            children: Number(0),
-            travelClass: 'ECONOMY',
-            nonStop: true
-          }
-        });
+        alert('변경하지 않은 예약이 있습니다.');
       }
 
       // 리렌더링 강제
       this.$forceUpdate();
-
 
     },
     formatDate(date) {
@@ -250,6 +245,21 @@ export default {
       const month = String(d.getMonth() + 1).padStart(2, '0'); // 월을 2자리로 맞추기
       const day = String(d.getDate()).padStart(2, '0'); // 일을 2자리로 맞추기
       return `${year}-${month}-${day}`;
+    },
+    getInChangeFlight(item) {
+      const index = this.changeFlight.findIndex((flight) => flight.flightId === item.flight_Id);
+
+      return index !== -1 ? true : false;
+    },
+    getChangeFlight(item){
+      const index = this.changeFlight.findIndex((flight) => flight.flightId === item.flight_Id);
+
+        return index !== -1 ? this.changeFlight[index] : [{changeDetail:{departureTime : "", arrivalTime : ""}}];
+    },
+    convertToTime(dateTime) {
+      const date = new Date(dateTime);
+      const time = date.toLocaleTimeString('en-GB', { hour12: false });  // '11:00:00'
+      return time;
     }
   },
   mounted() {
@@ -271,16 +281,28 @@ export default {
     // $route 객체를 직접 감시
     '$route.query.changeFlight': function(newValue) {
       if (newValue && this.selectedFlightId) {
-        // 값이 변경되었을 때 수행할 작업
-        alert('changeFlight 값이 변경되었습니다: ' + newValue);
+
+
+        // changeFlight 배열에서 flightId가 selectedFlightId와 같은 항목 찾기
+        const existingIndex = this.changeFlight.findIndex(
+            (flight) => flight.flightId === this.selectedFlightId
+        );
+
+        if (existingIndex === -1) {
+          // flightId가 없는 경우 새 항목 추가
+          this.changeFlight.push({
+            flightId: this.selectedFlightId,
+            changeDetail: JSON.parse(newValue),
+          });
+        } else {
+          // flightId가 있는 경우 changeDetail 값만 변경
+          this.changeFlight[existingIndex].changeDetail = newValue;
+        }
+        this.selectedFlightId = '';
+
       }
     }
-  },
-  // updated() {
-  //   if (this.$route.query.changeFlight) {
-  //     alert('changeFlight 값이 변경되었습니다: ' + this.$route.query.changeFlight);
-  //   }
-  // }
+  }
 }
 </script>
 

@@ -258,6 +258,7 @@ export default {
     }
   },
   mounted() {
+    this.$router.replace({ query: {} });  // URL 쿼리 비우기
       const element = document.querySelector('.v-application__wrap');
       if (element) {
         element.style.minHeight = 'initial';

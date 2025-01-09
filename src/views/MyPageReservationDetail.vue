@@ -3,8 +3,7 @@
   <ReservationPayment v-if="!isCancelMode && !isCancelSearchMode" />
   <ReservationBtns @activateCancel="activateCancel" v-if="!isCancelMode && !isCancelSearchMode" />
   <ReservationCancel @deactivateCancel="deactivateCancel" @activateCancelSearch="activateCancelSearch" v-if="isCancelMode" />
-  <ReservationCancelSearch @deactivateCancelSearch="deactivateCancelSearch" v-if="isCancelSearchMode" />
-  {{$route.query.changeFlight}}
+  <ReservationCancelSearch @deactivateCancelSearch="deactivateCancelSearch" @goDetail="goDetail" v-if="isCancelSearchMode" />
 </template>
 
 <script>
@@ -42,6 +41,10 @@ export default {
     },
     deactivateCancelSearch() {
       this.isCancelMode = true; // 취소 모드 활성화
+      this.isCancelSearchMode = false; // 취소 검색 모드 비활성화
+    },
+    goDetail() {
+      this.isCancelMode = false; // 취소 모드 활성화
       this.isCancelSearchMode = false; // 취소 검색 모드 비활성화
     },
   },

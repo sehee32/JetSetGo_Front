@@ -385,10 +385,10 @@ export default {
             changeFlight: JSON.stringify(this.$outgoingFlight)
           },
         });
-        alert(JSON.stringify(this.$outgoingFlight));
-        alert(JSON.stringify(this.$outgoingFlight.departureTime));
-        alert(JSON.stringify(this.$outgoingFlight.arrivalTime));
-        // alert(JSON.stringify(this.$outgoingFlight.price));
+        // alert(JSON.stringify(this.$outgoingFlight)); //확인용
+        // alert(JSON.stringify(this.$outgoingFlight.departureTime)); //확인용
+        // alert(JSON.stringify(this.$outgoingFlight.arrivalTime)); //확인용
+        // alert(JSON.stringify(this.$outgoingFlight.price)); //확인용
       }else{
         // BookingDetail로 라우팅하며 데이터 전달
         this.$router.push({
