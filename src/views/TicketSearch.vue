@@ -139,7 +139,8 @@ export default {
     adults: Number,
     children: Number,
     travelClass: String,
-    nonStop: Boolean
+    nonStop: Boolean,
+    reservationChange: Boolean,
   },
   data() {
     return {
@@ -170,7 +171,7 @@ export default {
       isScheduleChangeOpen: false,
       showSchedulePanel: false,
       totalPrice : 0,
-      reservationChangeMode : true // 예약 변경 시 사용 모드
+      reservationChangeMode : this.reservationChange // 예약 변경 시 사용 모드
     };
   },
 

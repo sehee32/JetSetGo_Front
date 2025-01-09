@@ -197,7 +197,8 @@ export default {
             adults: item.adults,
             children: item.children,
             travelClass: item.travelclass,
-            nonStop: item.nonstop === 1
+            nonStop: item.nonstop === 1,
+            reservationChange: true
           }
         }).then(() => {
           // 라우팅이 완료된 후에 설정

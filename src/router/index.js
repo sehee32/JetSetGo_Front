@@ -86,7 +86,8 @@ const routes = [
           adults: Number(route.query.adults),
           children: Number(route.query.children),
           travelClass: route.query.travelClass,
-          nonStop: route.query.nonStop === 'true'
+          nonStop: route.query.nonStop === 'true',
+          reservationChange: route.query.reservationChange === 'true'
         })
       }
     ]
