@@ -364,7 +364,7 @@ export default {
   text-align: center;
   line-height: 30px;
   font-size: 15px;
-  color: #777;
+  color: #666666;
 }
 
 .reservationDetail .costom-box .detail p strong{
