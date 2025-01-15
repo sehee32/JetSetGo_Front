@@ -119,7 +119,7 @@ export default {
       adults: 0,
       children: 0,
       nonStop:"",
-      tripType:"왕복",
+      tripType:"",
       travelClass: "",
       departureDate: "",
       returnDate: "",
@@ -133,7 +133,8 @@ export default {
       id: "",
       phoneNumber: "",
       contact: "",
-      userPassword: ""
+      userPassword: "",
+      member_Id: 0,
     };
   },
   mounted() {
@@ -153,6 +154,7 @@ export default {
     this.destination = query.destination;
     this.totalPrice = parseFloat(query.totalPrice || 0);
     this.nonStop = query.nonStop;
+    this.tripType = this.returnFlight && Object.keys(this.returnFlight).length > 0 ? "왕복" : "편도";
 
     // 총 승객 수 계산 및 초기화
     this.totalPassenger = this.adults + this.children;
@@ -171,6 +173,9 @@ export default {
   methods : {
     async fetchUserInfos() {
 
+      // eslint-disable-next-line no-debugger
+      debugger;
+
       const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
       if (token) {
         try {
@@ -183,6 +188,7 @@ export default {
           this.contact = response.data.phoneNumber;
           this.birthDate = response.data.birthdate;
           this.userPassword = response.data.password;
+          this.member_Id = response.data.membernum;
 
           if (this.passengers.length > 0) {
             this.passengers[0].passengerName = response.data.name;
@@ -219,9 +225,9 @@ export default {
 
 
       try {
-        // 예약 데이터 저장
+        // 예약 데이터 먼저 저장
         const reservationResponse = await axios.post('http://localhost:8080/api/reservation', {
-          member_Id: 6,
+          member_Id: this.member_Id,
           reservation_Id: Math.floor(Math.random() * 1000000), // 임의의 예약 ID 생성
           flight_Id: this.outgoingFlight.id,
           status: "예약대기",
