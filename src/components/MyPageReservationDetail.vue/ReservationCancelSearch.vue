@@ -54,7 +54,7 @@
                   <p>▶</p>
                 </v-col>
                 <v-col>
-                  <p>{{convertToTime(getChangeFlight(item).changeDetail.departureTime)}} ~ {{convertToTime(getChangeFlight(item).changeDetail.arrivalTime)}}</p>
+                  <p>{{convertToTime(getChangeFlight(item).changeDetail?.departureTime)}} ~ {{convertToTime(getChangeFlight(item).changeDetail.arrivalTime)}}</p>
                   <p>{{paymentAmount(getChangeFlight(item).changeDetail.price)}} 원</p>
                 </v-col>
               </v-row>
@@ -264,6 +264,8 @@ export default {
     },
     getChangeFlight(item){
       const index = this.changeFlight.findIndex((flight) => flight.flightId === item.flight_Id);
+      console.log(this.changeFlight[index].changeDetail.departureTime);
+      console.log(this.changeFlight[index].changeDetail);
 
         return index !== -1 ? this.changeFlight[index] : [{changeDetail:{departureTime : "", arrivalTime : ""}}];
     },
@@ -308,7 +310,7 @@ export default {
           });
         } else {
           // flightId가 있는 경우 changeDetail 값만 변경
-          this.changeFlight[existingIndex].changeDetail = newValue;
+          this.changeFlight[existingIndex].changeDetail = JSON.parse(newValue);
         }
         this.selectedFlightId = '';
 
