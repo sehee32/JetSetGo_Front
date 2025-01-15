@@ -123,6 +123,11 @@ const routes = [
     path: '/BookingDetail',
     name: 'BookingDetail',
     component: () => import(/* webpackChunkName: "about" */ '../views/BookingDetail.vue'),
+  },
+  {
+    path: '/paymentcompleted',
+    name: 'PaymentCompleted',
+    component: () => import(/* webpackChunkName: "about" */ '../views/PaymentCompleted'),
   }
 
 
