@@ -44,10 +44,21 @@
             </div>
             <!-- 수정 시 확인 -->
             <div v-if="getInChangeFlight(item)" class="ChangeFlight">
-              <h4>변경내역</h4>
-              <p>{{ item.departureTime }} ~ {{ item.arrivalTime }} ▶ {{convertToTime(getChangeFlight(item).changeDetail.departureTime)}} ~ {{convertToTime(getChangeFlight(item).changeDetail.arrivalTime)}}</p>
-              <p>{{paymentAmount(item.payment_Amount)}} 원 ▶ {{paymentAmount(getChangeFlight(item).changeDetail.price)}} 원 </p>
-              <p>결과 :{{ changeFlight }}</p>
+              <v-row>
+                <v-col>
+                  <p>{{ item.departureTime }} ~ {{ item.arrivalTime }}</p>
+                  <p>{{paymentAmount(item.payment_Amount)}} 원</p>
+                </v-col>
+                <v-col cols="2">
+                  <p>▶</p>
+                  <p>▶</p>
+                </v-col>
+                <v-col>
+                  <p>{{convertToTime(getChangeFlight(item).changeDetail.departureTime)}} ~ {{convertToTime(getChangeFlight(item).changeDetail.arrivalTime)}}</p>
+                  <p>{{paymentAmount(getChangeFlight(item).changeDetail.price)}} 원</p>
+                </v-col>
+              </v-row>
+<!--              <p>결과 :{{ changeFlight }}</p>-->
             </div>
           </div>
 
@@ -393,7 +404,7 @@ export default {
 }
 
 .reservationDetail .costom-box .detail{
-  padding: 30px 40px 50px 40px;
+  padding: 30px 40px 30px 40px;
 }
 
 .reservationDetail .costom-box .detail .detailTitle{
@@ -416,7 +427,7 @@ export default {
   text-align: center;
   line-height: 30px;
   font-size: 15px;
-  color: #777;
+  color: #666666;
 }
 
 .reservationDetail .costom-box .detail p strong{
@@ -453,7 +464,20 @@ export default {
   border: 2px solid #00256c; /* 선택된 항공편의 테두리 변경 */
 }
 
+/* 수정 시 확인 */
+.reservationDetail .costom-box .ChangeFlight{
+  background-color: #00256c;
+  color: white;
+  border-radius: 0 0 10px 10px;
+  padding: 30px 40px 30px 40px;
+  box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2); /* 수평 오프셋, 수직 오프셋, 흐림 정도, 색상 */
+}
 
+.reservationDetail .costom-box .ChangeFlight p{
+  color: white;
+  text-align: center;
+  font-size: 24px;
+}
 
 
 /* 검색화면 */
@@ -497,4 +521,6 @@ export default {
   background-color: #00256c;
   color: #fff;
 }
+
+
 </style>

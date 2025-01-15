@@ -207,7 +207,7 @@ export default {
   margin-left: auto;
   min-width: 34px;
   padding: 18px 20px;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 2;
   border: 1px solid #00256c;
