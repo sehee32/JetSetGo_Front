@@ -201,8 +201,11 @@ export default {
     },
 
     async Payment() {
-      // eslint-disable-next-line no-debugger
-      debugger;
+      const IMP = window.IMP;
+      IMP.init("imp12777257");
+
+      //merchant_uid 들어갈 예약 시간 저장
+      const date = new Date().toISOString()
 
       if (!this.$store.getters.isAuthenticated) {
         // 현재 예약 정보를 Vuex에 저장
@@ -223,55 +226,66 @@ export default {
         return;
       }
 
-
       try {
         // 예약 데이터 먼저 저장
-        const reservationResponse = await axios.post('http://localhost:8080/api/reservation', {
+        await axios.post('/api/reservation', {
           member_Id: this.member_Id,
           reservation_Id: Math.floor(Math.random() * 1000000), // 임의의 예약 ID 생성
           flight_Id: this.outgoingFlight.id,
           status: "예약대기",
           trip_Type: this.tripType,
-          reservation_Date: new Date().toISOString(),
+          reservation_Date: date,
           passenger_Name: this.passengers[0].passengerName,
           phone_Number: this.phoneNumber,
           passport_Number: "123123123",
           passport_Expirydate: "123123123",
           passport_Issuingcountry: "123123",
           payment_Amount: this.totalPrice,
-          payment_Method: "카드",
+          payment_Method: "card",
           nonstop: this.nonStop === "true" ? 1 : 0,
           travelclass: this.travelClass,
           adults: this.adults,
           children: this.children
         });
-
-        if (reservationResponse.data) {
+        this.verificationSuccess = true;
+      } catch (error) {
+        console.error("[ERROR] 예약 실패:", error);
+        this.verificationMessage = '[ERROR] 예약을 실패했습니다.';
+        this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
+      }
+      try {
+        if (this.verificationSuccess) {
           // 결제 진행
-          const IMP = window.IMP;
-          IMP.init("imp12777257");
-
           IMP.request_pay({
+            // param
             pg: "kakaopay",
-            merchant_uid: `uid-${crypto.randomUUID()}`,
+            merchant_uid: "uid_" + this.member_Id + date,   // 주문 번호
             channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
             paymentId: `payment-${crypto.randomUUID()}`,
             name: "항공권 예약",
             pay_method: "card",
             amount: this.totalPrice
-          }, function(rsp) {
-            if (rsp.success) {
-              console.log("결제 성공");
-              this.verificationSuccess = true;
-            } else {
-              console.log("결제 실패", rsp);
-              this.verificationSuccess = false;
-            }
+          }, async function (rsp) {
+            // callback
+            this.verificationSuccess = rsp.success
+            console.log("결제 결과: ", rsp)
+
+            /* 결제 완료 내역 DB 저장 */
+            const response = await axios.post('/api/payment', {
+              status: this.verificationSuccess,
+              amount: this.totalPrice
+
+            });
+            console.log(response.data); // 서버로부터의 응답 확인
           }.bind(this));
         }
       } catch (error) {
-        console.error('예약 처리 중 오류 발생:', error);
+        console.error("[ERROR] 결제 실패:", error);
+        this.verificationMessage = '[ERROR] 결제가 실패했습니다.';
+        this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
       }
+
+
     },
     Back() {
       this.$router.go(-1);
