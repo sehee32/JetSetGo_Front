@@ -236,31 +236,37 @@ export default {
         arrivalTime: dayjs(this.outgoingFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
         originlocationcode: this.outgoingFlight.departure,
         destinationlocationcode: this.outgoingFlight.destination,
-        departureCity: this.outgoingFlight.departureCity,
-        arrivalCity: this.outgoingFlight.arrivalCity,
+        // departureCity: this.outgoingFlight.departureCity,
+        // arrivalCity: this.outgoingFlight.arrivalCity,
+        departureCity: "인천",
+        arrivalCity: "오사카",
       };
 
-      const outgoingResponse = await axios.post("/api/saveFlight", outgoingFlightData);
-      const outgoingFlightId = outgoingResponse.data.flight_Id;
+      try {
+        const outgoingResponse = await axios.post("/api/myPageReservationChangeDetailsData", [outgoingFlightData]);
+        const outgoingFlightId = outgoingResponse.data.flight_Id;
 
-      let returnFlightId = null;
+        let returnFlightId = null;
 
-      if (this.tripType === "왕복") {
-        const returnFlightData = {
-          departureTime: dayjs(this.returnFlight.departureTime).format("YYYY-MM-DD HH:mm:ss"),
-          arrivalTime: dayjs(this.returnFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
-          originlocationcode: this.returnFlight.departure,
-          destinationlocationcode: this.returnFlight.destination,
-          departureCity: this.returnFlight.departureCity,
-          arrivalCity: this.returnFlight.arrivalCity,
-        };
+        if (this.tripType === "왕복") {
+          const returnFlightData = {
+            departureTime: dayjs(this.returnFlight.departureTime).format("YYYY-MM-DD HH:mm:ss"),
+            arrivalTime: dayjs(this.returnFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
+            originlocationcode: this.returnFlight.departure,
+            destinationlocationcode: this.returnFlight.destination,
+            departureCity: "오사카", // city는 일단 임시로 적어놨엉^^..
+            arrivalCity: "인천",
+          };
 
-        const returnResponse = await axios.post("/api/saveFlight", returnFlightData);
-        returnFlightId = returnResponse.data.flightId;
+          const returnResponse = await axios.post("/api/myPageReservationChangeDetailsData", [returnFlightData]);
+          returnFlightId = returnResponse.data.flightId;
+        }
+
+        console.log("출발 항공편 ID:", outgoingFlightId);
+        console.log("왕복 항공편 ID:", returnFlightId);
+      } catch (error) {
+        console.error("[ERROR] 항공편 데이터 전송 실패:", error);
       }
-
-      console.log("출발 항공편 ID:", outgoingFlightId);
-      console.log("왕복 항공편 ID:", returnFlightId);
 
       try {
         // 예약 데이터 먼저 저장
