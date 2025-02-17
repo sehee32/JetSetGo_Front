@@ -104,6 +104,7 @@
 <script>
 
 import axios from "axios";
+import dayjs from "dayjs";
 
 export default {
   props : {
@@ -145,6 +146,10 @@ export default {
     const query = this.$route.query;
     this.outgoingFlight = JSON.parse(decodeURIComponent(query.outgoingFlight || '{}'));
     this.returnFlight = JSON.parse(decodeURIComponent(query.returnFlight || '{}'));
+
+    console.log("outgoingFlight:", this.outgoingFlight);
+    console.log("returnFlight:", this.returnFlight);
+
     this.adults = parseInt(query.adults || 0, 10);
     this.children = parseInt(query.children || 0, 10);
     this.travelClass = query.travelClass;
@@ -225,6 +230,37 @@ export default {
 
         return;
       }
+
+      const outgoingFlightData = {
+        departureTime: dayjs(this.outgoingFlight.departureTime).format("YYYY-MM-DD HH:mm:ss"),
+        arrivalTime: dayjs(this.outgoingFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
+        originlocationcode: this.outgoingFlight.departure,
+        destinationlocationcode: this.outgoingFlight.destination,
+        departureCity: this.outgoingFlight.departureCity,
+        arrivalCity: this.outgoingFlight.arrivalCity,
+      };
+
+      const outgoingResponse = await axios.post("/api/saveFlight", outgoingFlightData);
+      const outgoingFlightId = outgoingResponse.data.flight_Id;
+
+      let returnFlightId = null;
+
+      if (this.tripType === "왕복") {
+        const returnFlightData = {
+          departureTime: dayjs(this.returnFlight.departureTime).format("YYYY-MM-DD HH:mm:ss"),
+          arrivalTime: dayjs(this.returnFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
+          originlocationcode: this.returnFlight.departure,
+          destinationlocationcode: this.returnFlight.destination,
+          departureCity: this.returnFlight.departureCity,
+          arrivalCity: this.returnFlight.arrivalCity,
+        };
+
+        const returnResponse = await axios.post("/api/saveFlight", returnFlightData);
+        returnFlightId = returnResponse.data.flightId;
+      }
+
+      console.log("출발 항공편 ID:", outgoingFlightId);
+      console.log("왕복 항공편 ID:", returnFlightId);
 
       try {
         // 예약 데이터 먼저 저장
