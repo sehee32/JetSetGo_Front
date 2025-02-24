@@ -125,7 +125,9 @@ export default {
       departureDate: "",
       returnDate: "",
       departure: "",
+      departureCity:"",
       destination: "",
+      destinationCity:"",
       passengers: [],
       expandedForms: [],
       token : localStorage.getItem('token'), // JWT 토큰 저장
@@ -156,7 +158,9 @@ export default {
     this.departureDate = query.departureDate;
     this.returnDate = query.returnDate;
     this.departure = query.departure;
+    this.departureCity = query.departureCity;
     this.destination = query.destination;
+    this.destinationCity = query.destinationCity;
     this.totalPrice = parseFloat(query.totalPrice || 0);
     this.nonStop = query.nonStop;
     this.tripType = this.returnFlight && Object.keys(this.returnFlight).length > 0 ? "왕복" : "편도";
@@ -231,64 +235,57 @@ export default {
         return;
       }
 
+      const flightData = [];
+
       const outgoingFlightData = {
-        departureTime: dayjs(this.outgoingFlight.departureTime).format("YYYY-MM-DD HH:mm:ss"),
-        arrivalTime: dayjs(this.outgoingFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
+        departureTime: dayjs(this.outgoingFlight.departureTime).format("YYYY-MM-DDTHH:mm:ss"),
+        arrivalTime: dayjs(this.outgoingFlight.arrivalTime).format("YYYY-MM-DDTHH:mm:ss"),
         originlocationcode: this.outgoingFlight.departure,
         destinationlocationcode: this.outgoingFlight.destination,
-        // departureCity: this.outgoingFlight.departureCity,
-        // arrivalCity: this.outgoingFlight.arrivalCity,
-        departureCity: "인천",
-        arrivalCity: "오사카",
+        departureCity: this.departureCity,
+        arrivalCity: this.destinationCity,
       };
 
-      try {
-        const outgoingResponse = await axios.post("/api/myPageReservationChangeDetailsData", [outgoingFlightData]);
-        const outgoingFlightId = outgoingResponse.data.flight_Id;
+      flightData.push(outgoingFlightData);
 
-        let returnFlightId = null;
+      if (this.tripType === "왕복" && this.returnFlight && this.returnFlight.departure) {
+        const returnFlightData = {
+          departureTime: dayjs(this.returnFlight.departureTime).format("YYYY-MM-DD HH:mm:ss"),
+          arrivalTime: dayjs(this.returnFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
+          originlocationcode: this.returnFlight.departure,
+          destinationlocationcode: this.returnFlight.destination,
+          departureCity: this.destinationCity,
+          arrivalCity: this.departureCity,
+        };
 
-        if (this.tripType === "왕복") {
-          const returnFlightData = {
-            departureTime: dayjs(this.returnFlight.departureTime).format("YYYY-MM-DD HH:mm:ss"),
-            arrivalTime: dayjs(this.returnFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
-            originlocationcode: this.returnFlight.departure,
-            destinationlocationcode: this.returnFlight.destination,
-            departureCity: "오사카", // city는 일단 임시로 적어놨엉^^..
-            arrivalCity: "인천",
-          };
-
-          const returnResponse = await axios.post("/api/myPageReservationChangeDetailsData", [returnFlightData]);
-          returnFlightId = returnResponse.data.flightId;
-        }
-
-        console.log("출발 항공편 ID:", outgoingFlightId);
-        console.log("왕복 항공편 ID:", returnFlightId);
-      } catch (error) {
-        console.error("[ERROR] 항공편 데이터 전송 실패:", error);
+        flightData.push(returnFlightData);
       }
+
+      const response = await axios.post("/api/reservation/flights", flightData);
+      console.log("저장된 항공편 ID:", response.data);
 
       try {
         // 예약 데이터 먼저 저장
-        await axios.post('/api/reservation', {
-          member_Id: this.member_Id,
-          reservation_Id: Math.floor(Math.random() * 1000000), // 임의의 예약 ID 생성
-          flight_Id: this.outgoingFlight.id,
-          status: "예약대기",
-          trip_Type: this.tripType,
-          reservation_Date: date,
-          passenger_Name: this.passengers[0].passengerName,
-          phone_Number: this.phoneNumber,
-          passport_Number: "123123123",
-          passport_Expirydate: "123123123",
-          passport_Issuingcountry: "123123",
-          payment_Amount: this.totalPrice,
-          payment_Method: "card",
-          nonstop: this.nonStop === "true" ? 1 : 0,
-          travelclass: this.travelClass,
-          adults: this.adults,
-          children: this.children
-        });
+        for (let i=0; i < this.passengers.length; i++) {
+          await axios.post('/api/reservation', {
+            member_Id: this.member_Id,
+            reservation_Id: this.member_Id + this.passengers[0].passengerName + date,
+            status: "예약대기",
+            trip_Type: this.tripType,
+            reservation_Date: date,
+            passenger_Name: this.passengers[i].passengerName,
+            phone_Number: this.phoneNumber,
+            passport_Number: "123123123",
+            passport_Expirydate: "123123123",
+            passport_Issuingcountry: "123123",
+            payment_Amount: this.totalPrice,
+            payment_Method: "card",
+            nonstop: this.nonStop === "true" ? 1 : 0,
+            travelclass: this.travelClass,
+            adults: this.adults,
+            children: this.children
+          });
+        }
         this.verificationSuccess = true;
       } catch (error) {
         console.error("[ERROR] 예약 실패:", error);

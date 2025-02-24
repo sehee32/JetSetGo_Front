@@ -108,10 +108,10 @@
       <v-col cols="12" class="text-center">
         <v-btn
             v-for="pageNumber in Math.ceil(currentFlights.length / flightsPerPage)"
-               :key="pageNumber"
-               :class="['pagination-btn', {'active': currentPage === pageNumber}]"
-               @click="changePage(pageNumber)"
-               class="mx-2"
+            :key="pageNumber"
+            :class="['pagination-btn', {'active': currentPage === pageNumber}]"
+            @click="changePage(pageNumber)"
+            class="mx-2"
         >
           {{ pageNumber }}
         </v-btn>
@@ -130,7 +130,9 @@ export default {
   },
   props: {
     departure: String,
+    departureCity: String,
     destination: String,
+    destinationCity: String,
     departureDate: String,
     returnDate: {
       type: String,
@@ -149,8 +151,9 @@ export default {
       returnFlightId: null, // 선택된 돌아오는 항공편 ID
       journeyStage: 'outgoing', // 현재 여정 단계 ('outgoing' 또는 'return')
       departureMutable: this.departure, // 수정 가능한 출발지
+      departureCityMutable: this.departureCity,
       destinationMutable: this.destination, // 수정 가능한 도착지
-
+      destinationCityMutable: this.destinationCity,
       departureDateMutable: this.departureDate, // 수정 가능한 출발 날짜
       returnDateMutable: this.returnDate,
       returnDepartureDateMutable: this.returnDate,
@@ -254,7 +257,9 @@ export default {
     },
     handleScheduleUpdate(newSchedule) {
       this.departureMutable = newSchedule.departure;
+      this.departureCityMutable = newSchedule.departureCity;
       this.destinationMutable = newSchedule.destination;
+      this.destinationCityMutable = newSchedule.destinationCity;
       this.departureDateMutable = newSchedule.departureDate;
       this.returnDateMutable = newSchedule.returnDate;
       this.adultsMutable = newSchedule.adults;
@@ -268,6 +273,14 @@ export default {
       this.returnFlightId = null;
 
       this.showSchedulePanel = false;
+
+      this.$nextTick(() => {
+        console.log("업데이트된 출발지:", this.departureMutable , this.departureCityMutable);
+        console.log("업데이트된 도착지:", this.destinationMutable , this.destinationCityMutable);
+        console.log("업뎃 출발일,도착일:", this.departureDateMutable , this.returnDateMutable);
+        console.log("업뎃 성인,아동,클래스,직항여부: ", this.adultsMutable , this.childrenMutable , this.travelClassMutable , this.nonStopMutable);
+      });
+
       this.searchFlights(); // 항공권 재검색
     },
 
@@ -339,13 +352,7 @@ export default {
     },
 
     Payment() {
-      // 선택한 항공권 정보 가져오기
-      // const outgoingFlight = {
-      //   ...this.currentFlights.find(flight => flight.id === this.selectedFlightId),
-      //   departure: this.departure,
-      //   destination: this.destination,
-      //   departureDate: this.departureDateMutable
-      // };
+
 
       // 바로 결제하기로 넘어왔을 경우 현재 선택한 값 검색 후 변수에 저장 추가
       if (this.journeyStage === 'outgoing' && this.selectedFlightId !== null) {
@@ -377,36 +384,49 @@ export default {
         totalPrice += parseFloat(returnFlight.price);
       }
 
-      if(this.reservationChangeMode){
-        //예약 변경 시 사용 부분 추가
-        this.$router.push({
-          name: 'MyPageReservationDetail',
-          query: {
-            changeFlight: JSON.stringify(this.$outgoingFlight)
-          },
+      this.$nextTick(() => {
+        console.log("최종 라우터 전달 데이터:", {
+          outgoingFlight: JSON.stringify(this.$outgoingFlight),
+          returnFlight: JSON.stringify(this.returnFlight || {}),
+          adults: this.adultsMutable,
+          children: this.childrenMutable,
+          travelClass: this.travelClassMutable,
+          departure: this.departureMutable,
+          departureCity: this.departureCityMutable,
+          destination: this.destinationMutable,
+          destinationCity: this.destinationCityMutable,
+          totalPrice: this.totalPrice,
+          nonStop: this.nonStopMutable
         });
-        // alert(JSON.stringify(this.$outgoingFlight)); //확인용
-        // alert(JSON.stringify(this.$outgoingFlight.departureTime)); //확인용
-        // alert(JSON.stringify(this.$outgoingFlight.arrivalTime)); //확인용
-        // alert(JSON.stringify(this.$outgoingFlight.price)); //확인용
-      }else{
-        // BookingDetail로 라우팅하며 데이터 전달
-        this.$router.push({
-          name: 'BookingDetail',
-          query: {
-            outgoingFlight: JSON.stringify(this.$outgoingFlight),
-            returnFlight: JSON.stringify(returnFlight || {}),
-            adults: this.adultsMutable,
-            children: this.childrenMutable,
-            travelClass: this.travelClassMutable,
-            departure: this.departure,
-            destination: this.destination,
-            totalPrice: totalPrice,
-            nonStop: this.nonStop
-          }
-        });
-      }
 
+        if (this.reservationChangeMode) {
+          // 예약 변경 시 사용 부분 추가
+          this.$router.push({
+            name: 'MyPageReservationDetail',
+            query: {
+              changeFlight: JSON.stringify(this.$outgoingFlight)
+            },
+          });
+        } else {
+          // BookingDetail로 라우팅하며 데이터 전달
+          this.$router.push({
+            name: 'BookingDetail',
+            query: {
+              outgoingFlight: JSON.stringify(this.$outgoingFlight),
+              returnFlight: JSON.stringify(returnFlight || {}),
+              adults: this.adultsMutable,
+              children: this.childrenMutable,
+              travelClass: this.travelClassMutable,
+              departure: this.departureMutable,
+              departureCity: this.departureCityMutable,
+              destination: this.destinationMutable,
+              destinationCity: this.destinationCityMutable,
+              totalPrice: totalPrice,
+              nonStop: this.nonStopMutable
+            }
+          });
+        }
+      });
     },
 
     changePage(pageNumber) {

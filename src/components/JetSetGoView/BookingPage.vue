@@ -138,7 +138,9 @@ export default {
   data() {
     return {
       departure: '', // 출발지
+      departureCity:'',
       destination: '', // 도착지
+      destinationCity:'',
       departureDate: null, // 출발 날짜
       returnDate: null, // 도착 날짜
       adults: '1', // 성인 수
@@ -164,6 +166,17 @@ export default {
 
   created() {
     this.loadAirports(); // 컴포넌트가 생성될 때 공항 데이터 불러오기
+  },
+
+  watch: {
+    departure(newCode) {
+      const selectedAirport = this.cities.find(city => city.value === newCode);
+      this.departureCity = selectedAirport ? selectedAirport.label.split(" (")[0] : '';
+    },
+    destination(newCode) {
+      const selectedAirport = this.cities.find(city => city.value === newCode);
+      this.destinationCity = selectedAirport ? selectedAirport.label.split(" (")[0] : '';
+    }
   },
   methods: {
     async loadAirports() {
@@ -257,7 +270,9 @@ export default {
         name: 'TicketSearch',
         query: {
           departure: this.departure,
+          departureCity: this.departureCity,
           destination: this.destination,
+          destinationCity: this.destinationCity,
           departureDate: formattedDepartureDate,
           returnDate: formattedReturnDate,
           adults: Number(this.adults),

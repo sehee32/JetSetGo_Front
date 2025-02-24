@@ -138,7 +138,9 @@ import axios from "axios";
 export default {
   props: {
     initialDeparture: String,
+    initialDepartureCity:String,
     initialDestination: String,
+    initialDestinationCity:String,
     initialDepartureDate: String,
     initialReturnDate: String,
     initialAdults: Number,
@@ -149,7 +151,9 @@ export default {
   data() {
     return {
       departure: this.initialDeparture,
+      departureCity: this.initialDepartureCity,
       destination: this.initialDestination,
+      destinationCity: this.initialDestinationCity,
       departureDate: this.initialDepartureDate,
       returnDate: this.initialReturnDate,
       adults: this.initialAdults,
@@ -175,6 +179,16 @@ export default {
 
   created() {
     this.loadAirports(); // 컴포넌트가 생성될 때 공항 데이터 불러오기
+  },
+  watch: {
+    departure(newCode) {
+      const selectedAirport = this.cities.find(city => city.value === newCode);
+      this.departureCity = selectedAirport ? selectedAirport.label.split(" (")[0] : '';
+    },
+    destination(newCode) {
+      const selectedAirport = this.cities.find(city => city.value === newCode);
+      this.destinationCity = selectedAirport ? selectedAirport.label.split(" (")[0] : '';
+    }
   },
   methods: {
     async loadAirports() {
@@ -253,7 +267,9 @@ export default {
     updateSchedule() {
       this.$emit('update-schedule', {
         departure: this.departure,
+        departureCity: this.departureCity,
         destination: this.destination,
+        destinationCity: this.destinationCity,
         departureDate: this.departureDate,
         returnDate: this.returnDate,
         adults: this.adults,
@@ -281,7 +297,9 @@ export default {
         name: 'TicketSearch',
         query: {
           departure: this.departure,
+          departureCity: this.departureCity,
           destination: this.destination,
+          destinationCity: this.destinationCity,
           departureDate: formattedDepartureDate,
           returnDate: formattedReturnDate,
           adults: Number(this.adults),

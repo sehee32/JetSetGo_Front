@@ -105,7 +105,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/TicketSearch.vue'),
     props: route => ({
       departure: route.query.departure,
+      departureCity: route.query.departureCity,
       destination: route.query.destination,
+      destinationCity: route.query.destinationCity,
       departureDate: route.query.departureDate,
       returnDate: route.query.returnDate,
       adults: Number(route.query.adults),
