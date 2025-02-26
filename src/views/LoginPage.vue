@@ -126,7 +126,7 @@ export default {
           this.$store.commit('clearBookingData');
         } else {
           // 예약 정보가 없으면 메인 페이지로 이동
-          this.$router.push('/bookingpage');
+          this.$router.push('/');
         }
       } catch (error) {
         console.error('로그인 오류:', error);
