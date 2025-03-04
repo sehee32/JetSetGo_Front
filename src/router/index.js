@@ -122,7 +122,7 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../components/JetSetGoView/BookingPage.vue')
   },
   {
-    path: '/BookingDetail',
+    path: '/bookingDetail',
     name: 'BookingDetail',
     component: () => import(/* webpackChunkName: "about" */ '../views/BookingDetail.vue'),
   },

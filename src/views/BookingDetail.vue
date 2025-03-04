@@ -152,6 +152,7 @@ export default {
     console.log("outgoingFlight:", this.outgoingFlight);
     console.log("returnFlight:", this.returnFlight);
 
+
     this.adults = parseInt(query.adults || 0, 10);
     this.children = parseInt(query.children || 0, 10);
     this.travelClass = query.travelClass;
