@@ -83,7 +83,7 @@
           <div class="form-row">
             <div class="input-group">
               <label class="form-text">생년월일(YYYY-MM-DD)<span class="required">*</span></label>
-              <input type="text" v-model="passenger.birthDate" placeholder="예) 1990.01.01">
+              <input type="text" v-model="passenger.birthDate" placeholder="예) 1990-01-01">
             </div>
           </div>
         </div>
@@ -183,8 +183,6 @@ export default {
   methods : {
     async fetchUserInfos() {
 
-      // eslint-disable-next-line no-debugger
-      debugger;
 
       const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
       if (token) {
@@ -211,6 +209,8 @@ export default {
     },
 
     async Payment() {
+
+
       const IMP = window.IMP;
       IMP.init("imp12777257");
 
@@ -243,8 +243,8 @@ export default {
         arrivalTime: dayjs(this.outgoingFlight.arrivalTime).format("YYYY-MM-DDTHH:mm:ss"),
         originlocationcode: this.outgoingFlight.departure,
         destinationlocationcode: this.outgoingFlight.destination,
-        departureCity: this.departureCity,
-        arrivalCity: this.destinationCity,
+        departureCity: this.destinationCity,
+        arrivalCity: this.departureCity,
       };
 
       flightData.push(outgoingFlightData);
@@ -255,22 +255,24 @@ export default {
           arrivalTime: dayjs(this.returnFlight.arrivalTime).format("YYYY-MM-DD HH:mm:ss"),
           originlocationcode: this.returnFlight.departure,
           destinationlocationcode: this.returnFlight.destination,
-          departureCity: this.destinationCity,
-          arrivalCity: this.departureCity,
+          departureCity: this.departureCity,
+          arrivalCity: this.destinationCity,
         };
 
         flightData.push(returnFlightData);
       }
-
+      console.log("flightData", flightData);
       const response = await axios.post("/api/reservation/flights", flightData);
-      console.log("저장된 항공편 ID:", response.data);
+      const savedFlightIds = response.data.flightIds; // 가는편,오는편ID 받음
+
+      console.log("저장된 항공편 ID들:", savedFlightIds);
 
       try {
         // 예약 데이터 먼저 저장
         for (let i=0; i < this.passengers.length; i++) {
           await axios.post('/api/reservation', {
             member_Id: this.member_Id,
-            reservation_Id: this.member_Id + this.passengers[0].passengerName + date,
+            reservation_Id: `${this.member_Id}_${this.passengers[i].passengerName}_${date}`,
             status: "예약대기",
             trip_Type: this.tripType,
             reservation_Date: date,
@@ -284,7 +286,8 @@ export default {
             nonstop: this.nonStop === "true" ? 1 : 0,
             travelclass: this.travelClass,
             adults: this.adults,
-            children: this.children
+            children: this.children,
+            flightIds: savedFlightIds // 저장된 항공편 ID 전달
           });
         }
         this.verificationSuccess = true;
