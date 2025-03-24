@@ -313,13 +313,15 @@ export default {
             this.verificationSuccess = rsp.success
             console.log("결제 결과: ", rsp)
 
-            /* 결제 완료 내역 DB 저장 */
-            const response = await axios.post('/api/payment', {
-              status: this.verificationSuccess,
-              amount: this.totalPrice
-
-            });
-            console.log(response.data); // 서버로부터의 응답 확인
+            for (let i=0; i < this.passengers.length; i++) {
+              /* 결제 완료 내역 DB 저장 */
+              const response = await axios.post('/api/payment', {
+                reservation_Id: `${this.member_Id}_${this.passengers[i].passengerName}_${date}`,
+                status: this.verificationSuccess,
+                amount: this.totalPrice
+              });
+              console.log("결제 완료 내역 DB 저장 결과", response.data); // 서버로부터의 응답 확인
+            }
           }.bind(this));
         }
       } catch (error) {
