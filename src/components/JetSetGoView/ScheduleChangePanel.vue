@@ -315,25 +315,74 @@ export default {
 </script>
 
 <style scoped>
+/* 카드 스타일 */
 .custom-card {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: auto;
-  background-color: #ffffff;
-  color: #00256c;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff; /* 카드 배경색 */
+  color: #00256c; /* 텍스트 색상 */
+  border-radius: 10px; /* 둥근 모서리 */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
 }
 
+/* 제목 스타일 */
+.text-center {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00256c;
+}
+
+/* 입력 필드 스타일 */
+.v-input {
+  border-bottom: solid 1px #d9d9d9; /* 하단 경계선 */
+}
+
+.v-input__control {
+  font-size: 16px; /* 텍스트 크기 */
+}
+
+/* 버튼 스타일 */
 .custom-btn {
-  background-color: #00256c; /* 버튼 배경색 */
+  background-color: #007bff; /* 버튼 배경색 */
   color: white; /* 버튼 텍스트 색상 */
+  font-weight: bold;
 }
 
 .custom-btn:hover {
-  background-color: #001a4d; /* 호버 시 버튼 배경색 */
+  background-color: #0056b3; /* 호버 시 버튼 배경색 */
 }
 
-.text-center {
+/* 아이콘 스타일 */
+.v-icon {
   color: #00256c;
 }
+
+/* 출발지/도착지 텍스트 박스 스타일 */
+.location-box {
+  text-align: center;
+}
+
+.location-label {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.location-desc {
+  font-size: 14px;
+}
+
+/* 승객 정보 및 좌석 등급 */
+.passenger-box {
+  display: flex;
+  align-items: center;
+}
+
+.passenger-label {
+  font-size: 16px;
+}
+
+.v-select__control {
+  font-size: 16px;
+}
 </style>
+

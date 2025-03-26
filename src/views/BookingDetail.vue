@@ -93,7 +93,7 @@
     <div class="payment-section">
 
         <span class="total-amount">최종 결제 금액</span>
-        <span class="amount">{{totalPrice}}원</span>
+        <span class="amount">{{formatNumberWithCommas(totalPrice)}}원</span>
 
       <button @click="Back" class="back-button">뒤로가기</button>
       <button @click="Payment" class="payment-button">결제하기</button>
@@ -206,6 +206,11 @@ export default {
           console.error('Error fetching user info:', error);
         }
       }
+    },
+
+    // 숫자 포맷팅 메서드 추가
+    formatNumberWithCommas(number) {
+      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
 
     async Payment() {
@@ -322,6 +327,14 @@ export default {
               });
               console.log("결제 완료 내역 DB 저장 결과", response.data); // 서버로부터의 응답 확인
             }
+            this.$router.push({
+              path: "/paymentcompleted",
+              query: {
+                amount: this.totalPrice,
+                paymentMethod: "카드",
+                reservationId: `${this.member_Id}_${this.passengers[0].passengerName}_${date}`
+              }
+            });
           }.bind(this));
         }
       } catch (error) {
