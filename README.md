@@ -36,6 +36,7 @@ npm run build
 <img width="100%" src="https://github.com/user-attachments/assets/2e6643dd-889a-4b21-8f3c-a48259e77aea"/>
 
 
+
 <details><summary> 주요 코드
 </summary>
 
@@ -146,8 +147,11 @@ async verify() {
 
 ### 로그인 (LoginPage.vue)
 
-<img width="80%" src=""/>
-<img width="80%" src=""/>
+![Image](https://github.com/user-attachments/assets/8c3171b0-738e-40ac-8dfa-d8a86fc5d3c8)
+
+<img width="100%" src="https://github.com/user-attachments/assets/f9921dc4-47ac-4e97-8a67-7217f1120f95"/>
+
+
 <img width="80%" src=""/>
 
 <details><summary>주요 코드
