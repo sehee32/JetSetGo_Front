@@ -31,7 +31,18 @@ npm run build
 
 ## 🌟 주요 기능
 
-### 회원가입
+### 회원가입 (SignUp.vue)
+
+<img width="80%" src="https://github.com/user-attachments/assets/5853d633-106e-4a92-986a-13cf965af1e7"/>
+
+<img width="80%" src="https://github.com/user-attachments/assets/2dfee7d5-dd7d-45a7-af66-3472f7773728"/>
+
+<img width="80%" src="https://github.com/user-attachments/assets/233c0420-4b33-411b-b4ed-91caad737bde"/>
+
+
+<details><summary> 주요 코드
+</summary>
+
 ```
 <templeat>
 <v-text-field
@@ -131,33 +142,153 @@ async verify() {
 </script>
 
 ```
+</details>
 
-### 로그인
+
+---
+
+
+### 로그인 (LoginPage.vue)
+
+<img width="80%" src=""/>
+<img width="80%" src=""/>
+<img width="80%" src=""/>
+
+<details><summary>주요 코드
+</summary>
+
 ```
-코드
+<templeat>
+<v-form
+          v-model="formValid"
+          @submit.prevent="submitlogin"
+      >
+        <v-text-field
+            v-model="username"
+            :readonly="loading"
+            :rules="[required]"
+            class="mb-2"
+            label="ID"
+            variant="outlined"
+            prepend-inner-icon="mdi-account-outline"
+            clearable
+        ></v-text-field>
+
+        <v-text-field
+            v-model="password"
+            :readonly="loading"
+            :rules="[required]"
+            :type="show ? 'text' : 'password'"
+            class="mb-2"
+            label="Password"
+            variant="outlined"
+            prepend-inner-icon="mdi-lock-outline"
+            clearable
+        >
+          <!-- 비밀번호 표시/숨김 아이콘 -->
+          <template v-slot:append-inner>
+            <v-icon @click="show = !show">
+              {{ show ? 'mdi-eye' : 'mdi-eye-off' }}
+            </v-icon>
+          </template>
+        </v-text-field>
+</templeat>
+
+<script>
+    async submitlogin() {
+      if (!this.formValid) return;
+      this.loading = true;
+
+      try {
+        // Vuex 액션 호출
+        await this.login({ username: this.username, password: this.password });
+
+        // 저장된 예약 정보가 있는지 확인
+        const bookingData = this.$store.getters.getBookingData;
+        if (bookingData) {
+          // 예약 정보가 있으면 BookingDetail 페이지로 리다이렉트
+          this.$router.push({
+            name: 'BookingDetail',
+            query: {
+              outgoingFlight: JSON.stringify(bookingData.outgoingFlight),
+              returnFlight: JSON.stringify(bookingData.returnFlight),
+              adults: bookingData.adults,
+              children: bookingData.children,
+              travelClass: bookingData.travelClass,
+              totalPrice: bookingData.totalPrice
+            }
+          });
+          // 사용한 예약 정보 초기화
+          this.$store.commit('clearBookingData');
+        } else {
+          // 예약 정보가 없으면 메인 페이지로 이동
+          this.$router.push('/');
+        }
+      } catch (error) {
+        console.error('로그인 오류:', error);
+        alert('아이디 또는 비밀번호를 확인해주세요.');
+      } finally {
+        this.loading = false;
+      }
+    }
+</script>
 ```
+</details>
+
+
+---
+
 
 ### 마이페이지
+
+<details><summary> 주요코드
+</summary>
+
 ```
 코드
 ```
+</details>
+
+---
 
 ### 문의하기
+<details><summary> 주요코드
+</summary>
+
 ```
 코드
 ```
+</details>
+
+---
 
 ### 항공권 조회
+<details><summary> 주요코드
+</summary>
+
 ```
 코드
 ```
+</details>
+
+---
 
 ### 항공권 예매
+<details><summary> 주요코드
+</summary>
+
 ```
 코드
 ```
+</details>
+
+---
 
 ### 항공권 결제
+<details><summary> 주요코드
+</summary>
+
 ```
 코드
 ```
+</details>
