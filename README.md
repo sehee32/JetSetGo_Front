@@ -33,12 +33,7 @@ npm run build
 
 ### 회원가입 (SignUp.vue)
 
-<img width="80%" src="https://github.com/user-attachments/assets/5853d633-106e-4a92-986a-13cf965af1e7"/>
-
-<img width="80%" src="https://github.com/user-attachments/assets/2dfee7d5-dd7d-45a7-af66-3472f7773728"/>
-
-<img width="80%" src="https://github.com/user-attachments/assets/233c0420-4b33-411b-b4ed-91caad737bde"/>
-
+![Image](https://github.com/user-attachments/assets/2e6643dd-889a-4b21-8f3c-a48259e77aea)
 
 <details><summary> 주요 코드
 </summary>
