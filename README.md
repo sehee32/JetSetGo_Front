@@ -150,8 +150,8 @@ async verify() {
 
 <img width="100%" src="https://github.com/user-attachments/assets/8c3171b0-738e-40ac-8dfa-d8a86fc5d3c8"/>
 
+<img width="100%" src="https://github-production-user-asset-6210df.s3.amazonaws.com/204322966/427904124-6be34c7f-40f4-4078-8aa7-f024e003df8d.PNG?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250328%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250328T074813Z&X-Amz-Expires=300&X-Amz-Signature=db3be1788f90d278ab919282100bbc168f23be2ba5e204f44864e9eeca1c955a&X-Amz-SignedHeaders=host"/>
 
-<img width="80%" src=""/>
 
 <details><summary>주요 코드
 </summary>
@@ -240,6 +240,18 @@ async verify() {
 
 ### 마이페이지
 
+<img width="100%" src="https://github-production-user-asset-6210df.s3.amazonaws.com/204322966/427910383-48994561-9880-4b15-9c8b-ba5cff9fb294.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250328%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250328T075849Z&X-Amz-Expires=300&X-Amz-Signature=e4fc3a972ec8a3feafad3056f5a9dd309321fc8ff436ee32af69cb751b24f3bb&X-Amz-SignedHeaders=host"/>
+
+
+<img width="100%" src="https://github-production-user-asset-6210df.s3.amazonaws.com/204322966/427911684-ac2cb468-98b4-442f-bb46-52ee2f559ee4.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250328%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250328T080124Z&X-Amz-Expires=300&X-Amz-Signature=83d1ce080371bfd1bb685c3afcf979ef5551c8a94af5e99776451aef6683e8e1&X-Amz-SignedHeaders=host"/>
+
+
+
+<img width="100%" src="https://github-production-user-asset-6210df.s3.amazonaws.com/204322966/427913152-a2339b0f-0c9f-4365-9941-8c64957c6722.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250328%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250328T080450Z&X-Amz-Expires=300&X-Amz-Signature=11d36ab31700276909769630552ab63f6eefa1e6617f198b3e086ba35527261d&X-Amz-SignedHeaders=host"/>
+
+
+<img width="100%" src=""/>
+
 <details><summary> 주요코드
 </summary>
 
@@ -251,6 +263,13 @@ async verify() {
 ---
 
 ### 문의하기
+
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+
+
 <details><summary> 주요코드
 </summary>
 
@@ -262,6 +281,13 @@ async verify() {
 ---
 
 ### 항공권 조회
+
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+
 <details><summary> 주요코드
 </summary>
 
@@ -273,6 +299,14 @@ async verify() {
 ---
 
 ### 항공권 예매
+
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+
 <details><summary> 주요코드
 </summary>
 
@@ -284,6 +318,14 @@ async verify() {
 ---
 
 ### 항공권 결제
+
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+<img width="100%" src=""/>
+
+
 <details><summary> 주요코드
 </summary>
 
