@@ -147,9 +147,8 @@ async verify() {
 
 ### 로그인 (LoginPage.vue)
 
-![Image](https://github.com/user-attachments/assets/8c3171b0-738e-40ac-8dfa-d8a86fc5d3c8)
 
-<img width="100%" src="https://github.com/user-attachments/assets/f9921dc4-47ac-4e97-8a67-7217f1120f95"/>
+<img width="100%" src="https://github.com/user-attachments/assets/8c3171b0-738e-40ac-8dfa-d8a86fc5d3c8"/>
 
 
 <img width="80%" src=""/>
