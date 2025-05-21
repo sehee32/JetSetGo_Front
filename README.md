@@ -276,11 +276,11 @@ async verify() {
 
 ### 항공권 조회
 
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
+![검색1](https://github.com/user-attachments/assets/cb1916d4-748e-4e83-9558-75f7dd1c3525)
+![검색2](https://github.com/user-attachments/assets/5fb531ee-abea-4b05-b9e0-82a69e4321ee)
+![검색3](https://github.com/user-attachments/assets/6a56866f-de94-44ce-a3b8-7d3e5a5d160d)
+![검색4](https://github.com/user-attachments/assets/cecc9d71-6576-422f-b5dc-fbba00b14374)
+
 
 <details><summary> 주요코드
 </summary>
@@ -294,12 +294,8 @@ async verify() {
 
 ### 항공권 예매
 
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
+![예매1](https://github.com/user-attachments/assets/1cfc4cb1-061a-4dbd-abd0-8b853690ec80)
+
 
 <details><summary> 주요코드
 </summary>
@@ -313,11 +309,8 @@ async verify() {
 
 ### 항공권 결제
 
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
+![결제1](https://github.com/user-attachments/assets/06af637d-71de-4e83-9d6a-2aabfecc6507)
+
 
 
 <details><summary> 주요코드
