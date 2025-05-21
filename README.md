@@ -1,6 +1,5 @@
 # **JetSetGo Front​**
 이 프로젝트는 Vue.js를 사용하여 항공권 검색 및 예약을 지원하는 웹 애플리케이션입니다.​
-![로그인실패](https://github.com/user-attachments/assets/d33f2f82-ffd3-4a96-ac84-a9df7ab1375d)
 
 
 ##  🛠기술 스택
@@ -151,7 +150,7 @@ async verify() {
 
 <img width="100%" src="https://github.com/user-attachments/assets/8c3171b0-738e-40ac-8dfa-d8a86fc5d3c8"/>
 
-<img width="100%" src="https://github-production-user-asset-6210df.s3.amazonaws.com/204322966/427904124-6be34c7f-40f4-4078-8aa7-f024e003df8d.PNG?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250328%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250328T074813Z&X-Amz-Expires=300&X-Amz-Signature=db3be1788f90d278ab919282100bbc168f23be2ba5e204f44864e9eeca1c955a&X-Amz-SignedHeaders=host"/>
+![로그인실패](https://github.com/user-attachments/assets/d33f2f82-ffd3-4a96-ac84-a9df7ab1375d)
 
 
 <details><summary>주요 코드
