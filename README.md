@@ -259,10 +259,9 @@ async verify() {
 
 ### 문의하기
 
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
-<img width="100%" src=""/>
+![문의1](https://github.com/user-attachments/assets/325b43eb-451f-4307-a074-3cb5ae321efc)
+![문의2](https://github.com/user-attachments/assets/f961cbfd-5d98-4b84-9502-703d30f1268d)
+
 
 
 <details><summary> 주요코드
