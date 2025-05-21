@@ -240,17 +240,9 @@ async verify() {
 
 ### 마이페이지
 
-<img width="100%" src="https://github-production-user-asset-6210df.s3.amazonaws.com/204322966/427910383-48994561-9880-4b15-9c8b-ba5cff9fb294.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250328%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250328T075849Z&X-Amz-Expires=300&X-Amz-Signature=e4fc3a972ec8a3feafad3056f5a9dd309321fc8ff436ee32af69cb751b24f3bb&X-Amz-SignedHeaders=host"/>
+![마이페이지1](https://github.com/user-attachments/assets/fbee741d-ca44-44ae-b6f3-df2975876c81)
+![마이페이지2](https://github.com/user-attachments/assets/eba02992-1498-4f94-916a-a1975b06111f)
 
-
-<img width="100%" src="https://github-production-user-asset-6210df.s3.amazonaws.com/204322966/427911684-ac2cb468-98b4-442f-bb46-52ee2f559ee4.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250328%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250328T080124Z&X-Amz-Expires=300&X-Amz-Signature=83d1ce080371bfd1bb685c3afcf979ef5551c8a94af5e99776451aef6683e8e1&X-Amz-SignedHeaders=host"/>
-
-
-
-<img width="100%" src="https://github-production-user-asset-6210df.s3.amazonaws.com/204322966/427913152-a2339b0f-0c9f-4365-9941-8c64957c6722.gif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250328%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250328T080450Z&X-Amz-Expires=300&X-Amz-Signature=11d36ab31700276909769630552ab63f6eefa1e6617f198b3e086ba35527261d&X-Amz-SignedHeaders=host"/>
-
-
-<img width="100%" src=""/>
 
 <details><summary> 주요코드
 </summary>
