@@ -11,6 +11,32 @@
 
 
 
+## 👥 역할 분담
+
+**[박세희]**
+
+- 회원가입, 로그인 기능 구현
+ 
+- 항공권 조회, 예매, 결제 페이지 개발
+
+- Vue.js, Axios, Spring Boot, MyBatis 등을 활용하여 백엔드 API와 연동
+
+- Iamport API를 활용한 본인 인증 및 결제 연동
+
+---
+
+
+**[이유리]**
+
+- 마이페이지, 문의하기 페이지 구현
+
+- 사용자 예약 내역 조회 및 상세 정보 확인 기능 개발
+
+- 사용자 정보 및 예약 이력 기반 화면 구성
+
+- Vue.js 기반 마이페이지 UI/UX 설계 및 구현
+
+
 ## 🚀 프로젝트 설정 및 실행
 ### 설치
 ```
@@ -238,18 +264,245 @@ async verify() {
 ---
 
 
-### 마이페이지
+### 마이페이지 (MyPage.vue)
 
 ![마이페이지1](https://github.com/user-attachments/assets/fbee741d-ca44-44ae-b6f3-df2975876c81)
-![마이페이지2](https://github.com/user-attachments/assets/eba02992-1498-4f94-916a-a1975b06111f)
-![마이페이지3](https://github.com/user-attachments/assets/ec963116-9217-4590-ae30-e3e0f5917d31)
-![마이페이지4](https://github.com/user-attachments/assets/608e08dd-5d70-4b35-b28c-7166470a92ab)
-![마이페이지5](https://github.com/user-attachments/assets/e44f1bce-945a-4599-af6e-c09fd8ba973f)
-
-
-<details><summary> 주요코드
+<details><summary>주요 코드
 </summary>
 
+```
+<templeat>
+<!-- 회원정보 -->
+        <div class="profile">
+          <v-row>
+            <!-- 첫 번째 항목 -->
+            <v-col class="costom-profile-col">
+              <v-list dense bg-color="#f3f4f8">
+                <v-list-item>
+                  <v-list-item-content >
+                    <v-list-item-title>성명</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title class="costom-profile-title"><strong>{{ name }}</strong></v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-col>
+
+
+<!-- 비밀번호 변경 박스 -->
+        <div class="costom-box">
+          <h3>비밀번호</h3>
+          <p>회원님의 소중한 개인정보 보호를 위해 비밀번호를 주기적으로 변경해 주세요.</p>
+          <v-btn :ripple="false" variant="outlined" @click="togglePanel('password')" class="costom-box-btn">변경</v-btn>
+          <v-expansion-panels v-model="activePanel">
+            <!-- 비밀번호 변경 패널 -->
+            <v-expansion-panel value="password">
+              <v-expansion-panel-text>
+                <div class="changePassword">
+                  <h1>비밀번호 변경</h1>
+                  <p>새로운 비밀번호를 입력해 주세요.</p>
+                  <p>[ <span class="red">*</span> 는 필수 입력 사항입니다.]</p>
+                    <v-form validate-on="submit" @submit.prevent="submit">
+                      <div class = "inputPassword" >
+                        <!-- 현재 비밀번호 -->
+                        <p>현재 비밀번호 <span class="red">*</span> </p>
+                        <v-text-field
+                            class="costom-text-field"
+                            v-model="currentPassword"
+                            type="password"
+                            variant="underlined"
+                            maxlength="20"
+                            :rules="[rules.required]"
+                            @keydown.enter="submit"
+                        ></v-text-field>
+                        <!-- 신규 비밀번호 -->
+                        <p>신규 비밀번호 <span class="red">*</span> </p>
+                        <v-text-field
+                            class="costom-text-field"
+                            v-model="newPassword"
+                            type="password"
+                            variant="underlined"
+                            maxlength="20"
+                            :rules="[rules.required, rules.password]"
+                            ref="newPasswordField"
+                            @input="validateNewPassword"
+                            @keydown.enter="submit"
+                        ></v-text-field>
+                        <!-- 신규 비밀번호 확인 -->
+                        <p>신규 비밀번호 확인 <span class="red">*</span> </p>
+                        <v-text-field
+                            class="costom-text-field"
+                            v-model="confirmNewPassword"
+                            type="password"
+                            variant="underlined"
+                            maxlength="20"
+                            :rules="[rules.required, rules.matchPassword]"
+                            @keydown.enter="submit"
+                        ></v-text-field>
+                      </div>
+                      <!-- 버튼 -->
+                      <div class="button-container">
+                        <v-btn
+                            :loading="loading"
+                            class="submitBtn"
+                            text="변경하기"
+                            type="submit"
+                            block
+                        ></v-btn>
+                      </div>
+                    </v-form>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
+</templeat>
+
+<script>
+   export default {
+    name: 'MyPage',
+    components: {},
+    data() {
+        return {
+          name: '',
+          id: '',
+          phoneNumber: '',
+          birthDate: '',
+          userPassword: '',
+          activePanel: [], // 현재 열려 있는 패널의 값을 저장
+          contact: '',
+          currentPasswordInfo: '',
+          isPasswordValid: false, // 비밀번호 확인 상태
+          currentPassword: '',
+          newPassword: '',
+          confirmNewPassword: '',
+          rules: {
+            required : value => !!value || '필수 입력 항목입니다.',
+            password: value => this.checkPassword(value),
+            matchPassword: value => value === this.newPassword || '비밀번호가 일치하지 않습니다.'
+          },
+          loading: false
+         };
+    },
+
+methods: {
+      // 비밀번호 변경 상세
+      async submit(event) {
+        this.loading = true;
+        // 비밀번호 확인 로직
+        if (this.currentPassword === this.userPassword) {
+          const results = await event;
+          if(results.valid){
+            const response = await axios.post('/api/myPageUserPasswordEdit', {
+              userId: this.id,
+              password: this.newPassword
+            });
+            console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+            if(response.data){
+              alert('비밀번호 변경이 완료되었습니다.'); // 비밀번호 변경 성공 시
+              this.userPassword = this.newPassword;
+            }else{
+              alert('비밀번호 변경 불가, 관리자 문의 필요');
+            }
+            this.activePanel = []; // 모든 패널 닫기
+          }else{
+            alert(results.errors[0].errorMessages); // 유효성 검사 실패 시
+          }
+          this.loading = false;
+        } else {
+          alert('현재 비밀번호가 일치하지 않습니다.'); // 비밀번호가 일치하지 않으면 에러 메시지 표시
+          this.loading = false;
+        }
+      },
+
+ async fetchUserInfos() {
+        const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+        if (token) {
+          try {
+            const response = await axios.post('/api/getUserInfos', {
+              token: token // 토큰을 본문에 포함
+            });
+            this.name = response.data.name; // 사용자 정보를 변수에 저장
+            this.id = response.data.username;
+            this.phoneNumber = response.data.phoneNumber;
+            this.contact = response.data.phoneNumber;
+            this.birthDate = response.data.birthdate;
+            this.userPassword = response.data.password;
+          } catch (error) {
+            console.error('Error fetching user info:', error);
+          }
+        }
+      }
+</script>
+```
+</details>
+
+
+![마이페이지2](https://github.com/user-attachments/assets/eba02992-1498-4f94-916a-a1975b06111f)
+<details><summary>주요 코드
+</summary>
+
+```
+<templeat>
+
+</templeat>
+
+<script>
+   
+</script>
+```
+</details>
+
+![마이페이지3](https://github.com/user-attachments/assets/ec963116-9217-4590-ae30-e3e0f5917d31)
+<details><summary>주요 코드
+</summary>
+
+```
+<templeat>
+
+</templeat>
+
+<script>
+   
+</script>
+```
+</details>
+
+![마이페이지4](https://github.com/user-attachments/assets/608e08dd-5d70-4b35-b28c-7166470a92ab)
+<details><summary>주요 코드
+</summary>
+
+```
+<templeat>
+
+</templeat>
+
+<script>
+   
+</script>
+```
+</details>
+
+![마이페이지5](https://github.com/user-attachments/assets/e44f1bce-945a-4599-af6e-c09fd8ba973f)
+<details><summary>주요 코드
+</summary>
+
+```
+<templeat>
+
+</templeat>
+
+<script>
+   
+</script>
+```
+</details>
+
+
+<details><summary> 주요코드</summary>
 ```
 코드
 ```
@@ -277,6 +530,9 @@ async verify() {
 ### 항공권 조회
 
 ![검색1](https://github.com/user-attachments/assets/cb1916d4-748e-4e83-9558-75f7dd1c3525)
+
+
+
 ![검색2](https://github.com/user-attachments/assets/5fb531ee-abea-4b05-b9e0-82a69e4321ee)
 ![검색3](https://github.com/user-attachments/assets/6a56866f-de94-44ce-a3b8-7d3e5a5d160d)
 ![검색4](https://github.com/user-attachments/assets/cecc9d71-6576-422f-b5dc-fbba00b14374)
