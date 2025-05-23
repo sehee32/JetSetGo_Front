@@ -501,50 +501,120 @@ methods: {
 </summary>
 
 ```
-<templeat>
-
-</templeat>
-
 <script>
-   
+   data() {
+  return {
+    reservationId: null,           // 예약 ID
+    selectedFlightId: '',          // 현재 선택한 항공편 ID
+    changeFlight: [],              // 변경 내역 배열
+    flights: [],                   // 예약 항공편 목록
+  };
+},
+methods: {
+  // 예약 변경 대상 항공편 목록 불러오기
+  async getReservationChangeDetail() {
+    const response = await axios.post('/api/myPageReservationChangeDetails', {
+      id: this.reservationId
+    });
+    this.flights = response.data;
+  },
+
+  // 항공편 선택(변경 검색 화면 이동)
+  selectFlight(item) {
+    if (this.selectedFlightId === item.flight_Id) {
+      this.selectedFlightId = '';
+    } else {
+      // 변경 검색 화면으로 이동 (선택 정보 쿼리로 전달)
+      this.$router.push({
+        name: 'TicketChangeSearch',
+        query: {
+          departure: item.originlocationcode,
+          destination: item.destinationlocationcode,
+          departureDate: this.formatDate(item.departureDate),
+          travelClass: item.travelclass,
+          reservationChange: true
+        }
+      }).then(() => {
+        this.selectedFlightId = item.flight_Id;
+      });
+    }
+  },
+
+  // 변경 내역 결제/환불 처리
+  async goChange() {
+    // 모든 변경 대상이 선택되었는지 확인
+    if (this.changeFlight.length === this.flights.length) {
+      const response = await axios.post('/api/myPageReservationChangeDetailsData', this.changeFlight);
+      if (response.data) {
+        alert('변경되었습니다.');
+        this.$emit('goDetail');
+      } else {
+        alert('변경실패 : 관리자에게 문의하세요.');
+      }
+    } else {
+      alert('변경하지 않은 예약이 있습니다.');
+    }
+  },
+},
+watch: {
+  // 변경 검색 결과가 쿼리로 돌아오면 변경 내역에 반영
+  '$route.query.changeFlight': function(newValue) {
+    if (newValue && this.selectedFlightId) {
+      const existingIndex = this.changeFlight.findIndex(
+        (flight) => flight.flightId === this.selectedFlightId
+      );
+      if (existingIndex === -1) {
+        this.changeFlight.push({
+          reservationId: this.reservationId,
+          flightId: this.selectedFlightId,
+          changeDetail: JSON.parse(newValue)
+        });
+      } else {
+        this.changeFlight[existingIndex].changeDetail = JSON.parse(newValue);
+      }
+      this.selectedFlightId = '';
+    }
+  }
+}
 </script>
 ```
 </details>
+<br><br>
 
+>예약이 변경됨
 ![마이페이지4](https://github.com/user-attachments/assets/608e08dd-5d70-4b35-b28c-7166470a92ab)
-<details><summary>주요 코드
-</summary>
-
-```
-<templeat>
-
-</templeat>
-
-<script>
-   
-</script>
-```
-</details>
+<br><br>
 
 ![마이페이지5](https://github.com/user-attachments/assets/e44f1bce-945a-4599-af6e-c09fd8ba973f)
 <details><summary>주요 코드
 </summary>
 
 ```
-<templeat>
-
-</templeat>
-
 <script>
-   
+   methods: {
+  goDialog(action) {
+    // '예약취소/환불' 버튼 클릭 시 안내 다이얼로그를 띄움
+    if (action === 'cancel') {
+      this.dialogTitle = '예약 취소/환불';
+      this.dialogDetail = '환불 신청 시 예약과 항공권이 모두 취소되며 취소 이후에는 사용이 불가합니다.<br> 승객 본인의 의사에 따라 신청한 것으로 간주하며 그에 따른 책임은 신청인에게 있습니다.';
+      this.showDialog = true;
+    }
+  },
+  async goAction() {
+    // 다이얼로그에서 '확인' 버튼을 누르면 실행
+    if (this.dialogTitle === '예약 취소/환불') {
+      // 서버에 예약 취소 요청
+      const response = await axios.post('/api/myPageCancelReservation', {
+        id: this.reservationId
+      });
+      // 취소 성공 시 UI 갱신 및 안내
+      this.showDialog = false;
+      this.$router.go(0); // 새로고침
+      alert('예약 취소 되었습니다.');
+    }
+  }
+}
 </script>
-```
-</details>
-
-
-<details><summary> 주요코드</summary>
-```
-코드
 ```
 </details>
 
