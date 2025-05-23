@@ -442,6 +442,59 @@ methods: {
 
 
 ![마이페이지2](https://github.com/user-attachments/assets/eba02992-1498-4f94-916a-a1975b06111f)
+<details><summary>주요 코드
+</summary>
+
+```
+<script>
+   methods: {
+    ...mapActions(['logout']),
+    async submitPassword() {
+      this.loading = true;
+
+      // 비밀번호 확인 로직
+      if (this.currentPassword === this.userPassword) {
+        this.isPasswordValid = true;
+        console.log('비밀번호가 유효합니다. 추가 작업을 수행합니다.');
+      } else {
+        alert('비밀번호가 일치하지 않습니다.'); // 비밀번호가 일치하지 않으면 에러 메시지 표시
+      }
+      this.loading = false;
+    },
+    async withdrawalSubmit() {
+      this.loading = true;
+      if (this.terms == true) {
+        const response = await axios.post('/api/myPageUserRemove', {
+          id: this.id
+        });
+        console.log('결과 확인: ' + response.data); // 서버에서 받은 데이터 출력
+        alert('회원탈퇴 성공'); // 정보 변경 성공 시
+        await this.logout(); // vuex액션 호출
+        this.$router.push('/');
+      }
+      this.loading = false;
+    },
+    async fetchUserInfos() {
+      const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+      if (token) {
+        try {
+          const response = await axios.post('/api/getUserInfos', {
+            token: token // 토큰을 본문에 포함
+          });
+          this.id = response.data.username;
+          this.userPassword = response.data.password;
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
+      }
+    },
+    goBack() {
+      this.$router.go(-1); // 이전 페이지로 이동
+    }
+  }
+</script>
+```
+</details>
 
 ![마이페이지3](https://github.com/user-attachments/assets/ec963116-9217-4590-ae30-e3e0f5917d31)
 <details><summary>주요 코드
