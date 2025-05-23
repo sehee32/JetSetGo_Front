@@ -439,6 +439,7 @@ methods: {
 </script>
 ```
 </details>
+<br><br>
 
 
 ![마이페이지2](https://github.com/user-attachments/assets/eba02992-1498-4f94-916a-a1975b06111f)
@@ -495,6 +496,7 @@ methods: {
 </script>
 ```
 </details>
+<br><br>
 
 ![마이페이지3](https://github.com/user-attachments/assets/ec963116-9217-4590-ae30-e3e0f5917d31)
 <details><summary>주요 코드
@@ -623,15 +625,33 @@ watch: {
 ### 문의하기
 
 ![문의1](https://github.com/user-attachments/assets/325b43eb-451f-4307-a074-3cb5ae321efc)
-![문의2](https://github.com/user-attachments/assets/f961cbfd-5d98-4b84-9502-703d30f1268d)
-
-
-
-<details><summary> 주요코드
+<details><summary>주요 코드
 </summary>
 
 ```
-코드
+<templeat>
+
+</templeat>
+
+<script>
+ 
+</script>
+```
+</details>
+
+![문의2](https://github.com/user-attachments/assets/f961cbfd-5d98-4b84-9502-703d30f1268d)
+
+<details><summary>주요 코드
+</summary>
+
+```
+<templeat>
+
+</templeat>
+
+<script>
+ 
+</script>
 ```
 </details>
 
@@ -640,21 +660,66 @@ watch: {
 ### 항공권 조회
 
 ![검색1](https://github.com/user-attachments/assets/cb1916d4-748e-4e83-9558-75f7dd1c3525)
-
-
-
-![검색2](https://github.com/user-attachments/assets/5fb531ee-abea-4b05-b9e0-82a69e4321ee)
-![검색3](https://github.com/user-attachments/assets/6a56866f-de94-44ce-a3b8-7d3e5a5d160d)
-![검색4](https://github.com/user-attachments/assets/cecc9d71-6576-422f-b5dc-fbba00b14374)
-
-
-<details><summary> 주요코드
+<details><summary>주요 코드
 </summary>
 
 ```
-코드
+<templeat>
+
+</templeat>
+
+<script>
+ 
+</script>
 ```
 </details>
+
+
+![검색2](https://github.com/user-attachments/assets/5fb531ee-abea-4b05-b9e0-82a69e4321ee)
+<details><summary>주요 코드
+</summary>
+
+```
+<templeat>
+
+</templeat>
+
+<script>
+ 
+</script>
+```
+</details>
+
+![검색3](https://github.com/user-attachments/assets/6a56866f-de94-44ce-a3b8-7d3e5a5d160d)
+<details><summary>주요 코드
+</summary>
+
+```
+<templeat>
+
+</templeat>
+
+<script>
+ 
+</script>
+```
+</details>
+
+![검색4](https://github.com/user-attachments/assets/cecc9d71-6576-422f-b5dc-fbba00b14374)
+<details><summary>주요 코드
+</summary>
+
+```
+<templeat>
+
+</templeat>
+
+<script>
+ 
+</script>
+```
+</details>
+
 
 ---
 
@@ -662,12 +727,17 @@ watch: {
 
 ![예매1](https://github.com/user-attachments/assets/1cfc4cb1-061a-4dbd-abd0-8b853690ec80)
 
-
-<details><summary> 주요코드
+<details><summary>주요 코드
 </summary>
 
 ```
-코드
+<templeat>
+
+</templeat>
+
+<script>
+ 
+</script>
 ```
 </details>
 
@@ -677,12 +747,16 @@ watch: {
 
 ![결제1](https://github.com/user-attachments/assets/06af637d-71de-4e83-9d6a-2aabfecc6507)
 
-
-
-<details><summary> 주요코드
+<details><summary>주요 코드
 </summary>
 
 ```
-코드
+<templeat>
+
+</templeat>
+
+<script>
+ 
+</script>
 ```
 </details>
