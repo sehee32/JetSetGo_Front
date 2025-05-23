@@ -442,11 +442,12 @@ methods: {
 
 
 ![마이페이지2](https://github.com/user-attachments/assets/eba02992-1498-4f94-916a-a1975b06111f)
-<details><summary>주요 코드
-</summary>
+<details>
+<summary>주요 코드</summary>
 
+```
 <script>
-   methods: {
+methods: {
     ...mapActions(['logout']),
     async submitPassword() {
       this.loading = true;
@@ -488,9 +489,7 @@ methods: {
       }
     }
 </script>
-
-</details>
-
+```
 ![마이페이지3](https://github.com/user-attachments/assets/ec963116-9217-4590-ae30-e3e0f5917d31)
 <details><summary>주요 코드
 </summary>
