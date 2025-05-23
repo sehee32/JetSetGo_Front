@@ -17,7 +17,7 @@
 
 - 회원가입, 로그인 기능 구현
  
-- 항공권 조회, 예매, 결제 페이지 개발
+- Amadeus API를 활용한 항공권 조회, 예매, 결제 페이지 개발
 
 - Vue.js, Axios, Spring Boot, MyBatis 등을 활용하여 백엔드 API와 연동
 
