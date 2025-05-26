@@ -1287,12 +1287,56 @@ async Payment() {
 </summary>
 
 ```
-<templeat>
-
-</templeat>
-
 <script>
- 
+async Payment() {
+
+
+      const IMP = window.IMP;
+      IMP.init("imp12777257");
+
+try {
+   if (this.verificationSuccess) {
+          // 결제 진행
+          IMP.request_pay({
+            // param
+            pg: "kakaopay",
+            merchant_uid: "uid_" + this.member_Id + date,   // 주문 번호
+            channelKey: "channel-key-016f94c1-5b8c-448d-81ee-f544a25da15b",
+            paymentId: `payment-${crypto.randomUUID()}`,
+            name: "항공권 예약",
+            pay_method: "card",
+            amount: this.totalPrice
+          }, async function (rsp) {
+            // callback
+            this.verificationSuccess = rsp.success
+            console.log("결제 결과: ", rsp)
+
+            for (let i=0; i < this.passengers.length; i++) {
+              /* 결제 완료 내역 DB 저장 */
+              const response = await axios.post('/api/payment', {
+                reservation_Id: `${this.member_Id}_${this.passengers[i].passengerName}_${date}`,
+                status: this.verificationSuccess,
+                amount: this.totalPrice
+              });
+              console.log("결제 완료 내역 DB 저장 결과", response.data); // 서버로부터의 응답 확인
+            }
+            this.$router.push({
+              path: "/paymentcompleted",
+              query: {
+                amount: this.totalPrice,
+                paymentMethod: "카드",
+                reservationId: `${this.member_Id}_${this.passengers[0].passengerName}_${date}`
+              }
+            });
+          }.bind(this));
+        }
+      } catch (error) {
+        console.error("[ERROR] 결제 실패:", error);
+        this.verificationMessage = '[ERROR] 결제가 실패했습니다.';
+        this.verificationSuccess = false; // 인증 실패 시 변수 값을 false로 설정
+      }
+}
 </script>
 ```
 </details>
+
