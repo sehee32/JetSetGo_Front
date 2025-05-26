@@ -21,7 +21,7 @@
 
 - Vue.js, Axios, Spring Boot, MyBatis 등을 활용하여 백엔드 API와 연동
 
-- Iamport API를 활용한 본인 인증 및 결제 연동
+- PortOne(구 Iamport) API를 활용한 본인 인증 및 결제 연동
 
 <br><br>
 
@@ -266,7 +266,7 @@ async verify() {
 
 ### 마이페이지 (MyPage.vue)
 
-![마이페이지1](https://github.com/user-attachments/assets/fbee741d-ca44-44ae-b6f3-df2975876c81)
+>연락처 정보, 비밀번호 변경, 예약목록 확인![마이페이지1](https://github.com/user-attachments/assets/fbee741d-ca44-44ae-b6f3-df2975876c81)
 <details><summary>주요 코드
 </summary>
 
@@ -442,7 +442,7 @@ methods: {
 <br><br>
 
 
-![마이페이지2](https://github.com/user-attachments/assets/eba02992-1498-4f94-916a-a1975b06111f)
+>회원 탈퇴 기능![마이페이지2](https://github.com/user-attachments/assets/eba02992-1498-4f94-916a-a1975b06111f)
 <details><summary>주요 코드
 </summary>
 
@@ -498,7 +498,7 @@ methods: {
 </details>
 <br><br>
 
-![마이페이지3](https://github.com/user-attachments/assets/ec963116-9217-4590-ae30-e3e0f5917d31)
+>여권 정보, 예약 항공편 변경![마이페이지3](https://github.com/user-attachments/assets/ec963116-9217-4590-ae30-e3e0f5917d31)
 <details><summary>주요 코드
 </summary>
 
@@ -583,11 +583,11 @@ watch: {
 </details>
 <br><br>
 
->예약이 변경됨
-![마이페이지4](https://github.com/user-attachments/assets/608e08dd-5d70-4b35-b28c-7166470a92ab)
+>예약이 변경됨![마이페이지4](https://github.com/user-attachments/assets/608e08dd-5d70-4b35-b28c-7166470a92ab)
+
 <br><br>
 
-![마이페이지5](https://github.com/user-attachments/assets/e44f1bce-945a-4599-af6e-c09fd8ba973f)
+>예약 취소![마이페이지5](https://github.com/user-attachments/assets/e44f1bce-945a-4599-af6e-c09fd8ba973f)
 <details><summary>주요 코드
 </summary>
 
@@ -624,7 +624,7 @@ watch: {
 
 ### 문의하기 (SupportPage.vue)
 
-![문의1](https://github.com/user-attachments/assets/325b43eb-451f-4307-a074-3cb5ae321efc)
+>문의글 작성, 문의 게시판 카테고리 별 분류, 비공개 글 암호 기능![문의1](https://github.com/user-attachments/assets/325b43eb-451f-4307-a074-3cb5ae321efc)
 <details><summary>주요 코드
 </summary>
 
@@ -729,9 +729,9 @@ async search({ page, itemsPerPage }) {
 </script>
 ```
 </details>
+<br><br>
 
-
-![문의2](https://github.com/user-attachments/assets/f961cbfd-5d98-4b84-9502-703d30f1268d)
+>문의글 수정![문의2](https://github.com/user-attachments/assets/f961cbfd-5d98-4b84-9502-703d30f1268d)
 
 <details><summary>주요 코드
 </summary>
@@ -819,7 +819,7 @@ computed: {
 
 ### 항공권 조회 (BookingPage.vue)
 
-![검색1](https://github.com/user-attachments/assets/cb1916d4-748e-4e83-9558-75f7dd1c3525)
+>출발지&도착지 자동완성 기능, 항공편 검색![검색1](https://github.com/user-attachments/assets/cb1916d4-748e-4e83-9558-75f7dd1c3525)
 <details><summary>주요 코드
 </summary>
 
@@ -911,9 +911,10 @@ computed: {
 </script>
 ```
 </details>
+<br><br>
 
 
-![검색2](https://github.com/user-attachments/assets/5fb531ee-abea-4b05-b9e0-82a69e4321ee)
+>항공편 목록 정렬, 페이징 기능![검색2](https://github.com/user-attachments/assets/5fb531ee-abea-4b05-b9e0-82a69e4321ee)
 <details><summary>주요 코드
 </summary>
 
@@ -993,8 +994,9 @@ computed: {
 </script>
 ```
 </details>
+<br><br>
 
-![검색3](https://github.com/user-attachments/assets/6a56866f-de94-44ce-a3b8-7d3e5a5d160d)
+>항공편 검색 조건 변경 후 재검색![검색3](https://github.com/user-attachments/assets/6a56866f-de94-44ce-a3b8-7d3e5a5d160d)
 <details><summary>주요 코드
 </summary>
 
@@ -1083,8 +1085,9 @@ export default {
 </script>
 ```
 </details>
+<br><br>
 
-![검색4](https://github.com/user-attachments/assets/cecc9d71-6576-422f-b5dc-fbba00b14374)
+>항공편 선택 후 정보 입력 페이지로 데이터 라우팅![검색4](https://github.com/user-attachments/assets/cecc9d71-6576-422f-b5dc-fbba00b14374)
 <details><summary>주요 코드
 </summary>
 
@@ -1179,9 +1182,9 @@ async Payment() {
 
 ---
 
-### 항공권 예매
+### 항공권 예매 (BookingDetail.vue)
 
-![예매1](https://github.com/user-attachments/assets/1cfc4cb1-061a-4dbd-abd0-8b853690ec80)
+>승객 정보 입력 후 결제![예매1](https://github.com/user-attachments/assets/1cfc4cb1-061a-4dbd-abd0-8b853690ec80)
 
 <details><summary>주요 코드
 </summary>
@@ -1279,9 +1282,9 @@ async Payment() {
 
 ---
 
-### 항공권 결제
+### 항공권 결제 (BookingDetail.vue)
 
-![결제1](https://github.com/user-attachments/assets/06af637d-71de-4e83-9d6a-2aabfecc6507)
+>아임포트(포트원) API 이용하여 결제 ![결제1](https://github.com/user-attachments/assets/06af637d-71de-4e83-9d6a-2aabfecc6507)
 
 <details><summary>주요 코드
 </summary>
@@ -1339,4 +1342,3 @@ try {
 </script>
 ```
 </details>
-
