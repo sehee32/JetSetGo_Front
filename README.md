@@ -622,7 +622,7 @@ watch: {
 
 ---
 
-### 문의하기
+### 문의하기 (SupportPage.vue)
 
 ![문의1](https://github.com/user-attachments/assets/325b43eb-451f-4307-a074-3cb5ae321efc)
 <details><summary>주요 코드
@@ -817,7 +817,7 @@ computed: {
 
 ---
 
-### 항공권 조회
+### 항공권 조회 (BookingPage.vue)
 
 ![검색1](https://github.com/user-attachments/assets/cb1916d4-748e-4e83-9558-75f7dd1c3525)
 <details><summary>주요 코드
@@ -1000,11 +1000,86 @@ computed: {
 
 ```
 <templeat>
+(TicketSearch.vue)
+<!-- 일정 변경 버튼 -->
+<v-btn @click="toggleSchedulePanel">일정 변경</v-btn>
 
+<!-- 일정 변경 패널 -->
+<v-expand-transition>
+  <div v-show="showSchedulePanel">
+    <ScheduleChangePanel 
+      @update-schedule="handleScheduleUpdate"
+      :initialDeparture="departureMutable"
+      :initialDestination="destinationMutable"
+      :initialDepartureDate="departureDateMutable"
+      :initialReturnDate="returnDateMutable"
+      :initialAdults="adults"
+      :initialChildren="children"
+      :initialTravelClass="travelClass"
+      :initialNonStop="nonStop"
+    />
+  </div>
+</v-expand-transition>
+
+(ScheduleChangePanel.vue)
+ <v-card>
+    <v-form @submit.prevent="updateSchedule">
+      <!-- 검색 조건 입력 필드들 -->
+      <v-autocomplete v-model="departure" label="출발지"/>
+      <v-autocomplete v-model="destination" label="도착지"/>
+      <v-text-field v-model="departureDate" type="date"/>
+      <v-text-field v-model="returnDate" type="date"/>
+      
+      <!-- 변경 버튼 -->
+      <v-btn @click="updateSchedule">변경하기</v-btn>
+    </v-form>
+  </v-card>
 </templeat>
 
 <script>
- 
+(TicketSearch.vue)
+ methods: {
+  // 일정 변경 패널 토글
+  toggleSchedulePanel() {
+    this.showSchedulePanel = !this.showSchedulePanel
+  },
+
+  // 새 일정 반영 및 재검색
+  handleScheduleUpdate(newSchedule) {
+    this.departureMutable = newSchedule.departure
+    this.destinationMutable = newSchedule.destination
+    this.departureDateMutable = newSchedule.departureDate
+    this.returnDateMutable = newSchedule.returnDate
+    this.adultsMutable = newSchedule.adults
+    this.childrenMutable = newSchedule.children
+    this.travelClassMutable = newSchedule.travelClass
+    this.nonStopMutable = newSchedule.nonStop
+
+    this.journeyStage = 'outgoing' // 여정 단계 초기화
+    this.selectedFlightId = null
+    this.returnFlightId = null
+    
+    this.searchFlights() // 변경된 조건으로 재검색 실행
+  }
+}
+
+(ScheduleChangePanel.vue)
+export default {
+  methods: {
+    updateSchedule() {
+      this.$emit('update-schedule', {
+        departure: this.departure,
+        destination: this.destination,
+        departureDate: this.departureDate,
+        returnDate: this.returnDate,
+        adults: this.adults,
+        children: this.children,
+        travelClass: this.travelClass,
+        nonStop: this.nonStop
+      })
+    }
+  }
+}
 </script>
 ```
 </details>
@@ -1015,12 +1090,89 @@ computed: {
 
 ```
 <templeat>
-
+<!-- 항공편 선택 이벤트 -->
+<div 
+  v-for="flight in paginatedFlights" 
+  :key="flight.id"
+  @click="selectFlight(flight.id)">
+  <!-- 항공편 정보 표시 -->
+</div>
 </templeat>
 
 <script>
- 
+ methods: {
+  // 항공편 선택
+  selectFlight(flightId) {
+    if (this.journeyStage === 'outgoing') {
+      this.selectedFlightId = flightId; // 가는 편 선택
+    } else if (this.journeyStage === 'return') {
+      this.returnFlightId = flightId; // 오는 편 선택
+    }
+  },
+
+  // 다음 여정으로 이동
+  NextJourney() {
+    if (this.selectedFlightId) {
+      this.journeyStage = 'return'; // 오는 편 선택 모드로 전환
+      this.searchFlights(); // 오는 편 항공편 재검색
+    }
+  },
+
+async Payment() {
+    // 가는 편 정보 저장
+    const outgoingFlight = {
+      ...this.currentFlights.find(f => f.id === this.selectedFlightId),
+      departure: this.departureMutable,
+      destination: this.destinationMutable,
+      departureDate: this.departureDateMutable
+    };
+
+    // 오는 편 정보 저장 (왕복인 경우)
+    let returnFlight = null;
+    if (this.returnFlightId) {
+      returnFlight = {
+        ...this.currentFlights.find(f => f.id === this.returnFlightId),
+        departure: this.destinationMutable, // 출발지/도착지 스왑
+        destination: this.departureMutable,
+        departureDate: this.returnDateMutable
+      };
+    }
+
+    // 총 가격 계산
+    const totalPrice = outgoingFlight.price + (returnFlight?.price || 0);
+
+    // BookingDetail 페이지로 이동
+    await this.$router.push({
+      name: 'BookingDetail',
+      query: {
+        outgoingFlight: encodeURIComponent(JSON.stringify(outgoingFlight)),
+        returnFlight: encodeURIComponent(JSON.stringify(returnFlight || {})),
+        adults: this.adultsMutable,
+        children: this.childrenMutable,
+        travelClass: this.travelClassMutable,
+        totalPrice: totalPrice,
+        nonStop: this.nonStopMutable
+      }
+    });
+  }
+}
 </script>
+
+
+라우터설정(router/index.js)
+{
+  path: '/booking',
+  name: 'BookingDetail',
+  component: () => import('@/views/BookingDetail.vue'),
+  props: (route) => ({
+    outgoingFlight: JSON.parse(decodeURIComponent(route.query.outgoingFlight)),
+    returnFlight: JSON.parse(decodeURIComponent(route.query.returnFlight)),
+    adults: Number(route.query.adults),
+    children: Number(route.query.children),
+    travelClass: route.query.travelClass,
+    totalPrice: Number(route.query.totalPrice)
+  })
+}
 ```
 </details>
 
@@ -1036,11 +1188,91 @@ computed: {
 
 ```
 <templeat>
+ <!-- 승객 정보 폼 동적 생성 -->
+  <div v-for="(passenger, index) in passengers" :key="index" class="passenger-form">
+    <div class="passenger-header" @click="toggleForm(index)">
+      <span class="passenger-number">승객 {{ index + 1 }}</span>
+    </div>
+    <div v-if="expandedForms[index]" class="form-content">
+      <!-- 로그인 사용자 정보 자동 입력 -->
+      <input type="text" v-model="passenger.passengerName" placeholder="이름">
+      <input type="text" v-model="passenger.birthDate" placeholder="생년월일">
+    </div>
+  </div>
 
+  <!-- 결제 정보 표시 -->
+  <div class="payment-section">
+    <span class="amount">{{formatNumberWithCommas(totalPrice)}}원</span>
+    <button @click="Payment">결제하기</button>
+  </div>
 </templeat>
 
 <script>
- 
+ export default {
+  data() {
+    return {
+      passengers: [], // 승객 수에 따른 동적 배열
+      totalPrice: 0   // TicketSearch.vue에서 전달받은 금액
+    }
+  },
+ mounted() {
+    this.fetchUserInfos();
+  },
+  methods: {
+    // 로그인 사용자 정보 조회
+    async fetchUserInfos() {
+      const token = localStorage.getItem('jwtToken'); // 저장된 토큰 가져오기
+      if (token) {
+        try {
+          const response = await axios.post('/api/getUserInfos', {
+            token: token // 토큰을 본문에 포함
+          });
+          this.name = response.data.name; // 사용자 정보를 변수에 저장
+          this.id = response.data.username;
+          this.phoneNumber = response.data.phoneNumber;
+          this.contact = response.data.phoneNumber;
+          this.birthDate = response.data.birthdate;
+          this.userPassword = response.data.password;
+          this.member_Id = response.data.membernum;
+
+          if (this.passengers.length > 0) {
+            this.passengers[0].passengerName = response.data.name;
+            this.passengers[0].birthDate = response.data.birthdate;
+          }
+        } catch (error) {
+          console.error('Error fetching user info:', error);
+        }
+      }
+    },
+
+    // 결제 처리 및 페이지 이동
+    async Payment() {
+      await axios.post('/api/reservation', { /* 예약 데이터 */ });
+      this.$router.push({
+        path: "/paymentcompleted",
+        query: { amount: this.totalPrice }
+      });
+    }
+  },
+  created() {
+   // 라우터에서 데이터 파싱
+    const query = this.$route.query;
+    this.outgoingFlight = JSON.parse(decodeURIComponent(query.outgoingFlight || '{}'));
+    this.returnFlight = JSON.parse(decodeURIComponent(query.returnFlight || '{}'));
+
+   // 총 승객 수 계산 및 초기화
+    this.totalPassenger = this.adults + this.children;
+
+    this.passengers = Array.from({ length: this.totalPassenger }, () => ({
+      nationality: "",
+      passengerName: "",
+      gender: "",
+      birthDate: "",
+    }));
+    this.expandedForms = Array(this.totalPassenger).fill(false);  // expandedForms도 총 승객 수에 맞게 초기화
+    this.expandedForms[0] = true; // 첫번째 폼은 펼쳐짐
+}
+
 </script>
 ```
 </details>
