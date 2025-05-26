@@ -825,11 +825,89 @@ computed: {
 
 ```
 <templeat>
+<!-- 출발지 자동완성 -->
+<v-autocomplete
+  v-model="departure"
+  label="출발지"
+  :items="cities"
+  item-value="value"
+  item-title="label"
+  @keyup="searchAirports($event.target.value, 'departure')"
+  no-data-text="일치하는 도시가 없습니다."
+></v-autocomplete>
 
+<!-- 도착지 자동완성 -->
+<v-autocomplete
+  v-model="destination"
+  label="도착지"
+  :items="cities"
+  item-value="value"
+  item-title="label"
+  @keyup="searchAirports($event.target.value, 'destination')"
+  no-data-text="일치하는 도시가 없습니다."
+></v-autocomplete>
 </templeat>
 
 <script>
- 
+ methods: {
+  // 공항 데이터 로드
+  async loadAirports() {
+    const response = await axios.get('/api/flights/airports', {
+      params: { keyword: this.keyword }
+    });
+    
+    this.cities = response.data.airports.map(airport => ({
+      label: `${airport.city} (${airport.code})`, // "서울 (ICN)" 형식
+      value: airport.code // 공항 코드
+    }));
+  },
+
+  // 실시간 검색 필터링
+  async searchAirports(keyword) {
+      this.keyword = keyword;
+      console.log('입력값 : ', keyword);
+
+      if (keyword) {
+        let keywordData = '';
+        console.log(this.cities);
+        keywordData = this.cities.filter(item =>
+            item.label.toLowerCase().includes(keyword.toLowerCase())
+        );
+        console.log(keywordData);
+      } else {
+        this.keywordData = this.cities;
+      }
+    },
+
+// 예매 정보 처리 메서드
+    bookTicket() {
+      if (!this.departure || !this.destination) {
+        console.log("출발지 또는 도착지가 비어 있습니다.");
+        return;
+      }
+
+      console.log('선택된 travelClass: ', this.travelClass);
+
+      const formattedDepartureDate = this.formatDate(this.departureDate);
+      const formattedReturnDate = this.returnDate ? this.formatDate(this.returnDate) : null; // 오는 날이 없을 경우 null로 처리
+
+      this.$router.push({
+        name: 'TicketSearch',
+        query: {
+          departure: this.departure,
+          departureCity: this.departureCity,
+          destination: this.destination,
+          destinationCity: this.destinationCity,
+          departureDate: formattedDepartureDate,
+          returnDate: formattedReturnDate,
+          adults: Number(this.adults),
+          children: Number(this.children),
+          travelClass: this.travelClass,
+          nonStop: this.nonStop
+        }
+      });
+    }
+
 </script>
 ```
 </details>
@@ -841,11 +919,77 @@ computed: {
 
 ```
 <templeat>
+<!-- 정렬 옵션 선택 UI -->
+<div class="sort-container">
+  <v-select
+    v-model="sortOption"
+    :items="sortOptions"
+    label="정렬 기준"
+    dense
+    outlined
+  ></v-select>
+</div>
 
+<!-- 페이지 네비게이션 -->
+<v-row v-if="!isLoading">
+  <v-col cols="12" class="text-center">
+    <v-btn
+      v-for="pageNumber in Math.ceil(currentFlights.length / flightsPerPage)"
+      :key="pageNumber"
+      @click="changePage(pageNumber)"
+    >
+      {{ pageNumber }}
+    </v-btn>
+  </v-col>
+</v-row>
 </templeat>
 
 <script>
- 
+ export default {
+  data() {
+    return {
+      sortOption: '출발시간 빠른순',
+      sortOptions: [
+        '출발시간 빠른순',
+        '출발시간 늦은순', 
+        '최저가순'
+      ],
+      flightsPerPage: 5,
+      currentPage: 1
+    }
+  },
+  watch: {
+    sortOption() {
+      this.sortFlights() // 정렬 옵션 변경 시 재정렬
+    }
+  },
+computed: {
+    paginatedFlights() {
+      const start = (this.currentPage - 1) * this.flightsPerPage
+      const end = start + this.flightsPerPage
+      return this.currentFlights.slice(start, end) // 현재 페이지 데이터 추출
+    }
+  },
+  methods: {
+    sortFlights() {
+      if (this.sortOption === '출발시간 빠른순') {
+        this.currentFlights.sort((a, b) => 
+          new Date(a.departureTime) - new Date(b.departureTime)
+        )
+      } else if (this.sortOption === '출발시간 늦은순') {
+        this.currentFlights.sort((a, b) =>
+          new Date(b.departureTime) - new Date(a.departureTime)
+        )
+      } else if (this.sortOption === '최저가순') {
+        this.currentFlights.sort((a, b) => a.price - b.price)
+      }
+    },
+
+   changePage(pageNumber) {
+      this.currentPage = pageNumber // 페이지 변경 핸들러
+    }
+  }
+}
 </script>
 ```
 </details>
