@@ -738,11 +738,79 @@ async search({ page, itemsPerPage }) {
 
 ```
 <templeat>
+<!-- 비밀번호 입력 다이얼로그 -->
+<v-dialog v-model="passwordDialog" max-width="500px">
+  <v-card>
+    <v-card-title>비밀번호 입력</v-card-title>
+    <v-card-text>
+      <v-text-field 
+        v-model="password" 
+        label="비밀번호" 
+        type="password"
+        @keyup.enter="submitPassword"></v-text-field>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="primary" @click="submitPassword">확인</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
 
+<!-- 공개여부 스위치 -->
+<v-switch
+  v-model="isPublic"
+  :label="isPublic ? '공개' : '비공개'"
+  color="primary"
+  @change="handlePublicChange"
+  :disabled="!editable">
+</v-switch>
 </templeat>
 
 <script>
- 
+(SupportPage.vue)
+ methods: {
+  showDetail(event, { item }) {
+    if (!item.public_Status) {
+      this.openPasswordDialog(item.support_Id); // 비공개 문의 시 다이얼로그 오픈
+    } else {
+      this.goDetail(item.support_Id);
+    }
+  },
+  async submitPassword() {
+    try {
+      const response = await axios.post('/api/supportCheckPassword', {
+        supportId: this.selectedSupportNum,
+        password: this.password
+      });
+      if(response.data){
+        this.goDetail(this.selectedSupportNum); // 인증 성공 시 상세 페이지 이동
+      }
+    } catch (error) {
+      alert('비밀번호 확인 실패');
+    }
+  }
+}
+
+
+(SupportDetail.vue)
+async submit() {
+    await axios.post('/api/supportEdit', {
+      public_Status: this.isPublic, // 수정된 공개 상태 전송
+      title: this.title,
+      detail: this.detail
+    });
+    alert('수정 완료');
+  },
+  handlePublicChange() {
+    if (!this.isPublic) {
+      alert('⚠️ 비공개 시 비밀번호 필요');
+    }
+  }
+},
+computed: {
+  editable() {
+    return this.sessionId === this.writerName; // 작성자만 수정 가능
+  }
+
 </script>
 ```
 </details>
