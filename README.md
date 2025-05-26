@@ -630,14 +630,106 @@ watch: {
 
 ```
 <templeat>
-
+<!--유형-->
+          <v-row no-gutters>
+            <v-col cols="1">
+              <v-sheet class="pa-3 fontSize20">
+                유형<span class="colRed">*</span>
+              </v-sheet>
+            </v-col>
+            <v-col>
+              <v-sheet>
+                <v-select
+                    v-model="selectedCategory"
+                    variant="outlined"
+                    placeholder="선택해주세요."
+                    :items="categories"
+                    item-title="name"
+                    item-value="value"
+                    :rules="[rules.requiredSelect]"
+                ></v-select>
+              </v-sheet>
+            </v-col>
+          </v-row>
+          <!--공개여부-->
+          <v-row no-gutters>
+            <v-col cols="1">
+              <v-sheet class="pa-3 fontSize20">
+                공개여부
+              </v-sheet>
+            </v-col>
+            <v-col>
+              <v-sheet>
+                <v-switch
+                    v-model="isPublic"
+                    :label="switchLabel"
+                    color="primary"
+                    @change="onSwitchChange"
+                    inset
+                ></v-switch>
+              </v-sheet>
+            </v-col>
+          </v-row>
 </templeat>
 
 <script>
- 
+ (SupportInquiry.vue)
+ // 데이터 정의
+data() {
+  return {
+    selectedCategory: null,
+    isPublic: true,
+    categories: [
+      { name: '항공권', value: 'ticket' },
+      { name: '수하물', value: 'baggage' }
+    ]
+  }
+}
+
+// 문의 등록 메서드
+async submit() {
+  const response = await axios.post('/api/supportAdd', {
+    category: this.selectedCategory,
+    public_Status: this.isPublic,
+    title: this.title,
+    detail: this.detail
+  });
+  if(response.data) {
+    this.$router.push('/support'); // 등록 후 목록 페이지 이동
+  }
+}
+
+
+(SupportPage.vue)
+// 카테고리 데이터
+categories: [
+  { name: '전체', value: 'total' },
+  { name: '항공권', value: 'ticket' },
+  { name: '수하물', value: 'baggage' }
+]
+
+// 카테고리 선택 메서드
+methods: {
+  setCategory(categoryValue) {
+    this.category = categoryValue;
+    this.search({ 
+      page: this.currentPage,
+      itemsPerPage: this.itemsPerPage
+    });
+  }
+}
+
+// 서버 검색 요청
+async search({ page, itemsPerPage }) {
+  const response = await axios.post('/api/supportSearch', {
+    category: this.category
+  });
+  this.searchResults = response.data; // 필터링된 결과 저장
+}
 </script>
 ```
 </details>
+
 
 ![문의2](https://github.com/user-attachments/assets/f961cbfd-5d98-4b84-9502-703d30f1268d)
 
