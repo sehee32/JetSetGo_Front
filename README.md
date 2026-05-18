@@ -57,6 +57,7 @@ npm run build
 ```
 
 
+
 ## ✍️ QA Testing
 
 - 회원가입 / 로그인 기능 테스트
@@ -66,6 +67,7 @@ npm run build
 
 📄 테스트케이스 문서:
 - JetSetGo_TC.xlsx
+
 
 
 ## 🌟 주요 기능
